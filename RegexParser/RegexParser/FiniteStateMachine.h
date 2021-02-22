@@ -2,8 +2,10 @@
 
 #include "State.h"
 #include "Arc.h"
+
 #include <set>
 #include <random>
+#include <memory>
 
 /// <summary>
 /// Описывает конечный автомат.
@@ -41,12 +43,14 @@ public:
 	/// </summary>
 	void next();
 
+	bool isInFinalState() const;
 
 private:
-	const State& _currentState;
+	std::unique_ptr<const State> _currentState;
 	std::set<State> _states;
 	std::set<State> _finalStates;
 	std::set<Arc> _arcs;
+	bool _isInFinalState;
 
 	std::mt19937 _engine;
 };

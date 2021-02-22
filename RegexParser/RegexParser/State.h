@@ -18,12 +18,13 @@ public:
 
 	bool operator == (const State& state) const;
 	bool operator < (const State& state) const;
+	State& operator = (const State& state);
 
 private:
 	/// <summary>
 	/// Идентификатор состояния.
 	/// </summary>
-	const unsigned _stateId;
+	unsigned _stateId;
 
 	/// <summary>
 	/// Глобальный идентификатор состояния для присваивания вновь созданным состояниям.
