@@ -148,7 +148,6 @@
   <ItemGroup>
     <ClInclude Include="Arc.h" />
     <ClInclude Include="FiniteStateMachine.h" />
-    <ClInclude Include="Uuid.h" />
     <ClInclude Include="Regex.h" />
     <ClInclude Include="State.h" />
   </ItemGroup>

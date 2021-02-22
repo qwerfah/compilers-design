@@ -18,3 +18,8 @@ char Arc::getMark() const
 {
     return _mark;
 }
+
+bool Arc::operator < (const Arc& arc) const
+{
+    return this->_initialState < arc._initialState;
+}

@@ -1,10 +1,23 @@
 #include "State.h"
-#include "Uuid.h"
 
-State::State() : _stateUid(newUUID())
+unsigned State::_globalId = 0;
+
+State::State() : _stateId(_globalId++)
 { }
 
-const std::string& State::getUid() const
+unsigned State::getId() const
 {
-	return _stateUid;
+	return _stateId;
 }
+
+bool State::operator == (const State& state) const
+{
+	return this->_stateId == state._stateId;
+}
+
+bool State::operator < (const State& state) const
+{
+	return this->_stateId < state._stateId;
+}
+
+
