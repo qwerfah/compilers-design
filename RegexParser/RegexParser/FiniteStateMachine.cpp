@@ -14,8 +14,11 @@ FiniteStateMachine::FiniteStateMachine() :
 FiniteStateMachine::FiniteStateMachine(const std::set<State>& states,
 									   const std::set<State>& finalStates,
 									   const State& currentState,
-									   const std::set<Arc>& arcs)
-	: _states(states), _finalStates(finalStates), _currentState(std::unique_ptr<const State>(&currentState)), _arcs(arcs)
+									   const std::set<Arc>& arcs) : 
+	_states(states), 
+	_finalStates(finalStates), 
+	_currentState(std::unique_ptr<const State>(&currentState)), 
+	_arcs(arcs)
 {
 	_engine = std::mt19937(std::random_device()());
 	_isInFinalState = false;
@@ -35,6 +38,7 @@ void FiniteStateMachine::addFinalState(const State& state)
 void FiniteStateMachine::addArc(const Arc& arc)
 {
 	_arcs.insert(arc);
+	_states.insert({ arc.getInitialState() , arc.getIFinalState() });
 }
 
 void FiniteStateMachine::next()

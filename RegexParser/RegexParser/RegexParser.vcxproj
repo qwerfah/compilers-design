@@ -141,14 +141,22 @@
   <ItemGroup>
     <ClCompile Include="Arc.cpp" />
     <ClCompile Include="FiniteStateMachine.cpp" />
+    <ClCompile Include="Literal.cpp" />
+    <ClCompile Include="Or.cpp" />
     <ClCompile Include="Regex.cpp" />
+    <ClCompile Include="RegularExpression.cpp" />
     <ClCompile Include="RegexParser.cpp" />
+    <ClCompile Include="Repeat.cpp" />
     <ClCompile Include="State.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Arc.h" />
     <ClInclude Include="FiniteStateMachine.h" />
+    <ClInclude Include="Literal.h" />
+    <ClInclude Include="Or.h" />
     <ClInclude Include="Regex.h" />
+    <ClInclude Include="RegularExpression.h" />
+    <ClInclude Include="Repeat.h" />
     <ClInclude Include="State.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

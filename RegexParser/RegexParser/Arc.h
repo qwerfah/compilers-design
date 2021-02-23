@@ -8,7 +8,7 @@
 class Arc
 {
 public:
-	Arc(const State& initialState, const State& finalState, char mark);
+	Arc(const State& initialState = State(), const State& finalState = State(), char mark = 0);
 
 	/// <summary>
 	/// ѕолучить состо€ние, из которого исходит данна€ дуга.

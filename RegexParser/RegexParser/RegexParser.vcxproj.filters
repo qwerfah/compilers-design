@@ -13,36 +13,72 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Исходные файлы\FiniteStateMachine">
+      <UniqueIdentifier>{7166ef7c-eaea-4e4f-a732-f6054ce0753f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\FiniteStateMachine">
+      <UniqueIdentifier>{122190b7-d569-41cc-bba6-8619961708bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Regex">
+      <UniqueIdentifier>{9d0520a5-21e3-4af3-83b3-a4f7b5653d51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Regex">
+      <UniqueIdentifier>{98fa6a8a-1d23-4492-b6be-3513b05fdd4b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RegexParser.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Regex.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="FiniteStateMachine.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="State.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Исходные файлы\FiniteStateMachine</Filter>
     </ClCompile>
     <ClCompile Include="Arc.cpp">
+      <Filter>Исходные файлы\FiniteStateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="State.cpp">
+      <Filter>Исходные файлы\FiniteStateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="Regex.cpp">
+      <Filter>Исходные файлы\Regex</Filter>
+    </ClCompile>
+    <ClCompile Include="Literal.cpp">
+      <Filter>Исходные файлы\Regex</Filter>
+    </ClCompile>
+    <ClCompile Include="Or.cpp">
+      <Filter>Исходные файлы\Regex</Filter>
+    </ClCompile>
+    <ClCompile Include="Repeat.cpp">
       <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="RegularExpression.cpp">
+      <Filter>Исходные файлы\Regex</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Regex.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="FiniteStateMachine.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="Arc.h">
+      <Filter>Файлы заголовков\FiniteStateMachine</Filter>
     </ClInclude>
     <ClInclude Include="State.h">
+      <Filter>Файлы заголовков\FiniteStateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="FiniteStateMachine.h">
+      <Filter>Файлы заголовков\FiniteStateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="Regex.h">
+      <Filter>Файлы заголовков\Regex</Filter>
+    </ClInclude>
+    <ClInclude Include="Literal.h">
+      <Filter>Файлы заголовков\Regex</Filter>
+    </ClInclude>
+    <ClInclude Include="Or.h">
+      <Filter>Файлы заголовков\Regex</Filter>
+    </ClInclude>
+    <ClInclude Include="Repeat.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Arc.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="RegularExpression.h">
+      <Filter>Файлы заголовков\Regex</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
