@@ -139,9 +139,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Any.cpp" />
     <ClCompile Include="Arc.cpp" />
     <ClCompile Include="FiniteStateMachine.cpp" />
     <ClCompile Include="Literal.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="NonZeroRepeat.cpp" />
     <ClCompile Include="Or.cpp" />
     <ClCompile Include="Regex.cpp" />
     <ClCompile Include="RegularExpression.cpp" />
@@ -150,11 +153,14 @@
     <ClCompile Include="State.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Any.h" />
     <ClInclude Include="Arc.h" />
     <ClInclude Include="FiniteStateMachine.h" />
     <ClInclude Include="Literal.h" />
+    <ClInclude Include="NonZeroRepeat.h" />
     <ClInclude Include="Or.h" />
     <ClInclude Include="Regex.h" />
+    <ClInclude Include="RegexParser.h" />
     <ClInclude Include="RegularExpression.h" />
     <ClInclude Include="Repeat.h" />
     <ClInclude Include="State.h" />

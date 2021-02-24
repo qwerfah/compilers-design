@@ -9,5 +9,3 @@ const RegularExpression& NonZeroRepeat::getExpr() const
 {
 	return _expr;
 }
-
-
