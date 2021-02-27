@@ -139,30 +139,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Arc.cpp" />
-    <ClCompile Include="Concat.cpp" />
-    <ClCompile Include="FiniteStateMachine.cpp" />
-    <ClCompile Include="Literal.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Or.cpp" />
-    <ClCompile Include="Regex.cpp" />
-    <ClCompile Include="RegularExpression.cpp" />
-    <ClCompile Include="RegexParser.cpp" />
-    <ClCompile Include="Repeat.cpp" />
-    <ClCompile Include="State.cpp" />
+    <ClCompile Include="src\finite_state_machine\arc.cpp" />
+    <ClCompile Include="src\regex\regular_expression\concat.cpp" />
+    <ClCompile Include="src\finite_state_machine\finite_state_machine.cpp" />
+    <ClCompile Include="src\regex\regular_expression\literal.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\regex\regular_expression\or.cpp" />
+    <ClCompile Include="src\regex\regex.cpp" />
+    <ClCompile Include="src\regex\regular_expression\regular_expression.cpp" />
+    <ClCompile Include="src\regex\regex_parser.cpp" />
+    <ClCompile Include="src\regex\regular_expression\repeat.cpp" />
+    <ClCompile Include="src\finite_state_machine\state.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Arc.h" />
-    <ClInclude Include="Concat.h" />
-    <ClInclude Include="FiniteStateMachine.h" />
-    <ClInclude Include="enums.h" />
-    <ClInclude Include="Literal.h" />
-    <ClInclude Include="Or.h" />
-    <ClInclude Include="Regex.h" />
-    <ClInclude Include="RegexParser.h" />
-    <ClInclude Include="RegularExpression.h" />
-    <ClInclude Include="Repeat.h" />
-    <ClInclude Include="State.h" />
+    <ClInclude Include="include\finite_state_machine\arc.h" />
+    <ClInclude Include="include\regex\regular_expression\concat.h" />
+    <ClInclude Include="include\finite_state_machine\finite_state_machine.h" />
+    <ClInclude Include="include\enums.h" />
+    <ClInclude Include="include\regex\regular_expression\literal.h" />
+    <ClInclude Include="include\regex\regular_expression\or.h" />
+    <ClInclude Include="include\regex\regex.h" />
+    <ClInclude Include="include\regex\regex_parser.h" />
+    <ClInclude Include="include\regex\regular_expression\regular_expression.h" />
+    <ClInclude Include="include\regex\regular_expression\repeat.h" />
+    <ClInclude Include="include\finite_state_machine\state.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

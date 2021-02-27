@@ -1,4 +1,4 @@
-#include "Concat.h"
+#include "../../../include/regex/regular_expression/concat.h"
 
 Concat::Concat(std::shared_ptr<RegularExpression>& expr1, std::shared_ptr<RegularExpression>& expr2) :
 	RegularExpression(expr1->getRawString() + expr2->getRawString()),

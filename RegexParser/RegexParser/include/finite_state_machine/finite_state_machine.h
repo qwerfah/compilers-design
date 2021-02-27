@@ -1,7 +1,7 @@
 #pragma once
 
-#include "State.h"
-#include "Arc.h"
+#include "state.h"
+#include "arc.h"
 
 #include <set>
 #include <random>

@@ -1,4 +1,4 @@
-﻿#include "RegexParser.h"
+﻿#include "../../include/regex/regex_parser.h"
 
 std::shared_ptr<RegularExpression> RegexParser::parse(const std::string& regex)
 {

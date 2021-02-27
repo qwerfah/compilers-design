@@ -1,4 +1,4 @@
-#include "Repeat.h"
+#include "../../../include/regex/regular_expression/repeat.h"
 
 Repeat::Repeat(std::shared_ptr<RegularExpression>& expr, RepeatType type) :
 	RegularExpression(expr->getRawString() + REPEAT_STR),

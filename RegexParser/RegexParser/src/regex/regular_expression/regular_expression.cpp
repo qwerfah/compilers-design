@@ -1,4 +1,4 @@
-#include "RegularExpression.h"
+#include "../../../include/regex/regular_expression/regular_expression.h"
 #include <stdexcept>
 
 RegularExpression::RegularExpression() : _rawString("")

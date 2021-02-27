@@ -2,8 +2,8 @@
 
 #define REPEAT_STR "*"
 
-#include "RegularExpression.h"
-#include "enums.h"
+#include "regular_expression.h"
+#include "../../enums.h"
 
 #include <memory>
 

@@ -5,11 +5,11 @@
 #define UNARY_QUANTIFIERS "?*+"
 #define BINARY_QUANTIFIERS "|"
 
-#include "RegularExpression.h"
-#include "Or.h"
-#include "Concat.h"
-#include "Repeat.h"
-#include "Literal.h"
+#include "../../include/regex/regular_expression/regular_expression.h"
+#include "../../include/regex/regular_expression/or.h"
+#include "../../include/regex/regular_expression/concat.h"
+#include "../../include/regex/regular_expression/repeat.h"
+#include "../../include/regex/regular_expression/literal.h"
 
 #include <memory>
 #include <stdexcept>

@@ -33,73 +33,73 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FiniteStateMachine.cpp">
+    <ClCompile Include="src\finite_state_machine\arc.cpp">
       <Filter>Исходные файлы\FiniteStateMachine</Filter>
     </ClCompile>
-    <ClCompile Include="Arc.cpp">
+    <ClCompile Include="src\finite_state_machine\finite_state_machine.cpp">
       <Filter>Исходные файлы\FiniteStateMachine</Filter>
     </ClCompile>
-    <ClCompile Include="State.cpp">
+    <ClCompile Include="src\finite_state_machine\state.cpp">
       <Filter>Исходные файлы\FiniteStateMachine</Filter>
     </ClCompile>
-    <ClCompile Include="Regex.cpp">
-      <Filter>Исходные файлы\Regex</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="RegexParser.cpp">
+    <ClCompile Include="src\regex\regular_expression\concat.cpp">
+      <Filter>Исходные файлы\Regex\RegularExpression</Filter>
+    </ClCompile>
+    <ClCompile Include="src\regex\regular_expression\literal.cpp">
+      <Filter>Исходные файлы\Regex\RegularExpression</Filter>
+    </ClCompile>
+    <ClCompile Include="src\regex\regular_expression\or.cpp">
+      <Filter>Исходные файлы\Regex\RegularExpression</Filter>
+    </ClCompile>
+    <ClCompile Include="src\regex\regular_expression\regular_expression.cpp">
+      <Filter>Исходные файлы\Regex\RegularExpression</Filter>
+    </ClCompile>
+    <ClCompile Include="src\regex\regular_expression\repeat.cpp">
+      <Filter>Исходные файлы\Regex\RegularExpression</Filter>
+    </ClCompile>
+    <ClCompile Include="src\regex\regex.cpp">
       <Filter>Исходные файлы\Regex</Filter>
     </ClCompile>
-    <ClCompile Include="Literal.cpp">
-      <Filter>Исходные файлы\Regex\RegularExpression</Filter>
-    </ClCompile>
-    <ClCompile Include="Or.cpp">
-      <Filter>Исходные файлы\Regex\RegularExpression</Filter>
-    </ClCompile>
-    <ClCompile Include="RegularExpression.cpp">
-      <Filter>Исходные файлы\Regex\RegularExpression</Filter>
-    </ClCompile>
-    <ClCompile Include="Repeat.cpp">
-      <Filter>Исходные файлы\Regex\RegularExpression</Filter>
-    </ClCompile>
-    <ClCompile Include="Concat.cpp">
-      <Filter>Исходные файлы\Regex\RegularExpression</Filter>
+    <ClCompile Include="src\regex\regex_parser.cpp">
+      <Filter>Исходные файлы\Regex</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Arc.h">
+    <ClInclude Include="include\finite_state_machine\finite_state_machine.h">
       <Filter>Файлы заголовков\FiniteStateMachine</Filter>
     </ClInclude>
-    <ClInclude Include="State.h">
+    <ClInclude Include="include\finite_state_machine\state.h">
       <Filter>Файлы заголовков\FiniteStateMachine</Filter>
     </ClInclude>
-    <ClInclude Include="FiniteStateMachine.h">
+    <ClInclude Include="include\finite_state_machine\arc.h">
       <Filter>Файлы заголовков\FiniteStateMachine</Filter>
     </ClInclude>
-    <ClInclude Include="Regex.h">
-      <Filter>Файлы заголовков\Regex</Filter>
-    </ClInclude>
-    <ClInclude Include="RegexParser.h">
-      <Filter>Файлы заголовков\Regex</Filter>
-    </ClInclude>
-    <ClInclude Include="Literal.h">
-      <Filter>Файлы заголовков\Regex\RegularExpression</Filter>
-    </ClInclude>
-    <ClInclude Include="Or.h">
-      <Filter>Файлы заголовков\Regex\RegularExpression</Filter>
-    </ClInclude>
-    <ClInclude Include="RegularExpression.h">
-      <Filter>Файлы заголовков\Regex\RegularExpression</Filter>
-    </ClInclude>
-    <ClInclude Include="Repeat.h">
-      <Filter>Файлы заголовков\Regex\RegularExpression</Filter>
-    </ClInclude>
-    <ClInclude Include="Concat.h">
-      <Filter>Файлы заголовков\Regex\RegularExpression</Filter>
-    </ClInclude>
-    <ClInclude Include="enums.h">
+    <ClInclude Include="include\enums.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\regex\regular_expression\concat.h">
+      <Filter>Файлы заголовков\Regex\RegularExpression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\regex\regular_expression\literal.h">
+      <Filter>Файлы заголовков\Regex\RegularExpression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\regex\regular_expression\or.h">
+      <Filter>Файлы заголовков\Regex\RegularExpression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\regex\regular_expression\repeat.h">
+      <Filter>Файлы заголовков\Regex\RegularExpression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\regex\regular_expression\regular_expression.h">
+      <Filter>Файлы заголовков\Regex\RegularExpression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\regex\regex.h">
+      <Filter>Файлы заголовков\Regex</Filter>
+    </ClInclude>
+    <ClInclude Include="include\regex\regex_parser.h">
+      <Filter>Файлы заголовков\Regex</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

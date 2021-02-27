@@ -2,7 +2,7 @@
 
 #define OR_STR "|"
 
-#include "RegularExpression.h"
+#include "regular_expression.h"
 
 #include <memory>
 

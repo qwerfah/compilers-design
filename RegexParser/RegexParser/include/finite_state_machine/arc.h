@@ -1,6 +1,6 @@
 #pragma once
 
-#include "State.h"
+#include "state.h"
 
 /// <summary>
 /// Дуга КА (переход между двумя состояниями КА).

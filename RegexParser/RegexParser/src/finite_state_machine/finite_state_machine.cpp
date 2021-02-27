@@ -1,4 +1,4 @@
-#include "FiniteStateMachine.h"
+#include "../../include/finite_state_machine/finite_state_machine.h"
 #include <stdexcept>
 
 FiniteStateMachine::FiniteStateMachine() :

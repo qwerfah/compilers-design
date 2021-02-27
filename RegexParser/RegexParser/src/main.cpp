@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "RegexParser.h"
+#include "../include/regex/regex_parser.h"
 
 void printTree(const std::shared_ptr<RegularExpression>& tree, std::string&& tabs = "")
 {

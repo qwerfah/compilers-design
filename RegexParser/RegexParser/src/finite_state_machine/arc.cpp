@@ -1,4 +1,4 @@
-#include "Arc.h"
+#include "../../include/finite_state_machine/arc.h"
 
 Arc::Arc(const State& initialState, const State& finalState, char mark) :
     _initialState(initialState), _finalState(finalState), _mark(mark)

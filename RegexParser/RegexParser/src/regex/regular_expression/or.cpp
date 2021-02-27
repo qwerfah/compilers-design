@@ -1,4 +1,4 @@
-#include "Or.h"
+#include "../../../include/regex/regular_expression/or.h"
 
 Or::Or(std::shared_ptr<RegularExpression>& expr1, std::shared_ptr<RegularExpression>& expr2) :
 	RegularExpression(expr1->getRawString() + OR_STR + expr2->getRawString()),

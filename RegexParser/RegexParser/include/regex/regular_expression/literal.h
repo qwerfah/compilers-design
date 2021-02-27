@@ -1,7 +1,7 @@
 #pragma once
 
-#include "RegularExpression.h"
-#include "enums.h"
+#include "regular_expression.h"
+#include "../../enums.h"
 
 /// <summary>
 /// Символьный литерал.
