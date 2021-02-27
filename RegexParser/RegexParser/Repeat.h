@@ -3,27 +3,44 @@
 #define REPEAT_STR "*"
 
 #include "RegularExpression.h"
+#include "enums.h"
+
+#include <memory>
 
 /// <summary>
-/// Описывает регулярное выражение "*", предполагающее 
-/// произвольное число повторений указанной конструкции.
+/// Описывает регулярное выражение, предполагающее 
+/// определенное число повторений указанной конструкции.
 /// </summary>
 class Repeat :
     public RegularExpression
 {
 public:
-    Repeat(const RegularExpression& expr);
+    Repeat(std::shared_ptr<RegularExpression>& expr, RepeatType type);
+    Repeat(std::shared_ptr<RegularExpression>&& expr, RepeatType type);
 
     /// <summary>
     /// Получить повторяемое регулярное выражение.
     /// </summary>
     /// <returns> Повторяемое регулярное выражение. </returns>
-    const  RegularExpression& getExpr() const;
+    const std::shared_ptr<RegularExpression>& getExpr() const;
+
+    /// <summary>
+    /// Получить тип конструкции повторения.
+    /// </summary>
+    /// <returns> Тип конструкции повторения. </returns>
+    RepeatType getType() const;
+
+    virtual RegularExpression& operator = (const RegularExpression& other) override;
 
 private:
     /// <summary>
     /// Регулярное выражение, повторяемое в данной конструкции.
     /// </summary>
-    const RegularExpression& _expr;
+    std::shared_ptr<RegularExpression> _expr;
+
+    /// <summary>
+    /// Тип конструкции повторения.
+    /// </summary>
+    RepeatType _type;
 };
 

@@ -20,14 +20,12 @@ bool State::operator < (const State& state) const
 	return this->_stateId < state._stateId;
 }
 
-State& State::operator=(const State& state)
+State& State::operator = (const State& state)
 {
-	if (this == &state)
+	if (this != &state)
 	{
-		return *this;
+		_stateId = state._stateId;
 	}
-
-	_stateId = state._stateId;
 
 	return *this;
 }

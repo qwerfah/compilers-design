@@ -1,20 +1,15 @@
 #pragma once
 
-#define OR_STR "|"
-
 #include "RegularExpression.h"
 
 #include <memory>
 
-/// <summary>
-/// Описывает конструкцию "|" в регулярном выражении.
-/// </summary>
-class Or :
+class Concat :
     public RegularExpression
 {
 public:
-    Or(std::shared_ptr<RegularExpression>& expr1, std::shared_ptr<RegularExpression>& expr2);
-    Or(std::shared_ptr<RegularExpression>&& expr1, std::shared_ptr<RegularExpression>&& expr2);
+    Concat(std::shared_ptr<RegularExpression>& expr1, std::shared_ptr<RegularExpression>& expr2);
+    Concat(std::shared_ptr<RegularExpression>&& expr1, std::shared_ptr<RegularExpression>&& expr2);
 
     /// <summary>
     /// Получить левый операнд конструкции "|".
@@ -29,7 +24,6 @@ public:
     const std::shared_ptr<RegularExpression>& getRightExpr() const;
 
     virtual RegularExpression& operator = (const RegularExpression& other) override;
-
 
 private:
     /// <summary>

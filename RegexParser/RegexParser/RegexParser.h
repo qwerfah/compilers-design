@@ -1,5 +1,19 @@
 #pragma once
+
+#define OPEN_BRACKETS "([{"
+#define CLOSE_BRACKETS ")]}"
+#define UNARY_QUANTIFIERS "?*+"
+#define BINARY_QUANTIFIERS "|"
+
 #include "RegularExpression.h"
+#include "Or.h"
+#include "Concat.h"
+#include "Repeat.h"
+#include "Literal.h"
+
+#include <memory>
+#include <stdexcept>
+#include <stack>
 
 /// <summary>
 /// Парсер регулярных выражений.
@@ -13,9 +27,63 @@ public:
 	/// </summary>
 	/// <param name="regex"> Строковое представление регулярного выражения. </param>
 	/// <returns> Синтаксическое дерево. </returns>
-	RegularExpression parse(const std::string& regex) const;
+	static std::shared_ptr<RegularExpression> parse(const std::string& regex);
 
 private:
 	RegexParser();
-	RegularExpression _parse(std::string& regex) const;
+
+	/// <summary>
+	/// Рекурсивно парсит регулярное выражение, строя на его основе синтаксическое дерево.
+	/// </summary>
+	/// <param name="regex"> Регулярное выражение. </param>
+	/// <returns> Синтаксическое дерево. </returns>
+	static std::shared_ptr<RegularExpression> _parse(std::string&& regex);
+
+	static bool _tryFindOr(std::string& regex, std::shared_ptr<RegularExpression>& expr);
+
+	static bool _tryFindConcat(std::string& regex, std::shared_ptr<RegularExpression>& expr);
+
+	static bool _tryFindQuantifier(std::string& regex, std::shared_ptr<RegularExpression>& expr);
+
+	/// <summary>
+	/// Проверяет регулярное выражение на правильность расстановки скобок.
+	/// </summary>
+	/// <param name="regex"> Регулярное выражение. </param>
+	/// <returns> true - если скобки расставлены корректно или отсутствуют, false - иначе. </returns>
+	static bool _checkBrackets(const std::string& regex);
+
+	/// <summary>
+	/// Првоеряет, является ли переданный символ открывающейся скобкой.
+	/// </summary>
+	/// <param name="ch"> Символ строки. </param>
+	/// <returns> true - если ch является открывающейся скобкой, false - иначе. </returns>
+	static bool _isOpenBracket(char ch);
+
+	/// <summary>
+	/// Првоеряет, является ли переданный символ закрывающейся скобкой.
+	/// </summary>
+	/// <param name="ch"> Символ строки. </param>
+	/// <returns> true - если ch является закрывающейся скобкой, false - иначе. </returns>
+	static bool _isCloseBracket(char ch);
+
+	/// <summary>
+	/// Првоеряет, является ли переданный символ унарным квантификатором.
+	/// </summary>
+	/// <param name="ch"> Символ строки. </param>
+	/// <returns> true - если ch является унарным квантификатором, false - иначе. </returns>
+	static bool _isUnaryQuantifier(char ch);
+
+	/// <summary>
+	/// Првоеряет, является ли переданный символ бинарным квантификатором.
+	/// </summary>
+	/// <param name="ch"> Символ строки. </param>
+	/// <returns> true - если ch является бинарным квантификатором, false - иначе. </returns>
+	static bool _isBinaryQuantifier(char ch);
+
+	/// <summary>
+	/// Првоеряет, является ли переданный символ квантификатором.
+	/// </summary>
+	/// <param name="ch"> Символ строки. </param>
+	/// <returns> true - если ch является квантификатором, false - иначе. </returns>
+	static bool _isQuantifier(char ch);
 };

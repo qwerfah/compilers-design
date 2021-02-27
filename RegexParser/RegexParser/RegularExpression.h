@@ -7,6 +7,7 @@
 class RegularExpression
 {
 public:
+	RegularExpression();
 	RegularExpression(const std::string& rawString);
 
 	/// <summary>
@@ -15,10 +16,12 @@ public:
 	/// <returns> Строковое представление. </returns>
 	const std::string& getRawString() const;
 
+	virtual RegularExpression& operator = (const RegularExpression& other);
+
 protected:
 	/// <summary>
 	/// Строковое представление конструкции регулярного выражения.
 	/// </summary>
-	const std::string _rawString;
+	std::string _rawString;
 };
 

@@ -51,13 +51,7 @@
     <ClCompile Include="RegexParser.cpp">
       <Filter>Исходные файлы\Regex</Filter>
     </ClCompile>
-    <ClCompile Include="Any.cpp">
-      <Filter>Исходные файлы\Regex\RegularExpression</Filter>
-    </ClCompile>
     <ClCompile Include="Literal.cpp">
-      <Filter>Исходные файлы\Regex\RegularExpression</Filter>
-    </ClCompile>
-    <ClCompile Include="NonZeroRepeat.cpp">
       <Filter>Исходные файлы\Regex\RegularExpression</Filter>
     </ClCompile>
     <ClCompile Include="Or.cpp">
@@ -67,6 +61,9 @@
       <Filter>Исходные файлы\Regex\RegularExpression</Filter>
     </ClCompile>
     <ClCompile Include="Repeat.cpp">
+      <Filter>Исходные файлы\Regex\RegularExpression</Filter>
+    </ClCompile>
+    <ClCompile Include="Concat.cpp">
       <Filter>Исходные файлы\Regex\RegularExpression</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,13 +83,7 @@
     <ClInclude Include="RegexParser.h">
       <Filter>Файлы заголовков\Regex</Filter>
     </ClInclude>
-    <ClInclude Include="Any.h">
-      <Filter>Файлы заголовков\Regex\RegularExpression</Filter>
-    </ClInclude>
     <ClInclude Include="Literal.h">
-      <Filter>Файлы заголовков\Regex\RegularExpression</Filter>
-    </ClInclude>
-    <ClInclude Include="NonZeroRepeat.h">
       <Filter>Файлы заголовков\Regex\RegularExpression</Filter>
     </ClInclude>
     <ClInclude Include="Or.h">
@@ -103,6 +94,12 @@
     </ClInclude>
     <ClInclude Include="Repeat.h">
       <Filter>Файлы заголовков\Regex\RegularExpression</Filter>
+    </ClInclude>
+    <ClInclude Include="Concat.h">
+      <Filter>Файлы заголовков\Regex\RegularExpression</Filter>
+    </ClInclude>
+    <ClInclude Include="enums.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
