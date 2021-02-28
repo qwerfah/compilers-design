@@ -5,9 +5,9 @@ Repeat::Repeat(std::shared_ptr<RegularExpression>& expr, RepeatType type) :
 	_expr(expr), _type(type)
 { }
 
-Repeat::Repeat(std::shared_ptr<RegularExpression>&& expr, RepeatType type) :
+Repeat::Repeat(std::shared_ptr<RegularExpression>&& expr, RepeatType type, size_t from, size_t to) :
 	RegularExpression(expr->getRawString() + REPEAT_STR),
-	_expr(expr), _type(type)
+	_expr(expr), _type(type), _from(from), _to(to)
 { }
 
 const std::shared_ptr<RegularExpression>& Repeat::getExpr() const

@@ -16,7 +16,11 @@ enum class RepeatType
 	/// <summary>
 	/// Нуль или единственное вхождение.
 	/// </summary>
-	NoneOrSingle
+	NoneOrSingle,
+	/// <summary>
+	/// Заданный диапазон числа вхождений.
+	/// </summary>
+	Range
 };
 
 /// <summary>

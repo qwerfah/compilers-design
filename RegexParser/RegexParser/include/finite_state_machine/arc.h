@@ -2,25 +2,27 @@
 
 #include "state.h"
 
+#include <memory>
+
 /// <summary>
 /// Дуга КА (переход между двумя состояниями КА).
 /// </summary>
 class Arc
 {
 public:
-	Arc(const State& initialState = State(), const State& finalState = State(), char mark = 0);
+	Arc(const std::shared_ptr<State>& initialState, const std::shared_ptr<State>& finalState, char mark);
 
 	/// <summary>
 	/// Получить состояние, из которого исходит данная дуга.
 	/// </summary>
 	/// <returns> Начальное состояние дуги. </returns>
-	const State& getInitialState() const;
+	const std::shared_ptr<State>& getInitialState() const;
 
 	/// <summary>
 	/// Получить состояние, в которое входит данная дуга.
 	/// </summary>
 	/// <returns> Конечное состояние дуги. </returns>
-	const State& getIFinalState() const;
+	const std::shared_ptr<State>& getIFinalState() const;
 
 	/// <summary>
 	/// Получить метку данной дуги.
@@ -34,12 +36,12 @@ private:
 	/// <summary>
 	/// Начальное состояние дуги.
 	/// </summary>
-	const State& _initialState;
+	std::shared_ptr<State> _initialState;
 
 	/// <summary>
 	/// Конечное состояние дуги.
 	/// </summary>
-	const State& _finalState;
+	std::shared_ptr<State> _finalState;
 
 	/// <summary>
 	/// Метка дуги.

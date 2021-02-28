@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "../include/regex/regex_parser.h"
+#include "../include/finite_state_machine/finite_state_machine.h"
 
 void printTree(const std::shared_ptr<RegularExpression>& tree, std::string&& tabs = "")
 {
@@ -36,9 +37,33 @@ void printTree(const std::shared_ptr<RegularExpression>& tree, std::string&& tab
 
 int main()
 {
-    auto tree = RegexParser::parse("abc|(dfr)*g+..f?(ab|)");
+    // auto tree = RegexParser::parse("(ab*c){3,8}|(dfr)*(g)+((..f)?)(ab|)");
+    // printTree(tree);
 
-    printTree(tree);
+    auto machine = FiniteStateMachine();
+
+    auto state1 = std::shared_ptr<State>(new State);
+    auto state2 = std::shared_ptr<State>(new State);
+    auto state3 = std::shared_ptr<State>(new State);
+    auto state4 = std::shared_ptr<State>(new State);
+
+    auto arc1 = std::shared_ptr<Arc>(new Arc(state1, state2, 'a'));
+    auto arc2 = std::shared_ptr<Arc>(new Arc(state2, state3, 'b'));
+    auto arc3 = std::shared_ptr<Arc>(new Arc(state3, state4, 'c'));
+
+    machine.addState(state1);
+    machine.addState(state2);
+    machine.addState(state3);
+    machine.addState(state4);
+
+    machine.addArc(arc1);
+    machine.addArc(arc2);
+    machine.addArc(arc3);
+
+    machine.setInitState(state1);
+    machine.setFinalState(state4);
+
+    std::cout << machine.match("abc") << std::endl;
 
     system("pause");
 }

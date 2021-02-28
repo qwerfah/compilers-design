@@ -1,15 +1,15 @@
 #include "../../include/finite_state_machine/arc.h"
 
-Arc::Arc(const State& initialState, const State& finalState, char mark) :
+Arc::Arc(const std::shared_ptr<State>& initialState, const std::shared_ptr<State>& finalState, char mark) :
     _initialState(initialState), _finalState(finalState), _mark(mark)
 { }
 
-const State& Arc::getInitialState() const
+const std::shared_ptr<State>& Arc::getInitialState() const
 {
     return _initialState;
 }
 
-const State& Arc::getIFinalState() const
+const std::shared_ptr<State>& Arc::getIFinalState() const
 {
     return _finalState;
 }

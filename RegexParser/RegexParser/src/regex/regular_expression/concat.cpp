@@ -23,7 +23,7 @@ const std::shared_ptr<RegularExpression>& Concat::getRightExpr() const
 	return _rightExpr;
 }
 
-RegularExpression& Concat::operator=(const RegularExpression& other)
+RegularExpression& Concat::operator = (const RegularExpression& other)
 {
 	if (this != &other)
 	{

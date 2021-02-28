@@ -14,42 +14,50 @@ class FiniteStateMachine
 {
 public:
 	FiniteStateMachine();
-	FiniteStateMachine(const std::set<State>& states,
-					   const std::set<State>& finalStates,
-					   const State& currentState,
-					   const std::set<Arc>& arcs);
+
+	/// <summary>
+	/// Установить начальное состояние для данного КА 
+	/// (состояние добавляется в множество состояний КА).
+	/// </summary>
+	/// <param name="state"> Новое начальное состояние КА. </param>
+	void setInitState(const std::shared_ptr<State>& state);
+
+	/// <summary>
+	/// Установить конечное состояние для данного КА 
+	/// (состояние добавляется в множество состояний КА).
+	/// </summary>
+	/// <param name="state"> Новое конечное состояние КА. </param>
+	void setFinalState(const std::shared_ptr<State>& state);
 
 	/// <summary>
 	/// Добавить новое состояние в множество состояний.
 	/// </summary>
 	/// <param name="state"> Новое состояние КА. </param>
-	void addState(const State& state);
-
-	/// <summary>
-	/// Добавить конечное состояние для данного КА 
-	/// (состояние добавляется и в множество состояний КА, и в множество конечных состояний КА).
-	/// </summary>
-	/// <param name="state"> Новое конечное состояние КА. </param>
-	void addFinalState(const State& state);
+	void addState(const std::shared_ptr<State>& state);
 
 	/// <summary>
 	/// Добавить новую дугу в множество дуг КА.
 	/// </summary>
 	/// <param name="arc"> Новая дуга КА. </param>
-	void addArc(const Arc& arc);
+	void addArc(const std::shared_ptr<Arc>& arc);
+
+	bool match(const std::string& expr);
 
 	/// <summary>
 	/// Переход из текущего состояния в следующее состояние.
 	/// </summary>
-	void next();
+	/// <returns> Метка дуги, по которой был осуществлен переход. </returns>
+	char next();
 
 	bool isInFinalState() const;
 
 private:
-	std::unique_ptr<const State> _currentState;
-	std::set<State> _states;
-	std::set<State> _finalStates;
-	std::set<Arc> _arcs;
+	std::shared_ptr<State> _initState;
+	std::shared_ptr<State> _finalState;
+	std::shared_ptr<State> _currentState;
+
+	std::set<std::shared_ptr<State>> _states;
+	std::set<std::shared_ptr<Arc>> _arcs;
 	bool _isInFinalState;
 
 	std::mt19937 _engine;

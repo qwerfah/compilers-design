@@ -2,80 +2,119 @@
 #include <stdexcept>
 
 FiniteStateMachine::FiniteStateMachine() :
-	_states(std::set<State>()), 
-	_finalStates(std::set<State>()),
-	_currentState(nullptr), 
-	_arcs(std::set<Arc>())
-{ 
-	_engine = std::mt19937(std::random_device()());
-	_isInFinalState = false;
-}
-
-FiniteStateMachine::FiniteStateMachine(const std::set<State>& states,
-									   const std::set<State>& finalStates,
-									   const State& currentState,
-									   const std::set<Arc>& arcs) : 
-	_states(states), 
-	_finalStates(finalStates), 
-	_currentState(std::unique_ptr<const State>(&currentState)), 
-	_arcs(arcs)
+	_initState(nullptr),
+	_finalState(nullptr),
+	_currentState(nullptr),
+	_arcs(std::set<std::shared_ptr<Arc>>()),
+	_states(std::set<std::shared_ptr<State>>())
 {
 	_engine = std::mt19937(std::random_device()());
 	_isInFinalState = false;
 }
 
-void FiniteStateMachine::addState(const State& state)
+void FiniteStateMachine::setInitState(const std::shared_ptr<State>& state)
 {
+	if (state == nullptr)
+	{
+		throw std::invalid_argument("State ptr is null.");
+	}
+
+	_states.insert(state);
+	_initState = state;
+}
+
+void FiniteStateMachine::setFinalState(const std::shared_ptr<State>& state)
+{
+	if (state == nullptr)
+	{
+		throw std::invalid_argument("State ptr is null.");
+	}
+
+	_states.insert(state);
+	_finalState = state;
+}
+
+void FiniteStateMachine::addState(const std::shared_ptr<State>& state)
+{
+	if (state == nullptr)
+	{
+		throw std::invalid_argument("State ptr is null.");
+	}
+
 	_states.insert(state);
 }
 
-void FiniteStateMachine::addFinalState(const State& state)
+void FiniteStateMachine::addArc(const std::shared_ptr<Arc>& arc)
 {
-	_states.insert(state);
-	_finalStates.insert(state);
-}
+	if (arc == nullptr)
+	{
+		throw std::invalid_argument("Arc ptr is null.");
+	}
 
-void FiniteStateMachine::addArc(const Arc& arc)
-{
 	_arcs.insert(arc);
-	_states.insert({ arc.getInitialState() , arc.getIFinalState() });
+	_states.insert({ arc->getInitialState() , arc->getIFinalState() });
 }
 
-void FiniteStateMachine::next()
+bool FiniteStateMachine::match(const std::string& expr)
 {
-	if (_isInFinalState) return;
-
-	if (_states.empty() || _finalStates.empty() || _arcs.empty())
+	if (!_finalState || !_initState || _states.empty() || _arcs.empty())
 	{
-		throw std::invalid_argument("None of the sets can be empty");
+		throw std::invalid_argument("Invalid finite-state machine configuration.");
 	}
 
-	if (_finalStates.find(*_currentState) != _finalStates.end())
-	{
-		_isInFinalState = true;
-		return;
-	}
+	std::string copy = expr.substr();
+	_currentState = _initState;
 
-	auto nextStates = std::vector<State>();
-
-	for (auto& arc : _arcs)
+	while (!_isInFinalState)
 	{
-		if (arc.getInitialState() == *_currentState)
+		char mark = next();
+		if (mark == copy[0] || mark == 0)
 		{
-			nextStates.push_back(arc.getIFinalState());
+			copy = copy.substr(1);
 		}
 	}
 
-	switch (nextStates.size())
+	return copy.empty();
+}
+
+char FiniteStateMachine::next()
+{
+	if (_isInFinalState) return -1;
+
+	if (!_finalState || !_initState || _states.empty() || _arcs.empty())
+	{
+		throw std::invalid_argument("Invalid finite-state machine configuration.");
+	}
+
+	if (_currentState == _finalState)
+	{
+		_isInFinalState = true;
+		return -1;
+	}
+
+	auto arcs = std::vector<std::shared_ptr<Arc>>();
+
+	for (auto& arc : _arcs)
+	{
+		if (arc->getInitialState() == _currentState)
+		{
+			arcs.push_back(arc);
+		}
+	}
+
+	switch (arcs.size())
 	{
 	case 0:
 		_isInFinalState = true;
+		return -1;
 	case 1:
-		_currentState = std::unique_ptr<const State>(&nextStates[0]);
+		_currentState = arcs[0]->getIFinalState();
+		return arcs[0]->getMark();
 	default:
-		std::uniform_int_distribution<int> distribution(0, nextStates.size());
-		_currentState = std::unique_ptr<const State>(&nextStates[distribution(_engine)]);
-		break;
+		std::uniform_int_distribution<int> distribution(0, arcs.size());
+		std::shared_ptr<Arc> arc = arcs[distribution(_engine)];
+		_currentState = arc->getIFinalState();
+		return arc->getMark();
 	}
 }
 

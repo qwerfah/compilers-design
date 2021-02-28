@@ -16,7 +16,7 @@ class Repeat :
 {
 public:
     Repeat(std::shared_ptr<RegularExpression>& expr, RepeatType type);
-    Repeat(std::shared_ptr<RegularExpression>&& expr, RepeatType type);
+    Repeat(std::shared_ptr<RegularExpression>&& expr, RepeatType type, size_t from = 0, size_t to = 0);
 
     /// <summary>
     /// Получить повторяемое регулярное выражение.
@@ -42,5 +42,15 @@ private:
     /// Тип конструкции повторения.
     /// </summary>
     RepeatType _type;
+
+    /// <summary>
+    /// Минимально допустимое число повторений выражения (если специфицировано).
+    /// </summary>
+    size_t _from;
+
+    /// <summary>
+    /// Максимально допустимое число повторений выражения (если специфицировано).
+    /// </summary>
+    size_t _to;
 };
 
