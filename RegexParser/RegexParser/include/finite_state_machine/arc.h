@@ -1,8 +1,12 @@
 #pragma once
 
 #include "state.h"
+// #include "finite_state_machine.h"
+
+class FiniteStateMachine;
 
 #include <memory>
+#include <stdexcept>
 
 /// <summary>
 /// Дуга КА (переход между двумя состояниями КА).
@@ -10,7 +14,12 @@
 class Arc
 {
 public:
-	Arc(const std::shared_ptr<State>& initialState, const std::shared_ptr<State>& finalState, char mark);
+	Arc(const std::shared_ptr<State>& initialState, 
+		const std::shared_ptr<State>& finalState, char mark);
+	Arc(const std::shared_ptr<FiniteStateMachine>& machine,
+		const std::shared_ptr<State>& finalState, char mark);
+	Arc(const std::shared_ptr<State>& initialState, 
+		const std::shared_ptr<FiniteStateMachine>& machine, char mark);
 
 	/// <summary>
 	/// Получить состояние, из которого исходит данная дуга.

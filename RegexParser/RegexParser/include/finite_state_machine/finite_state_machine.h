@@ -6,6 +6,7 @@
 #include <set>
 #include <random>
 #include <memory>
+#include <stdexcept>
 
 /// <summary>
 /// Описывает конечный автомат.
@@ -41,6 +42,18 @@ public:
 	/// <param name="arc"> Новая дуга КА. </param>
 	void addArc(const std::shared_ptr<Arc>& arc);
 
+	/// <summary>
+	/// Включить другой КА в состав данного: множества состояний и дуг 
+	/// результирующего КА определяются как объединения соответствующих множеств исходных КА.
+	/// </summary>
+	/// <param name="machine"> Новый КА. </param>
+	void addMachine(const std::shared_ptr<FiniteStateMachine>& machine);
+
+	/// <summary>
+	/// Проверить, соответсвует ли входная цепочка языку, порождаемому данным КА.
+	/// </summary>
+	/// <param name="expr"> Входная цепочка. </param>
+	/// <returns> true - если принадлежит, false - иначе. </returns>
 	bool match(const std::string& expr);
 
 	/// <summary>
@@ -50,6 +63,10 @@ public:
 	char next();
 
 	bool isInFinalState() const;
+
+	const std::shared_ptr<State>& getInitState() const;
+	const std::shared_ptr<State>& getFinalState() const;
+	const std::shared_ptr<State>& getCurrentState() const;
 
 private:
 	std::shared_ptr<State> _initState;

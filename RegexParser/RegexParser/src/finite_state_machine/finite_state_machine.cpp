@@ -1,5 +1,4 @@
 #include "../../include/finite_state_machine/finite_state_machine.h"
-#include <stdexcept>
 
 FiniteStateMachine::FiniteStateMachine() :
 	_initState(nullptr),
@@ -53,6 +52,17 @@ void FiniteStateMachine::addArc(const std::shared_ptr<Arc>& arc)
 
 	_arcs.insert(arc);
 	_states.insert({ arc->getInitialState() , arc->getIFinalState() });
+}
+
+void FiniteStateMachine::addMachine(const std::shared_ptr<FiniteStateMachine>& machine)
+{
+	if (machine == nullptr)
+	{
+		throw std::invalid_argument("Finite-state machine ptr is null.");
+	}
+
+	_states.insert(machine->_states.begin(), machine->_states.end());
+	_arcs.insert(machine->_arcs.begin(), machine->_arcs.end());
 }
 
 bool FiniteStateMachine::match(const std::string& expr)
@@ -121,4 +131,19 @@ char FiniteStateMachine::next()
 bool FiniteStateMachine::isInFinalState() const
 {
 	return _isInFinalState;
+}
+
+const std::shared_ptr<State>& FiniteStateMachine::getInitState() const
+{
+	return _initState;
+}
+
+const std::shared_ptr<State>& FiniteStateMachine::getFinalState() const
+{
+	return _finalState;
+}
+
+const std::shared_ptr<State>& FiniteStateMachine::getCurrentState() const
+{
+	return _currentState;
 }
