@@ -77,8 +77,9 @@ bool FiniteStateMachine::match(const std::string& expr)
 
 	while (!_isInFinalState)
 	{
-		char mark = next();
-		if (mark == copy[0] || mark == 0)
+		if (copy.empty()) return false;
+
+		if (next(copy[0]))
 		{
 			copy = copy.substr(1);
 		}
@@ -87,19 +88,13 @@ bool FiniteStateMachine::match(const std::string& expr)
 	return copy.empty();
 }
 
-char FiniteStateMachine::next()
+bool FiniteStateMachine::next(char ch)
 {
-	if (_isInFinalState) return -1;
+	if (_isInFinalState) return false;
 
 	if (!_finalState || !_initState || _states.empty() || _arcs.empty())
 	{
 		throw std::invalid_argument("Invalid finite-state machine configuration.");
-	}
-
-	if (_currentState == _finalState)
-	{
-		_isInFinalState = true;
-		return -1;
 	}
 
 	auto arcs = std::vector<std::shared_ptr<Arc>>();
@@ -116,15 +111,17 @@ char FiniteStateMachine::next()
 	{
 	case 0:
 		_isInFinalState = true;
-		return -1;
+		return false;
 	case 1:
 		_currentState = arcs[0]->getIFinalState();
-		return arcs[0]->getMark();
+		_isInFinalState = _currentState == _finalState;
+		return arcs[0]->getMark() == '.' || arcs[0]->getMark() == ch;
 	default:
 		std::uniform_int_distribution<int> distribution(0, arcs.size());
 		std::shared_ptr<Arc> arc = arcs[distribution(_engine)];
 		_currentState = arc->getIFinalState();
-		return arc->getMark();
+		_isInFinalState = _currentState == _finalState;
+		return arc->getMark() == '.' || arc->getMark() == ch;
 	}
 }
 

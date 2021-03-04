@@ -60,7 +60,10 @@ public:
 	/// ѕереход из текущего состо€ни€ в следующее состо€ние.
 	/// </summary>
 	/// <returns> ћетка дуги, по которой был осуществлен переход. </returns>
-	char next();
+	bool next(char ch);
+
+	void determine();
+	void minimize();
 
 	bool isInFinalState() const;
 
