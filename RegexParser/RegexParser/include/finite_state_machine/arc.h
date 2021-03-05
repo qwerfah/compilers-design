@@ -1,7 +1,7 @@
 #pragma once
 
 #include "state.h"
-// #include "finite_state_machine.h"
+#include "../enums.h"
 
 class FiniteStateMachine;
 
@@ -15,11 +15,17 @@ class Arc
 {
 public:
 	Arc(const std::shared_ptr<State>& initialState, 
-		const std::shared_ptr<State>& finalState, char mark);
+		const std::shared_ptr<State>& finalState, 
+		ArcType type = ArcType::Lambda, char mark = 0);
 	Arc(const std::shared_ptr<FiniteStateMachine>& machine,
-		const std::shared_ptr<State>& finalState, char mark);
+		const std::shared_ptr<State>& finalState, 
+		ArcType type = ArcType::Lambda, char mark = 0);
 	Arc(const std::shared_ptr<State>& initialState, 
-		const std::shared_ptr<FiniteStateMachine>& machine, char mark);
+		const std::shared_ptr<FiniteStateMachine>& machine, 
+		ArcType type = ArcType::Lambda, char mark = 0);
+	Arc(const std::shared_ptr<FiniteStateMachine>& initMachine,
+		const std::shared_ptr<FiniteStateMachine>& finalMachine,
+		ArcType type = ArcType::Lambda, char mark = 0);
 
 	/// <summary>
 	/// Получить состояние, из которого исходит данная дуга.
@@ -39,6 +45,12 @@ public:
 	/// <returns> Метка дуги. </returns>
 	char getMark() const;
 
+	/// <summary>
+	/// Возвращает тип перехода для данной дуги.
+	/// </summary>
+	/// <returns> Тип перехода. </returns>
+	ArcType getType() const;
+
 	bool operator < (const Arc& arc) const;
 
 private:
@@ -56,5 +68,10 @@ private:
 	/// Метка дуги.
 	/// </summary>
 	const char _mark;
+
+	/// <summary>
+	/// Тип перехода.
+	/// </summary>
+	ArcType _type;
 };
 

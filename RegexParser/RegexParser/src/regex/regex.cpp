@@ -58,8 +58,7 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildFSM(const std::shared_ptr<Regul
 	{
 		switch (literal->getType())
 		{
-		case LiteralType::Symbol: return _buildSymbolLiteral(literal);
-		case LiteralType::Any: return _buildAnyLiteral(literal);
+		case LiteralType::Symbol: case LiteralType::Any: return _buildSymbolLiteral(literal);
 		case LiteralType::Empty: return _buildEmptyLiteral(literal);
 		}
 	}
@@ -71,27 +70,101 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildFSM(const std::shared_ptr<Regul
 
 std::shared_ptr<FiniteStateMachine> Regex::_buildOr(const std::shared_ptr<Or>& expr)
 {
-	return std::shared_ptr<FiniteStateMachine>();
+	auto machine = std::shared_ptr<FiniteStateMachine>(new FiniteStateMachine);
+
+	auto in = std::shared_ptr<State>(new State());
+	auto out = std::shared_ptr<State>(new State());
+
+	std::shared_ptr<FiniteStateMachine> leftFSM = _buildFSM(expr->getLeftExpr());
+	std::shared_ptr<FiniteStateMachine> rightFSM = _buildFSM(expr->getRightExpr());
+
+	machine->addState({ in, out, leftFSM, rightFSM });
+
+	machine->addArc(std::shared_ptr<Arc>(new Arc(in, leftFSM)));
+	machine->addArc(std::shared_ptr<Arc>(new Arc(in, rightFSM)));
+	machine->addArc(std::shared_ptr<Arc>(new Arc(leftFSM, out)));
+	machine->addArc(std::shared_ptr<Arc>(new Arc(rightFSM, out)));
+
+	machine->setInitState(in);
+	machine->setFinalState(out);
+
+	return machine;
 }
 
 std::shared_ptr<FiniteStateMachine> Regex::_buildConcat(const std::shared_ptr<Concat>& expr)
 {
-	return std::shared_ptr<FiniteStateMachine>();
+	auto machine = std::shared_ptr<FiniteStateMachine>(new FiniteStateMachine);
+
+	std::shared_ptr<FiniteStateMachine> leftFSM = _buildFSM(expr->getLeftExpr());
+	std::shared_ptr<FiniteStateMachine> rightFSM = _buildFSM(expr->getRightExpr());
+
+	machine->addState({ leftFSM, rightFSM });
+
+	machine->addArc(std::shared_ptr<Arc>(new Arc(leftFSM, rightFSM)));
+
+	machine->setInitState(leftFSM->getInitState());
+	machine->setFinalState(rightFSM->getFinalState());
+
+	return machine;
 }
 
 std::shared_ptr<FiniteStateMachine> Regex::_buildArbitraryRepeat(const std::shared_ptr<Repeat>& expr)
 {
-	return std::shared_ptr<FiniteStateMachine>();
+	auto machine = std::shared_ptr<FiniteStateMachine>(new FiniteStateMachine);
+
+	auto in = std::shared_ptr<State>(new State());
+	auto out = std::shared_ptr<State>(new State());
+
+	std::shared_ptr<FiniteStateMachine> inner = _buildFSM(expr->getExpr());
+
+	machine->addState({ in, out, inner });
+
+	machine->addArc(std::shared_ptr<Arc>(new Arc(in, inner)));
+	machine->addArc(std::shared_ptr<Arc>(new Arc(inner, in)));
+	machine->addArc(std::shared_ptr<Arc>(new Arc(in, out)));
+
+	machine->setInitState(in);
+	machine->setFinalState(out);
+
+	return machine;
 }
 
 std::shared_ptr<FiniteStateMachine> Regex::_buildNonZeroRepeat(const std::shared_ptr<Repeat>& expr)
 {
-	return std::shared_ptr<FiniteStateMachine>();
+	auto machine = std::shared_ptr<FiniteStateMachine>(new FiniteStateMachine);
+
+	auto in = std::shared_ptr<State>(new State());
+	auto inner = _buildFSM(expr->getExpr());
+
+	machine->addState({ in, inner });
+
+	machine->addArc(std::shared_ptr<Arc>(new Arc(in, inner)));
+	machine->addArc(std::shared_ptr<Arc>(new Arc(inner, in)));
+
+	machine->setInitState(in);
+	machine->setFinalState(inner->getFinalState());
+
+	return machine;
 }
 
 std::shared_ptr<FiniteStateMachine> Regex::_buildNonOrSingle(const std::shared_ptr<Repeat>& expr)
 {
-	return std::shared_ptr<FiniteStateMachine>();
+	auto machine = std::shared_ptr<FiniteStateMachine>(new FiniteStateMachine);
+
+	auto in = std::shared_ptr<State>(new State());
+	auto out = std::shared_ptr<State>(new State());
+	auto inner = _buildFSM(expr->getExpr());
+
+	machine->addState({ in, out, inner });
+
+	machine->addArc(std::shared_ptr<Arc>(new Arc(in, inner)));
+	machine->addArc(std::shared_ptr<Arc>(new Arc(inner, out)));
+	machine->addArc(std::shared_ptr<Arc>(new Arc(in, out)));
+
+	machine->setInitState(in);
+	machine->setFinalState(out);
+
+	return machine;
 }
 
 std::shared_ptr<FiniteStateMachine> Regex::_buildRangeRepeat(const std::shared_ptr<Repeat>& expr)
@@ -101,15 +174,31 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildRangeRepeat(const std::shared_p
 
 std::shared_ptr<FiniteStateMachine> Regex::_buildSymbolLiteral(const std::shared_ptr<Literal>& expr)
 {
-	return std::shared_ptr<FiniteStateMachine>();
-}
+	auto machine = std::shared_ptr<FiniteStateMachine>(new FiniteStateMachine);
 
-std::shared_ptr<FiniteStateMachine> Regex::_buildAnyLiteral(const std::shared_ptr<Literal>& expr)
-{
-	return std::shared_ptr<FiniteStateMachine>();
+	auto in = std::shared_ptr<State>(new State());
+	auto out = std::shared_ptr<State>(new State());
+
+	machine->addState({ in, out });
+
+	machine->addArc(std::shared_ptr<Arc>(new Arc(in, out, ArcType::Symbol, expr->getChar())));
+
+	machine->setInitState(in);
+	machine->setFinalState(out);
+
+	return machine;
 }
 
 std::shared_ptr<FiniteStateMachine> Regex::_buildEmptyLiteral(const std::shared_ptr<Literal>& expr)
 {
-	return std::shared_ptr<FiniteStateMachine>();
+	auto machine = std::shared_ptr<FiniteStateMachine>(new FiniteStateMachine);
+
+	auto in = std::shared_ptr<State>(new State());
+
+	machine->addState({ in });
+
+	machine->setInitState(in);
+	machine->setFinalState(in);
+
+	return machine;
 }

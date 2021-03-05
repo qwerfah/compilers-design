@@ -43,6 +43,37 @@ void FiniteStateMachine::addState(const std::shared_ptr<State>& state)
 	_states.insert(state);
 }
 
+void FiniteStateMachine::addState(const std::initializer_list<
+	std::variant<std::shared_ptr<State>, std::shared_ptr<FiniteStateMachine>>>& list)
+{
+	for (auto elem : list)
+	{
+		try
+		{
+			auto state = std::get<std::shared_ptr<State>>(elem);
+
+			if (!state)
+			{
+				throw std::invalid_argument("Null pointer to state of FSM.");
+			}
+
+			_states.insert(state);
+		}
+		catch (std::exception _)
+		{
+			auto machine = std::get<std::shared_ptr<FiniteStateMachine>>(elem);
+
+			if (!machine)
+			{
+				throw std::invalid_argument("Null pointer to state of FSM.");
+			}
+
+			_states.insert(machine->_states.begin(), machine->_states.end());
+			_arcs.insert(machine->_arcs.begin(), machine->_arcs.end());
+		}
+	}
+}
+
 void FiniteStateMachine::addArc(const std::shared_ptr<Arc>& arc)
 {
 	if (arc == nullptr)
@@ -123,6 +154,15 @@ bool FiniteStateMachine::next(char ch)
 		_isInFinalState = _currentState == _finalState;
 		return arc->getMark() == '.' || arc->getMark() == ch;
 	}
+}
+
+void FiniteStateMachine::determine()
+{
+
+}
+
+void FiniteStateMachine::minimize()
+{
 }
 
 bool FiniteStateMachine::isInFinalState() const

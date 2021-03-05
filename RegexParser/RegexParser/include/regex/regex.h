@@ -95,13 +95,6 @@ private:
 	std::shared_ptr<FiniteStateMachine> _buildSymbolLiteral(const std::shared_ptr<Literal>& expr);
 
 	/// <summary>
-	/// Построить НКА для произвольного символьного литерала регулярного выражения.
-	/// </summary>
-	/// <param name="expr"> Регулярное выражение. </param>
-	/// <returns> Указатель на построенный КА. </returns>
-	std::shared_ptr<FiniteStateMachine> _buildAnyLiteral(const std::shared_ptr<Literal>& expr);
-
-	/// <summary>
 	/// Построить НКА для пустого символьного литерала регулярного выражения.
 	/// </summary>
 	/// <param name="expr"> Регулярное выражение. </param>

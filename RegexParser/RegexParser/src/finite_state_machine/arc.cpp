@@ -2,7 +2,9 @@
 #include "../../include/finite_state_machine/finite_state_machine.h"
 
 Arc::Arc(const std::shared_ptr<State>& initialState, 
-         const std::shared_ptr<State>& finalState, char mark) :
+         const std::shared_ptr<State>& finalState,
+         ArcType type, char mark) :
+    _type(type),
     _mark(mark)
 {
     if (!initialState || !finalState)
@@ -15,7 +17,9 @@ Arc::Arc(const std::shared_ptr<State>& initialState,
 }
 
 Arc::Arc(const std::shared_ptr<FiniteStateMachine>& machine,
-         const std::shared_ptr<State>& finalState, char mark) :
+         const std::shared_ptr<State>& finalState,
+         ArcType type, char mark) :
+    _type(type),
     _mark(mark)
 {
     if (!machine->getFinalState() || !finalState)
@@ -28,7 +32,9 @@ Arc::Arc(const std::shared_ptr<FiniteStateMachine>& machine,
 }
 
 Arc::Arc(const std::shared_ptr<State>& initialState,
-         const std::shared_ptr<FiniteStateMachine>& machine, char mark) :
+         const std::shared_ptr<FiniteStateMachine>& machine,
+         ArcType type, char mark) :
+    _type(type),
     _mark(mark)
 {
     if (!initialState || !machine->getInitState())
@@ -38,6 +44,21 @@ Arc::Arc(const std::shared_ptr<State>& initialState,
 
     _initialState = initialState;
     _finalState = machine->getInitState();
+}
+
+Arc::Arc(const std::shared_ptr<FiniteStateMachine>& initMachine,
+         const std::shared_ptr<FiniteStateMachine>& finalMachine,
+         ArcType type, char mark) :
+    _type(type),
+    _mark(mark)
+{
+    if (!initMachine->getFinalState() || !finalMachine->getInitState())
+    {
+        throw std::invalid_argument("State ptr is null.");
+    }
+
+    _initialState = initMachine->getFinalState();
+    _finalState = finalMachine->getInitState();
 }
 
 const std::shared_ptr<State>& Arc::getInitialState() const
@@ -53,6 +74,11 @@ const std::shared_ptr<State>& Arc::getIFinalState() const
 char Arc::getMark() const
 {
     return _mark;
+}
+
+ArcType Arc::getType() const
+{
+    return _type;
 }
 
 bool Arc::operator < (const Arc& arc) const

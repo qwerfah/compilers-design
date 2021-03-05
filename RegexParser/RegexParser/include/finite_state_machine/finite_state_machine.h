@@ -7,6 +7,8 @@
 #include <random>
 #include <memory>
 #include <stdexcept>
+#include <variant>
+
 
 /// <summary>
 /// Описывает конечный автомат.
@@ -35,6 +37,13 @@ public:
 	/// </summary>
 	/// <param name="state"> Новое состояние КА. </param>
 	void addState(const std::shared_ptr<State>& state);
+
+	/// <summary>
+	/// Добавить новое состояние или КА в состав данного КА.
+	/// </summary>
+	/// <param name="list"> Список, каждый элемент которого либо состояние, либо КА. </param>
+	void addState(const std::initializer_list<std::variant<
+		std::shared_ptr<State>, std::shared_ptr<FiniteStateMachine>>>& list);
 
 	/// <summary>
 	/// Добавить новую дугу в множество дуг КА.

@@ -41,3 +41,18 @@ enum class LiteralType
 	/// </summary>
 	Empty
 };
+
+/// <summary>
+/// Тип перехода в КА.
+/// </summary>
+enum class ArcType
+{
+	/// <summary>
+	/// Символьный переход.
+	/// </summary>
+	Symbol,
+	/// <summary>
+	/// Лямбда-переход.
+	/// </summary>
+	Lambda
+};
