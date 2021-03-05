@@ -20,6 +20,16 @@ RepeatType Repeat::getType() const
 	return _type;
 }
 
+size_t Repeat::getRangeFrom() const
+{
+	return _from;
+}
+
+size_t Repeat::getRangeTo() const
+{
+	return _to;
+}
+
 RegularExpression& Repeat::operator = (const RegularExpression& other)
 {
 	if (this != &other)

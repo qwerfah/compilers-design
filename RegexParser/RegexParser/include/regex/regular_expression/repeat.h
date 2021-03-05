@@ -30,6 +30,9 @@ public:
     /// <returns> Тип конструкции повторения. </returns>
     RepeatType getType() const;
 
+    size_t getRangeFrom() const;
+    size_t getRangeTo() const;
+
     virtual RegularExpression& operator = (const RegularExpression& other) override;
 
 private:
