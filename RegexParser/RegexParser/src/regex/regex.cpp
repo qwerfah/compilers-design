@@ -2,9 +2,7 @@
 
 Regex::Regex(const std::string& expression)
 {
-	_machine = std::shared_ptr<FiniteStateMachine>(new FiniteStateMachine);
-	_machine->determine();
-	_machine->minimize();
+	_buildFSM(expression);
 }
 
 bool Regex::match(const std::string& chain)
@@ -19,22 +17,30 @@ bool Regex::match(const std::string& chain)
 
 void Regex::buildFSM(const std::string& expression)
 {
-	std::shared_ptr<RegularExpression> expr = RegexParser::parse(expression);
+	_buildFSM(expression);
+}
 
-	if (!expr)
+void Regex::_buildFSM(const std::string& expression)
+{
+	_parser = std::shared_ptr<RegexParser>(new RegexParser(expression));
+
+	if (!_parser->getTree())
 	{
 		throw std::logic_error("Can't build tree for string expression.");
 	}
 
-	_machine = _buildFSM(expr);
+	_machine = _buildFSMRecur(_parser->getTree());
 
 	if (!_machine)
 	{
 		throw std::logic_error("Can't build FSM for expression tree.");
 	}
+
+	_machine->determine();
+	_machine->minimize();
 }
 
-std::shared_ptr<FiniteStateMachine> Regex::_buildFSM(const std::shared_ptr<RegularExpression>& expr)
+std::shared_ptr<FiniteStateMachine> Regex::_buildFSMRecur(const std::shared_ptr<RegularExpression>& expr)
 {
 	if (auto orExpr = std::dynamic_pointer_cast<Or>(expr))
 	{
@@ -75,8 +81,8 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildOr(const std::shared_ptr<Or>& e
 	auto in = std::shared_ptr<State>(new State);
 	auto out = std::shared_ptr<State>(new State);
 
-	std::shared_ptr<FiniteStateMachine> leftFSM = _buildFSM(expr->getLeftExpr());
-	std::shared_ptr<FiniteStateMachine> rightFSM = _buildFSM(expr->getRightExpr());
+	std::shared_ptr<FiniteStateMachine> leftFSM = _buildFSMRecur(expr->getLeftExpr());
+	std::shared_ptr<FiniteStateMachine> rightFSM = _buildFSMRecur(expr->getRightExpr());
 
 	machine->addState({ in, out, leftFSM, rightFSM });
 
@@ -95,8 +101,8 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildConcat(const std::shared_ptr<Co
 {
 	auto machine = std::shared_ptr<FiniteStateMachine>(new FiniteStateMachine);
 
-	std::shared_ptr<FiniteStateMachine> leftFSM = _buildFSM(expr->getLeftExpr());
-	std::shared_ptr<FiniteStateMachine> rightFSM = _buildFSM(expr->getRightExpr());
+	std::shared_ptr<FiniteStateMachine> leftFSM = _buildFSMRecur(expr->getLeftExpr());
+	std::shared_ptr<FiniteStateMachine> rightFSM = _buildFSMRecur(expr->getRightExpr());
 
 	machine->addState({ leftFSM, rightFSM });
 
@@ -115,7 +121,7 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildArbitraryRepeat(const std::shar
 	auto in = std::shared_ptr<State>(new State);
 	auto out = std::shared_ptr<State>(new State);
 
-	std::shared_ptr<FiniteStateMachine> inner = _buildFSM(expr->getExpr());
+	std::shared_ptr<FiniteStateMachine> inner = _buildFSMRecur(expr->getExpr());
 
 	machine->addState({ in, out, inner });
 
@@ -134,7 +140,7 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildNonZeroRepeat(const std::shared
 	auto machine = std::shared_ptr<FiniteStateMachine>(new FiniteStateMachine);
 
 	auto in = std::shared_ptr<State>(new State);
-	auto inner = _buildFSM(expr->getExpr());
+	auto inner = _buildFSMRecur(expr->getExpr());
 
 	machine->addState({ in, inner });
 
@@ -153,7 +159,7 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildNonOrSingle(const std::shared_p
 
 	auto in = std::shared_ptr<State>(new State);
 	auto out = std::shared_ptr<State>(new State);
-	auto inner = _buildFSM(expr->getExpr());
+	auto inner = _buildFSMRecur(expr->getExpr());
 
 	machine->addState({ in, out, inner });
 
@@ -181,7 +187,7 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildRangeRepeat(const std::shared_p
 
 	for (size_t i = 0; i < expr->getRangeTo(); i++)
 	{
-		std::shared_ptr<FiniteStateMachine> curr = _buildFSM(expr->getExpr());
+		std::shared_ptr<FiniteStateMachine> curr = _buildFSMRecur(expr->getExpr());
 
 		machine->addMachine(curr);
 

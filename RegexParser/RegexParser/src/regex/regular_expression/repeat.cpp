@@ -2,7 +2,7 @@
 
 Repeat::Repeat(std::shared_ptr<RegularExpression>& expr, RepeatType type) :
 	RegularExpression(expr->getRawString() + REPEAT_STR),
-	_expr(expr), _type(type)
+	_expr(expr), _type(type), _from(0), _to(0)
 { }
 
 Repeat::Repeat(std::shared_ptr<RegularExpression>&& expr, RepeatType type, size_t from, size_t to) :

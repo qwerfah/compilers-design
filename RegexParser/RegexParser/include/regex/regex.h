@@ -34,16 +34,23 @@ public:
 
 private:
 	/// <summary>
+	/// Текущий парсер для последнего регулярного выражения, переданного в функцию buildFSM или конструктор. 
+	/// </summary>
+	std::shared_ptr<RegexParser> _parser;
+
+	/// <summary>
 	/// Текущий КА для последнего регулярного выражения, переданного в функцию buildFSM или конструктор.
 	/// </summary>
 	std::shared_ptr<FiniteStateMachine> _machine;
+
+	void _buildFSM(const std::string& expression);
 
 	/// <summary>
 	/// Построить НКА, соответсвующий регулярному выражению, представленному в виде синтаксического дерева.
 	/// </summary>
 	/// <param name="expr"> Синтаксическое дерево регулярного выражения. </param>
 	/// <returns> Указатель на построенный КА. </returns>
-	std::shared_ptr<FiniteStateMachine> _buildFSM(const std::shared_ptr<RegularExpression>& expr);
+	std::shared_ptr<FiniteStateMachine> _buildFSMRecur(const std::shared_ptr<RegularExpression>& expr);
 
 	/// <summary>
 	/// Построить НКА для конструкции "или" регулярного выражения.

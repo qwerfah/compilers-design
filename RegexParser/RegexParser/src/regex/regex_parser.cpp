@@ -1,16 +1,38 @@
 ﻿#include "../../include/regex/regex_parser.h"
 
-std::shared_ptr<RegularExpression> RegexParser::parse(const std::string& regex)
+RegexParser::RegexParser(const std::string& expression)
+{
+	_tree = _parse(expression);
+}
+
+void RegexParser::parse(const std::string& regex)
+{
+	_tree = _parse(regex);
+}
+
+const std::shared_ptr<RegularExpression>& RegexParser::getTree() const
+{
+	return _tree;
+}
+
+std::shared_ptr<RegularExpression> RegexParser::_parse(const std::string& regex)
 {
 	if (!_checkBrackets(regex))
 	{
 		throw std::invalid_argument("Incorrect brackets placement.");
 	}
 
-	return _parse(regex);
+	std::shared_ptr<RegularExpression> tree = _parseRecur(regex);
+
+	if (!tree)
+	{
+		throw std::invalid_argument("Falied to parse regular expression.");
+	}
+
+	return tree;
 }
 
-std::shared_ptr<RegularExpression> RegexParser::_parse(const std::string& regex)
+std::shared_ptr<RegularExpression> RegexParser::_parseRecur(const std::string& regex)
 {
 	// Если входная строка пуста, возвращаем пустой литерал.
 	if (regex.empty())
@@ -35,7 +57,7 @@ std::shared_ptr<RegularExpression> RegexParser::_parse(const std::string& regex)
 	// Если оставшееся выражение - не единственный символ, это ошибка.
 	if (regex.length() != 1)
 	{
-		throw std::logic_error("Can't parse regular expression, unexpected string length.");
+		throw std::invalid_argument("Invalid regular expression.");
 	}
 
 	// Парсим литерал или произвольный символ.
@@ -153,6 +175,11 @@ std::pair<size_t, size_t> RegexParser::_parseRange(const std::string& str)
 		range.second = std::stoi(strings[1]);
 	}
 	catch (std::exception e)
+	{
+		throw std::invalid_argument("Invalid repeat range representation.");
+	}
+
+	if (range.first > range.second)
 	{
 		throw std::invalid_argument("Invalid repeat range representation.");
 	}

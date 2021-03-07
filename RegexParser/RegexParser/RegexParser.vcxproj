@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\interface.cpp" />
     <ClCompile Include="src\finite_state_machine\arc.cpp" />
     <ClCompile Include="src\regex\regular_expression\concat.cpp" />
     <ClCompile Include="src\finite_state_machine\finite_state_machine.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="include\regex\regular_expression\regular_expression.h" />
     <ClInclude Include="include\regex\regular_expression\repeat.h" />
     <ClInclude Include="include\finite_state_machine\state.h" />
+    <ClInclude Include="include\interface.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

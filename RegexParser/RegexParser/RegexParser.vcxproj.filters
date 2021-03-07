@@ -66,6 +66,9 @@
     <ClCompile Include="src\regex\regex_parser.cpp">
       <Filter>Исходные файлы\Regex</Filter>
     </ClCompile>
+    <ClCompile Include="src\interface.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\finite_state_machine\finite_state_machine.h">
@@ -100,6 +103,9 @@
     </ClInclude>
     <ClInclude Include="include\regex\regex_parser.h">
       <Filter>Файлы заголовков\Regex</Filter>
+    </ClInclude>
+    <ClInclude Include="include\interface.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
