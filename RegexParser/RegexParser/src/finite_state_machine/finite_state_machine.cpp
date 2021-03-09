@@ -158,7 +158,60 @@ bool FiniteStateMachine::next(char ch)
 
 void FiniteStateMachine::determine()
 {
+	std::vector<std::shared_ptr<State>> states;
 
+	for (auto state: _states)
+	{
+		if (state != _initState && state != _finalState)
+		{
+			std::vector<std::shared_ptr<Arc>> inArcs;
+			std::vector<std::shared_ptr<Arc>> outArcs;
+			bool isLambda = true;
+
+			for (auto arc: arcs)
+			{
+				if (arc->getFinalState() == state)
+				{
+					inArcs.insert(arc);
+					isLambda = arc->getType() == ArcType::Lambda ? isLambda : false;
+					
+					if (arc->getType() == ArcType::Lambda)
+					{
+						inArcs.insert(arc);
+					}
+				}
+				else if (arc->getInitialState() == state)
+				{
+					outArcs.insert(arc);
+				}
+			}
+			
+			for (auto inArc: inArcs)
+			{
+				for (auto outArc: outArcs)
+				{
+					_arcs.insert(std::shared_ptr<Arc>(new Arc(
+						inArc->getInitState(), 
+						outArc->getFinalState(), 
+						outArc->getType(), 
+						outArc->getMark()));
+				}
+			}
+
+			_arcs.erase(inArcs.begin(), isArcs.end());
+
+			if (isLambda)
+			{
+				states.insert(state);
+				_arcs.erase(outArcs.begin(), outArcs.end());
+			}
+		}
+	}
+
+	for (auto state: states)
+	{
+		_states.erase(state);	
+	}
 }
 
 void FiniteStateMachine::minimize()

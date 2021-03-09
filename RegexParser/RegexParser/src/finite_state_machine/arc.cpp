@@ -66,7 +66,7 @@ const std::shared_ptr<State>& Arc::getInitialState() const
     return _initialState;
 }
 
-const std::shared_ptr<State>& Arc::getIFinalState() const
+const std::shared_ptr<State>& Arc::getFinalState() const
 {
     return _finalState;
 }
