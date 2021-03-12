@@ -2,8 +2,8 @@
 
 FiniteStateMachine::FiniteStateMachine() :
 	_initState(nullptr),
-	_finalState(nullptr),
 	_currentState(nullptr),
+	_finalStates(std::set<std::shared_ptr<State>>()),
 	_arcs(std::set<std::shared_ptr<Arc>>()),
 	_states(std::set<std::shared_ptr<State>>())
 {
@@ -22,17 +22,6 @@ void FiniteStateMachine::setInitState(const std::shared_ptr<State>& state)
 	_initState = state;
 }
 
-void FiniteStateMachine::setFinalState(const std::shared_ptr<State>& state)
-{
-	if (state == nullptr)
-	{
-		throw std::invalid_argument("State ptr is null.");
-	}
-
-	_states.insert(state);
-	_finalState = state;
-}
-
 void FiniteStateMachine::addState(const std::shared_ptr<State>& state)
 {
 	if (state == nullptr)
@@ -41,6 +30,24 @@ void FiniteStateMachine::addState(const std::shared_ptr<State>& state)
 	}
 
 	_states.insert(state);
+}
+
+
+void FiniteStateMachine::addFinalState(const std::shared_ptr<State>& state)
+{
+	if (state == nullptr)
+	{
+		throw std::invalid_argument("State ptr is null.");
+	}
+
+	_states.insert(state);
+	_finalStates.insert(state);
+}
+
+void FiniteStateMachine::addFinalState(const std::set<std::shared_ptr<State>>& states)
+{
+	_states.insert(states.begin(), states.end());
+	_finalStates.insert(states.begin(), states.end());
 }
 
 void FiniteStateMachine::addState(const std::initializer_list<
@@ -82,7 +89,7 @@ void FiniteStateMachine::addArc(const std::shared_ptr<Arc>& arc)
 	}
 
 	_arcs.insert(arc);
-	_states.insert({ arc->getInitialState() , arc->getIFinalState() });
+	_states.insert({ arc->getInitialState() , arc->getFinalState() });
 }
 
 void FiniteStateMachine::addMachine(const std::shared_ptr<FiniteStateMachine>& machine)
@@ -98,7 +105,7 @@ void FiniteStateMachine::addMachine(const std::shared_ptr<FiniteStateMachine>& m
 
 bool FiniteStateMachine::match(const std::string& expr)
 {
-	if (!_finalState || !_initState || _states.empty() || _arcs.empty())
+	if (!_initState || _states.empty() || _finalStates.empty() || _arcs.empty())
 	{
 		throw std::invalid_argument("Invalid finite-state machine configuration.");
 	}
@@ -123,7 +130,7 @@ bool FiniteStateMachine::next(char ch)
 {
 	if (_isInFinalState) return false;
 
-	if (!_finalState || !_initState || _states.empty() || _arcs.empty())
+	if (!_initState || _states.empty() || _finalStates.empty() || _arcs.empty())
 	{
 		throw std::invalid_argument("Invalid finite-state machine configuration.");
 	}
@@ -144,74 +151,24 @@ bool FiniteStateMachine::next(char ch)
 		_isInFinalState = true;
 		return false;
 	case 1:
-		_currentState = arcs[0]->getIFinalState();
-		_isInFinalState = _currentState == _finalState;
+		_currentState = arcs[0]->getFinalState();
+		_isInFinalState = _finalStates.find(_currentState) != _finalStates.end();
 		return arcs[0]->getMark() == '.' || arcs[0]->getMark() == ch;
 	default:
 		std::uniform_int_distribution<int> distribution(0, arcs.size());
 		std::shared_ptr<Arc> arc = arcs[distribution(_engine)];
-		_currentState = arc->getIFinalState();
-		_isInFinalState = _currentState == _finalState;
+		_currentState = arc->getFinalState();
+		_isInFinalState = _finalStates.find(_currentState) != _finalStates.end();
 		return arc->getMark() == '.' || arc->getMark() == ch;
 	}
 }
 
+
+
 void FiniteStateMachine::determine()
 {
-	std::vector<std::shared_ptr<State>> states;
-
-	for (auto state: _states)
-	{
-		if (state != _initState && state != _finalState)
-		{
-			std::vector<std::shared_ptr<Arc>> inArcs;
-			std::vector<std::shared_ptr<Arc>> outArcs;
-			bool isLambda = true;
-
-			for (auto arc: arcs)
-			{
-				if (arc->getFinalState() == state)
-				{
-					inArcs.insert(arc);
-					isLambda = arc->getType() == ArcType::Lambda ? isLambda : false;
-					
-					if (arc->getType() == ArcType::Lambda)
-					{
-						inArcs.insert(arc);
-					}
-				}
-				else if (arc->getInitialState() == state)
-				{
-					outArcs.insert(arc);
-				}
-			}
-			
-			for (auto inArc: inArcs)
-			{
-				for (auto outArc: outArcs)
-				{
-					_arcs.insert(std::shared_ptr<Arc>(new Arc(
-						inArc->getInitState(), 
-						outArc->getFinalState(), 
-						outArc->getType(), 
-						outArc->getMark()));
-				}
-			}
-
-			_arcs.erase(inArcs.begin(), isArcs.end());
-
-			if (isLambda)
-			{
-				states.insert(state);
-				_arcs.erase(outArcs.begin(), outArcs.end());
-			}
-		}
-	}
-
-	for (auto state: states)
-	{
-		_states.erase(state);	
-	}
+	_removeLambda();
+	_determine();
 }
 
 void FiniteStateMachine::minimize()
@@ -228,12 +185,91 @@ const std::shared_ptr<State>& FiniteStateMachine::getInitState() const
 	return _initState;
 }
 
-const std::shared_ptr<State>& FiniteStateMachine::getFinalState() const
+const std::set<std::shared_ptr<State>>& FiniteStateMachine::getFinalStates() const
 {
-	return _finalState;
+	return _finalStates;
 }
 
 const std::shared_ptr<State>& FiniteStateMachine::getCurrentState() const
 {
 	return _currentState;
+}
+
+void FiniteStateMachine::_removeLambda()
+{
+	std::vector<std::shared_ptr<State>> states;
+
+	for (auto state : _states)
+	{
+		if (state != _initState)
+		{
+			std::set<std::shared_ptr<Arc>> inArcs;  // Входящие дуги с лямбда-переходами
+			std::set<std::shared_ptr<Arc>> outArcs; // Все исходящие дуги
+			bool isLambda = true;
+
+			for (auto arc : _arcs)
+			{
+				if (arc->getFinalState() == state)
+				{
+					inArcs.insert(arc);
+					isLambda = arc->getType() == ArcType::Lambda ? isLambda : false;
+
+					if (arc->getType() == ArcType::Lambda)
+					{
+						inArcs.insert(arc);
+					}
+				}
+				else if (arc->getInitialState() == state)
+				{
+					outArcs.insert(arc);
+				}
+			}
+			
+			// Если текущее состояние не является конечным, заменяем лямбда-переходы
+			if (_finalStates.find(state) == _finalStates.end())
+			{
+				for (auto inArc : inArcs)
+				{
+					for (auto outArc : outArcs)
+					{
+						_arcs.insert(std::shared_ptr<Arc>(new Arc(
+							inArc->getInitialState(),
+							outArc->getFinalState(),
+							outArc->getType(),
+							outArc->getMark())));
+					}
+				}
+			}
+			// Иначе делаем все состояния, из которых есть лямбда-переходы в текущее, конечными
+			else
+			{
+				if (!outArcs.empty())
+				{
+					throw std::invalid_argument("Final state can't have outgoing arcs.");
+				}
+
+				for (auto inArc : inArcs) { _finalStates.insert(inArc->getInitialState()); }
+			}
+
+			// Удаляем все входящие лямбда-переходы
+			std::erase_if(_arcs, [&](auto el) { return inArcs.find(el) != inArcs.end(); });
+
+			// Если в текущее состояние есть только лямбда-переходы, 
+			// добавляем его для удаления и удаляем все исходящие дуги
+			if (isLambda)
+			{
+				states.push_back(state);
+				std::erase_if(_arcs, [&](auto el) { return outArcs.find(el) != outArcs.end(); });
+			}
+		}
+	}
+
+	for (auto state : states)
+	{
+		_states.erase(state);
+	}
+}
+
+void FiniteStateMachine::_determine()
+{
 }

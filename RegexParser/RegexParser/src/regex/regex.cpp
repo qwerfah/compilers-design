@@ -92,7 +92,7 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildOr(const std::shared_ptr<Or>& e
 	machine->addArc(std::shared_ptr<Arc>(new Arc(rightFSM, out)));
 
 	machine->setInitState(in);
-	machine->setFinalState(out);
+	machine->addFinalState(out);
 
 	return machine;
 }
@@ -109,7 +109,7 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildConcat(const std::shared_ptr<Co
 	machine->addArc(std::shared_ptr<Arc>(new Arc(leftFSM, rightFSM)));
 
 	machine->setInitState(leftFSM->getInitState());
-	machine->setFinalState(rightFSM->getFinalState());
+	machine->addFinalState(rightFSM->getFinalStates());
 
 	return machine;
 }
@@ -130,7 +130,7 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildArbitraryRepeat(const std::shar
 	machine->addArc(std::shared_ptr<Arc>(new Arc(in, out)));
 
 	machine->setInitState(in);
-	machine->setFinalState(out);
+	machine->addFinalState(out);
 
 	return machine;
 }
@@ -148,7 +148,7 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildNonZeroRepeat(const std::shared
 	machine->addArc(std::shared_ptr<Arc>(new Arc(inner, in)));
 
 	machine->setInitState(in);
-	machine->setFinalState(inner->getFinalState());
+	machine->addFinalState(inner->getFinalStates());
 
 	return machine;
 }
@@ -168,7 +168,7 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildNonOrSingle(const std::shared_p
 	machine->addArc(std::shared_ptr<Arc>(new Arc(in, out)));
 
 	machine->setInitState(in);
-	machine->setFinalState(out);
+	machine->addFinalState(out);
 
 	return machine;
 }
@@ -181,7 +181,7 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildRangeRepeat(const std::shared_p
 	auto out = std::shared_ptr<State>(new State);
 
 	machine->setInitState(in);
-	machine->setFinalState(out);
+	machine->addFinalState(out);
 
 	std::variant<std::shared_ptr<State>, std::shared_ptr<FiniteStateMachine>> prev = in;
 
@@ -223,7 +223,7 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildSymbolLiteral(const std::shared
 	machine->addArc(std::shared_ptr<Arc>(new Arc(in, out, ArcType::Symbol, expr->getChar())));
 
 	machine->setInitState(in);
-	machine->setFinalState(out);
+	machine->addFinalState(out);
 
 	return machine;
 }
@@ -237,7 +237,7 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildEmptyLiteral(const std::shared_
 	machine->addState({ in });
 
 	machine->setInitState(in);
-	machine->setFinalState(in);
+	machine->addFinalState(in);
 
 	return machine;
 }
