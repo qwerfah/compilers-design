@@ -56,3 +56,22 @@ enum class ArcType
 	/// </summary>
 	Lambda
 };
+
+/// <summary>
+/// Тип перехода, осуществленного КА.
+/// </summary>
+enum class TransitionType
+{
+	/// <summary>
+	/// Успешныый переход в новое состояние.
+	/// </summary>
+	Successful,
+	/// <summary>
+	/// Невозможно совершить переход.
+	/// </summary>
+	Impossible,
+	/// <summary>
+	/// Лямбда-переход в новое состояние.
+	/// </summary>
+	Lambda
+};

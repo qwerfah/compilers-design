@@ -11,6 +11,18 @@ FiniteStateMachine::FiniteStateMachine() :
 	_isInFinalState = false;
 }
 
+FiniteStateMachine& FiniteStateMachine::operator = (FiniteStateMachine&& machine)  
+{
+	_initState = std::move(machine._initState);
+	_finalStates = std::move(machine._finalStates);
+	_states = std::move(machine._states);
+	_arcs = std::move(machine._arcs);
+	_currentState = std::move(machine._currentState);
+	_isInFinalState = machine._isInFinalState;
+
+	return *this;
+}
+
 void FiniteStateMachine::setInitState(const std::shared_ptr<State>& state)
 {
 	if (state == nullptr)
@@ -46,6 +58,11 @@ void FiniteStateMachine::addFinalState(const std::shared_ptr<State>& state)
 
 void FiniteStateMachine::addFinalState(const std::set<std::shared_ptr<State>>& states)
 {
+	if (std::any_of(states.begin(), states.end(), [&](auto v) { return !v; }))
+	{
+		throw std::invalid_argument("One of inner states is null pointer.");
+	}
+
 	_states.insert(states.begin(), states.end());
 	_finalStates.insert(states.begin(), states.end());
 }
@@ -113,54 +130,74 @@ bool FiniteStateMachine::match(const std::string& expr)
 	std::string copy = expr.substr();
 	_currentState = _initState;
 
-	while (!_isInFinalState)
+	for ( ; ; )
 	{
-		if (copy.empty()) return false;
+		TransitionType transition = next(copy[0]);
 
-		if (next(copy[0]))
+		switch (transition)
 		{
-			copy = copy.substr(1);
+		case TransitionType::Successful: copy = copy.substr(1); break;
+		case TransitionType::Impossible: return false;
+		default: continue;
+		}
+
+		if (copy.empty() && _isInFinalState)
+		{
+			return true;
 		}
 	}
-
-	return copy.empty();
 }
 
-bool FiniteStateMachine::next(char ch)
+TransitionType FiniteStateMachine::next(char ch)
 {
-	if (_isInFinalState) return false;
+	if (_isInFinalState) return TransitionType::Impossible;
 
 	if (!_initState || _states.empty() || _finalStates.empty() || _arcs.empty())
 	{
 		throw std::invalid_argument("Invalid finite-state machine configuration.");
 	}
 
-	auto arcs = std::vector<std::shared_ptr<Arc>>();
+	std::vector<std::shared_ptr<Arc>> arcs;
+	std::vector<std::shared_ptr<Arc>> lambdaArcs;
+	std::shared_ptr<Arc> arc = nullptr;
 
-	for (auto& arc : _arcs)
-	{
-		if (arc->getInitialState() == _currentState)
-		{
-			arcs.push_back(arc);
-		}
-	}
+	std::copy_if(_arcs.begin(), _arcs.end(), std::back_inserter(arcs), [&](auto arc) { 
+		return arc->getInitialState() == _currentState;
+	});
 
 	switch (arcs.size())
 	{
 	case 0:
-		_isInFinalState = true;
-		return false;
+		throw std::logic_error("FSM is in state without outgoing arcs, but it's not a final state.");
 	case 1:
-		_currentState = arcs[0]->getFinalState();
-		_isInFinalState = _finalStates.find(_currentState) != _finalStates.end();
-		return arcs[0]->getMark() == '.' || arcs[0]->getMark() == ch;
+		arc = arcs[0];
+		break;
 	default:
-		std::uniform_int_distribution<int> distribution(0, arcs.size());
-		std::shared_ptr<Arc> arc = arcs[distribution(_engine)];
+		auto it = std::find_if(arcs.begin(), arcs.end(), [&](auto v) { return v->getMark() == ch; });
+		if (it != arcs.end())
+		{
+			arc = *it;
+		}
+		else
+		{
+			std::copy_if(arcs.begin(), arcs.end(), std::back_inserter(lambdaArcs), [&](auto v) {
+				return v->getType() == ArcType::Lambda;
+			});
+			std::uniform_int_distribution<int> distribution(0, lambdaArcs.size());
+			arc = lambdaArcs.empty() ? nullptr : arcs[distribution(_engine)];
+		}
+	}
+
+	if (arc && (arc->getType() == ArcType::Lambda || arc->getMark() == '.' || arc->getMark() == ch))
+	{
 		_currentState = arc->getFinalState();
 		_isInFinalState = _finalStates.find(_currentState) != _finalStates.end();
-		return arc->getMark() == '.' || arc->getMark() == ch;
+		return arc->getType() == ArcType::Lambda 
+			? TransitionType::Lambda 
+			: TransitionType::Successful;
 	}
+	
+	return TransitionType::Impossible;
 }
 
 
@@ -205,25 +242,13 @@ void FiniteStateMachine::_removeLambda()
 		{
 			std::set<std::shared_ptr<Arc>> inArcs;  // Входящие дуги с лямбда-переходами
 			std::set<std::shared_ptr<Arc>> outArcs; // Все исходящие дуги
-			bool isLambda = true;
 
-			for (auto arc : _arcs)
-			{
-				if (arc->getFinalState() == state)
-				{
-					inArcs.insert(arc);
-					isLambda = arc->getType() == ArcType::Lambda ? isLambda : false;
-
-					if (arc->getType() == ArcType::Lambda)
-					{
-						inArcs.insert(arc);
-					}
-				}
-				else if (arc->getInitialState() == state)
-				{
-					outArcs.insert(arc);
-				}
-			}
+			std::copy_if(_arcs.begin(), _arcs.end(), std::inserter(inArcs, inArcs.end()), [&](auto arc) {
+				return arc->getFinalState() == state && arc->getType() == ArcType::Lambda;
+			});
+			std::copy_if(_arcs.begin(), _arcs.end(), std::inserter(outArcs, outArcs.end()), [&](auto arc) {
+				return arc->getInitialState() == state;
+			});
 			
 			// Если текущее состояние не является конечным, заменяем лямбда-переходы
 			if (_finalStates.find(state) == _finalStates.end())
@@ -248,7 +273,7 @@ void FiniteStateMachine::_removeLambda()
 					throw std::invalid_argument("Final state can't have outgoing arcs.");
 				}
 
-				for (auto inArc : inArcs) { _finalStates.insert(inArc->getInitialState()); }
+				for (auto& inArc : inArcs) { _finalStates.insert(inArc->getInitialState()); }
 			}
 
 			// Удаляем все входящие лямбда-переходы
@@ -256,7 +281,9 @@ void FiniteStateMachine::_removeLambda()
 
 			// Если в текущее состояние есть только лямбда-переходы, 
 			// добавляем его для удаления и удаляем все исходящие дуги
-			if (isLambda)
+			if (std::count_if(_arcs.begin(), _arcs.end(), [&](auto arc) { 
+				return arc->getFinalState() == state; 
+			}) == inArcs.size())
 			{
 				states.push_back(state);
 				std::erase_if(_arcs, [&](auto el) { return outArcs.find(el) != outArcs.end(); });
@@ -272,4 +299,89 @@ void FiniteStateMachine::_removeLambda()
 
 void FiniteStateMachine::_determine()
 {
+	FiniteStateMachine machine;
+
+	_initState->addInnerState(_initState);
+	machine._initState = _initState;
+	_determineRecur(machine, _initState);
+
+	std::copy_if(machine._states.begin(), machine._states.end(), 
+		std::inserter(machine._finalStates, machine._finalStates.end()), [&](auto v) {
+			return std::any_of(v->getInnerStates().begin(), v->getInnerStates().end(), [&](auto s) {
+				return _finalStates.find(s) != _finalStates.end();
+			});
+		});
+
+	machine._clearInnerStates();
+
+	*this = std::move(machine);
 }
+
+void FiniteStateMachine::_determineRecur(FiniteStateMachine& machine, const std::shared_ptr<State>& state)
+{
+	if (!state)
+	{
+		throw std::invalid_argument("Null state pointer.");
+	}
+
+	std::set<std::shared_ptr<Arc>> arcs;
+
+	machine._states.insert(state);
+
+	// Находим все дуги, исходящие из данного множества состояний
+	for (auto& innerState : state->getInnerStates())
+	{
+		std::copy_if(_arcs.begin(), _arcs.end(), std::inserter(arcs, arcs.end()), [&](auto v) { 
+			return v->getInitialState() == innerState; 
+		});
+	}
+
+	for (auto& arc : arcs)
+	{
+		std::set<std::shared_ptr<Arc>> oneMarkArcs;
+		std::set<std::shared_ptr<State>> states;
+
+		// Определяем множество дуг с одинаковыми метками
+		std::copy_if(arcs.begin(), arcs.end(), std::inserter(oneMarkArcs, oneMarkArcs.end()), [&](auto v) {
+			return v->getMark() == arc->getMark();
+		});
+
+		// Определяем множество состояний, в которые есть переход по данной метке
+		for (auto& arc : oneMarkArcs) { states.insert(arc->getFinalState()); }
+
+		// Ищем состояние, являющееся таким же множеством состояний в новом КА
+		auto it = std::find_if(machine._states.begin(), machine._states.end(), [&](auto v) {
+			return v->getInnerStates() == states;
+		});
+
+		// Если оно уже есть, добавляем дугу из нового состояния в данное
+		if (it != machine._states.end())
+		{
+			machine._arcs.insert(std::shared_ptr<Arc>(new Arc(state, *it)));
+		}
+		// Иначе добавляем состояние с данным множеством состояний и 
+		// дугу в него, а также ищем все состояния, связанные с новым
+		else
+		{
+			auto newState = std::shared_ptr<State>(new State);
+
+			newState->addInnerState(states);
+
+			machine._states.insert(newState);
+			machine._arcs.insert(std::shared_ptr<Arc>(new Arc(state, newState)));
+
+			_determineRecur(machine, newState);
+		}
+	}
+}
+
+void FiniteStateMachine::_clearInnerStates()
+{
+	for (auto& state : _states) 
+	{ 
+		state->clearInnerStates(); 
+	}
+}
+
+
+

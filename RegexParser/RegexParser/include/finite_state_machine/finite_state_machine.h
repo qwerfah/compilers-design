@@ -8,7 +8,8 @@
 #include <memory>
 #include <stdexcept>
 #include <variant>
-
+#include <iterator>
+#include <execution>
 
 /// <summary>
 /// Описывает конечный автомат.
@@ -17,6 +18,9 @@ class FiniteStateMachine
 {
 public:
 	FiniteStateMachine();
+
+	FiniteStateMachine& operator = (FiniteStateMachine&& machine);
+
 
 	/// <summary>
 	/// Установить начальное состояние для данного КА 
@@ -76,7 +80,7 @@ public:
 	/// Переход из текущего состояния в следующее состояние.
 	/// </summary>
 	/// <returns> Метка дуги, по которой был осуществлен переход. </returns>
-	bool next(char ch);
+	TransitionType next(char ch);
 
 	/// <summary>
 	/// Выполняет детерминизацию данного КА.
@@ -157,5 +161,17 @@ private:
 	/// выполняет детерминизацию данного КА, в котором предварительно удалены все Lambda-переходы.
 	/// </summary>
 	void _determine();
+
+	/// <summary>
+	/// Выполняет рекурсивное построение детерминированного КА путем объединения состояний исходного КА в множества.
+	/// </summary>
+	/// <param name="machine"> Детерминированный КА, получаемый в процессе построения из исходного КА. </param>
+	/// <param name="state"> Начальное состояние нового КА, с которого начинается его построение. </param>
+	void _determineRecur(FiniteStateMachine& machine, const std::shared_ptr<State>& state);
+
+	/// <summary>
+	/// Удаление внутренних состояний всех состояний КА после детерминизации.
+	/// </summary>
+	void _clearInnerStates();
 };
 

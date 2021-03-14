@@ -234,7 +234,7 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildEmptyLiteral(const std::shared_
 
 	auto in = std::shared_ptr<State>(new State);
 
-	machine->addState({ in });
+	machine->addState(in);
 
 	machine->setInitState(in);
 	machine->addFinalState(in);
