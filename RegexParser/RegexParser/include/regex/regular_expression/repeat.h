@@ -1,11 +1,11 @@
 #pragma once
 
-#define REPEAT_STR "*"
-
 #include "regular_expression.h"
 #include "../../enums.h"
 
 #include <memory>
+
+const std::string REPEAT_STR = "*";
 
 /// <summary>
 /// ќписывает регул€рное выражение, предполагающее 

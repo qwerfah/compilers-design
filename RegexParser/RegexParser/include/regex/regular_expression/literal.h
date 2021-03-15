@@ -3,6 +3,8 @@
 #include "regular_expression.h"
 #include "../../enums.h"
 
+#include <string>
+
 /// <summary>
 /// Символьный литерал.
 /// </summary>

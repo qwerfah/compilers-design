@@ -10,6 +10,7 @@
 #include <variant>
 #include <iterator>
 #include <execution>
+#include <fstream>
 
 /// <summary>
 /// Описывает конечный автомат.
@@ -173,5 +174,10 @@ private:
 	/// Удаление внутренних состояний всех состояний КА после детерминизации.
 	/// </summary>
 	void _clearInnerStates();
+
+	/// <summary>
+	/// Осуществляет запись КА в файл в виде графа на языке разметки DOT.
+	/// </summary>
+	void _writeToFile();
 };
 

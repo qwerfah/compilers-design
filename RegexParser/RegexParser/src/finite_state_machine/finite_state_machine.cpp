@@ -70,7 +70,7 @@ void FiniteStateMachine::addFinalState(const std::set<std::shared_ptr<State>>& s
 void FiniteStateMachine::addState(const std::initializer_list<
 	std::variant<std::shared_ptr<State>, std::shared_ptr<FiniteStateMachine>>>& list)
 {
-	for (auto elem : list)
+	for (auto& elem : list)
 	{
 		try
 		{
@@ -234,67 +234,68 @@ const std::shared_ptr<State>& FiniteStateMachine::getCurrentState() const
 
 void FiniteStateMachine::_removeLambda()
 {
-	std::vector<std::shared_ptr<State>> states;
+	auto it = std::find_if(_arcs.begin(), _arcs.end(), [&](auto arc) {
+		return arc->getType() == ArcType::Lambda;
+	});
 
-	for (auto state : _states)
+	_writeToFile();
+
+	// Удаляем все лямбда-переходы и определяем новые конечные состояния
+	while  (it != _arcs.end())
 	{
-		if (state != _initState)
+		std::set<std::shared_ptr<Arc>> outArcs;
+
+		std::copy_if(_arcs.begin(), _arcs.end(), std::inserter(outArcs, outArcs.end()), [&](auto arc) {
+			return arc != *it && arc->getInitialState() == (*it)->getFinalState();
+		});
+
+		if (_finalStates.find((*it)->getFinalState()) != _finalStates.end())
 		{
-			std::set<std::shared_ptr<Arc>> inArcs;  // Входящие дуги с лямбда-переходами
-			std::set<std::shared_ptr<Arc>> outArcs; // Все исходящие дуги
+			_finalStates.insert((*it)->getInitialState());
+		}
 
-			std::copy_if(_arcs.begin(), _arcs.end(), std::inserter(inArcs, inArcs.end()), [&](auto arc) {
-				return arc->getFinalState() == state && arc->getType() == ArcType::Lambda;
-			});
-			std::copy_if(_arcs.begin(), _arcs.end(), std::inserter(outArcs, outArcs.end()), [&](auto arc) {
-				return arc->getInitialState() == state;
-			});
-			
-			// Если текущее состояние не является конечным, заменяем лямбда-переходы
-			if (_finalStates.find(state) == _finalStates.end())
+		for (auto& arc : outArcs)
+		{
+			_arcs.insert(std::shared_ptr<Arc>(new Arc(
+				(*it)->getInitialState(),
+				arc->getFinalState(),
+				arc->getType(),
+				arc->getMark())));
+
+			if (arc->getType() == ArcType::Lambda)
 			{
-				for (auto inArc : inArcs)
-				{
-					for (auto outArc : outArcs)
-					{
-						_arcs.insert(std::shared_ptr<Arc>(new Arc(
-							inArc->getInitialState(),
-							outArc->getFinalState(),
-							outArc->getType(),
-							outArc->getMark())));
-					}
-				}
-			}
-			// Иначе делаем все состояния, из которых есть лямбда-переходы в текущее, конечными
-			else
-			{
-				if (!outArcs.empty())
-				{
-					throw std::invalid_argument("Final state can't have outgoing arcs.");
-				}
-
-				for (auto& inArc : inArcs) { _finalStates.insert(inArc->getInitialState()); }
-			}
-
-			// Удаляем все входящие лямбда-переходы
-			std::erase_if(_arcs, [&](auto el) { return inArcs.find(el) != inArcs.end(); });
-
-			// Если в текущее состояние есть только лямбда-переходы, 
-			// добавляем его для удаления и удаляем все исходящие дуги
-			if (std::count_if(_arcs.begin(), _arcs.end(), [&](auto arc) { 
-				return arc->getFinalState() == state; 
-			}) == inArcs.size())
-			{
-				states.push_back(state);
-				std::erase_if(_arcs, [&](auto el) { return outArcs.find(el) != outArcs.end(); });
+				_arcs.erase(arc);
 			}
 		}
+
+		_arcs.erase(it);
+
+		it = std::find_if(_arcs.begin(), _arcs.end(), [&](auto arc) {
+			return arc->getType() == ArcType::Lambda;
+		});
+
+		_writeToFile();
 	}
 
-	for (auto state : states)
-	{
-		_states.erase(state);
-	}
+	std::set<std::shared_ptr<State>> states;
+
+	// Находим все состояния кроме начального, в которые не входит ни одна дуга.
+	std::copy_if(_states.begin(), _states.end(), std::inserter(states, states.end()), [&](auto state) { 
+		return state != _initState && std::none_of(_arcs.begin(), _arcs.end(), [&](auto arc) {
+			return arc->getFinalState() == state;
+		});
+	});
+
+	// Удаляем все найденные состояния и исходящие из них дуги.
+	std::erase_if(_arcs, [&](auto arc) {
+		return states.find(arc->getInitialState()) != states.end();
+	});
+
+	std::erase_if(_states, [&](auto state) {
+		return states.find(state) != states.end();
+	});
+
+	_writeToFile();
 }
 
 void FiniteStateMachine::_determine()
@@ -379,8 +380,39 @@ void FiniteStateMachine::_clearInnerStates()
 {
 	for (auto& state : _states) 
 	{ 
-		state->clearInnerStates(); 
+		state->clearInnerStates();
 	}
+}
+
+void FiniteStateMachine::_writeToFile()
+{
+	std::ofstream out;
+
+	out.open("graph.dot");
+
+	if (out.is_open())
+	{
+		out << "digraph FSM {\n";
+
+		for (auto& state : _states)
+		{
+			out << state->getId() << std::endl;
+		}
+
+		for (auto& arc : _arcs)
+		{
+			out << arc->getInitialState()->getId()
+				<< " -> "
+				<< arc->getFinalState()->getId()
+				<< " [label="
+				<< (arc->getType() == ArcType::Lambda ? "lambda" : std::string({ arc->getMark() }))
+				<< "]" << std::endl;
+		}
+
+		out << "}";
+	}
+
+	out.close();
 }
 
 

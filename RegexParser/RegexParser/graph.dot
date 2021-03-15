@@ -1,0 +1,24 @@
+digraph FSM {
+9
+11
+7
+3
+0
+5
+13
+17
+15
+5 -> 11 [label=t]
+7 -> 9 [label=c]
+3 -> 5 [label=b]
+5 -> 11 [label=t]
+9 -> 7 [label=b]
+5 -> 7 [label=b]
+5 -> 3 [label=a]
+9 -> 11 [label=t]
+15 -> 17 [label=t]
+13 -> 15 [label=s]
+9 -> 11 [label=t]
+9 -> 3 [label=a]
+11 -> 13 [label=e]
+}

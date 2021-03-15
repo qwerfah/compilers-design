@@ -16,16 +16,16 @@ class Arc
 public:
 	Arc(const std::shared_ptr<State>& initialState, 
 		const std::shared_ptr<State>& finalState, 
-		ArcType type = ArcType::Lambda, char mark = 0);
+		ArcType type = ArcType::Lambda, char mark = 'λ');
 	Arc(const std::shared_ptr<FiniteStateMachine>& machine,
 		const std::shared_ptr<State>& finalState, 
-		ArcType type = ArcType::Lambda, char mark = 0);
+		ArcType type = ArcType::Lambda, char mark = 'λ');
 	Arc(const std::shared_ptr<State>& initialState, 
 		const std::shared_ptr<FiniteStateMachine>& machine, 
-		ArcType type = ArcType::Lambda, char mark = 0);
+		ArcType type = ArcType::Lambda, char mark = 'λ');
 	Arc(const std::shared_ptr<FiniteStateMachine>& initMachine,
 		const std::shared_ptr<FiniteStateMachine>& finalMachine,
-		ArcType type = ArcType::Lambda, char mark = 0);
+		ArcType type = ArcType::Lambda, char mark = 'λ');
 
 	/// <summary>
 	/// �������� ���������, �� �������� ������� ������ ����.

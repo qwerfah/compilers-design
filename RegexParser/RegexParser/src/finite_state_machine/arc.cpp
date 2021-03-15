@@ -1,4 +1,4 @@
-#include "../../include/finite_state_machine/arc.h"
+﻿#include "../../include/finite_state_machine/arc.h"
 #include "../../include/finite_state_machine/finite_state_machine.h"
 
 Arc::Arc(const std::shared_ptr<State>& initialState, 
@@ -52,7 +52,7 @@ Arc::Arc(const std::shared_ptr<FiniteStateMachine>& initMachine,
     _type(type),
     _mark(mark)
 {
-    if (!initMachine->getFinalStates().size() != 1 || !finalMachine->getInitState())
+    if (initMachine->getFinalStates().size() != 1 || !finalMachine->getInitState())
     {
         throw std::invalid_argument("No init or final state.");
     }

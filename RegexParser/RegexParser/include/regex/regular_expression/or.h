@@ -1,10 +1,11 @@
 #pragma once
 
-#define OR_STR "|"
-
 #include "regular_expression.h"
 
 #include <memory>
+#include <string>
+
+const std::string OR_STR = "|";
 
 /// <summary>
 /// ќписывает конструкцию "|" в регул€рном выражении.
