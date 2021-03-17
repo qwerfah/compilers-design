@@ -21,7 +21,6 @@ void Interface::loop()
             return;
         default:
             std::cout << std::endl <<  "Bad option, try again" << std::endl;
-            system("pause");
         }
     }
 }

@@ -122,6 +122,7 @@ void FiniteStateMachine::addMachine(const std::shared_ptr<FiniteStateMachine>& m
 
 bool FiniteStateMachine::match(const std::string& expr)
 {
+
 	if (!_initState || _states.empty() || _finalStates.empty() || _arcs.empty())
 	{
 		throw std::invalid_argument("Invalid finite-state machine configuration.");
@@ -150,8 +151,6 @@ bool FiniteStateMachine::match(const std::string& expr)
 
 TransitionType FiniteStateMachine::next(char ch)
 {
-	if (_isInFinalState) return TransitionType::Impossible;
-
 	if (!_initState || _states.empty() || _finalStates.empty() || _arcs.empty())
 	{
 		throw std::invalid_argument("Invalid finite-state machine configuration.");
@@ -168,7 +167,7 @@ TransitionType FiniteStateMachine::next(char ch)
 	switch (arcs.size())
 	{
 	case 0:
-		throw std::logic_error("FSM is in state without outgoing arcs, but it's not a final state.");
+		return TransitionType::Impossible;
 	case 1:
 		arc = arcs[0];
 		break;
@@ -206,6 +205,7 @@ void FiniteStateMachine::determine()
 {
 	_removeLambda();
 	_determine();
+	_writeToFile();
 }
 
 void FiniteStateMachine::minimize()
@@ -232,68 +232,78 @@ const std::shared_ptr<State>& FiniteStateMachine::getCurrentState() const
 	return _currentState;
 }
 
-void FiniteStateMachine::_removeLambda()
+std::set<std::shared_ptr<Arc>> FiniteStateMachine::_bfs(
+	const std::shared_ptr<State>& init, 
+	std::set<std::shared_ptr<State>>& finalStates)
 {
-	auto it = std::find_if(_arcs.begin(), _arcs.end(), [&](auto arc) {
-		return arc->getType() == ArcType::Lambda;
-	});
+	std::queue<std::shared_ptr<Arc>> queue;
+	std::set<std::shared_ptr<State>> marked;
+	std::set<std::shared_ptr<Arc>> arcs;
 
-	_writeToFile();
+	queue.push(std::shared_ptr<Arc>(new Arc(init, init)));
 
-	// ”дал€ем все л€мбда-переходы и определ€ем новые конечные состо€ни€
-	while  (it != _arcs.end())
+	while (!queue.empty())
 	{
-		std::set<std::shared_ptr<Arc>> outArcs;
+		auto arc = queue.front();
+		auto& state = arc->getFinalState();
+		queue.pop();
 
-		std::copy_if(_arcs.begin(), _arcs.end(), std::inserter(outArcs, outArcs.end()), [&](auto arc) {
-			return arc != *it && arc->getInitialState() == (*it)->getFinalState();
-		});
-
-		if (_finalStates.find((*it)->getFinalState()) != _finalStates.end())
+		if (arc->getType() != ArcType::Lambda)
 		{
-			_finalStates.insert((*it)->getInitialState());
+			arcs.insert(std::shared_ptr<Arc>(
+				new Arc(init, state, arc->getType(), arc->getMark())));
 		}
-
-		for (auto& arc : outArcs)
+		else
 		{
-			_arcs.insert(std::shared_ptr<Arc>(new Arc(
-				(*it)->getInitialState(),
-				arc->getFinalState(),
-				arc->getType(),
-				arc->getMark())));
-
-			if (arc->getType() == ArcType::Lambda)
+			if (_finalStates.find(state) != _finalStates.end())
 			{
-				_arcs.erase(arc);
+				finalStates.insert(init);
 			}
+
+			if (marked.find(state) != marked.end())
+			{
+				continue;
+			}
+
+			marked.insert(state);
+			std::set<std::shared_ptr<Arc>> successors;
+
+			std::copy_if(_arcs.begin(), _arcs.end(),
+				std::inserter(successors, successors.end()), [&](auto v) { 
+					return v->getInitialState() == state;
+				});
+
+			for (auto& succ : successors) { queue.push(succ); }
 		}
-
-		_arcs.erase(it);
-
-		it = std::find_if(_arcs.begin(), _arcs.end(), [&](auto arc) {
-			return arc->getType() == ArcType::Lambda;
-		});
-
-		_writeToFile();
 	}
 
-	std::set<std::shared_ptr<State>> states;
+	return arcs;
+}
 
-	// Ќаходим все состо€ни€ кроме начального, в которые не входит ни одна дуга.
-	std::copy_if(_states.begin(), _states.end(), std::inserter(states, states.end()), [&](auto state) { 
-		return state != _initState && std::none_of(_arcs.begin(), _arcs.end(), [&](auto arc) {
-			return arc->getFinalState() == state;
+void FiniteStateMachine::_removeLambda()
+{
+	_writeToFile();
+
+	std::set<std::shared_ptr<Arc>> newArcs;
+	std::set<std::shared_ptr<State>> newStates;
+	std::set<std::shared_ptr<State>> newFinalStates;
+
+	std::copy_if(_states.begin(), _states.end(), 
+		std::inserter(newStates, newStates.end()), [&](auto state) {
+		return state == _initState || std::any_of(_arcs.begin(), _arcs.end(), [&](auto arc) {
+			return arc->getFinalState() == state && arc->getType() != ArcType::Lambda;
 		});
 	});
 
-	// ”дал€ем все найденные состо€ни€ и исход€щие из них дуги.
-	std::erase_if(_arcs, [&](auto arc) {
-		return states.find(arc->getInitialState()) != states.end();
-	});
+	for (auto& state : newStates)
+	{
+		std::set<std::shared_ptr<Arc>> arcs = _bfs(state, newFinalStates);
+		newArcs.insert(arcs.begin(), arcs.end());
+	}
 
-	std::erase_if(_states, [&](auto state) {
-		return states.find(state) != states.end();
-	});
+	_states = newStates;
+	_arcs = newArcs;
+	_finalStates = newFinalStates;
 
 	_writeToFile();
 }
@@ -318,7 +328,8 @@ void FiniteStateMachine::_determine()
 	*this = std::move(machine);
 }
 
-void FiniteStateMachine::_determineRecur(FiniteStateMachine& machine, const std::shared_ptr<State>& state)
+void FiniteStateMachine::_determineRecur(
+	FiniteStateMachine& machine, const std::shared_ptr<State>& state)
 {
 	if (!state)
 	{
@@ -343,7 +354,8 @@ void FiniteStateMachine::_determineRecur(FiniteStateMachine& machine, const std:
 		std::set<std::shared_ptr<State>> states;
 
 		// ќпредел€ем множество дуг с одинаковыми метками
-		std::copy_if(arcs.begin(), arcs.end(), std::inserter(oneMarkArcs, oneMarkArcs.end()), [&](auto v) {
+		std::copy_if(arcs.begin(), arcs.end(), 
+			std::inserter(oneMarkArcs, oneMarkArcs.end()), [&](auto v) {
 			return v->getMark() == arc->getMark();
 		});
 
@@ -358,7 +370,8 @@ void FiniteStateMachine::_determineRecur(FiniteStateMachine& machine, const std:
 		// ≈сли оно уже есть, добавл€ем дугу из нового состо€ни€ в данное
 		if (it != machine._states.end())
 		{
-			machine._arcs.insert(std::shared_ptr<Arc>(new Arc(state, *it)));
+			machine._arcs.insert(std::shared_ptr<Arc>(
+				new Arc(state, *it, arc->getType(), arc->getMark())));
 		}
 		// »наче добавл€ем состо€ние с данным множеством состо€ний и 
 		// дугу в него, а также ищем все состо€ни€, св€занные с новым
@@ -369,7 +382,8 @@ void FiniteStateMachine::_determineRecur(FiniteStateMachine& machine, const std:
 			newState->addInnerState(states);
 
 			machine._states.insert(newState);
-			machine._arcs.insert(std::shared_ptr<Arc>(new Arc(state, newState)));
+			machine._arcs.insert(std::shared_ptr<Arc>(
+				new Arc(state, newState, arc->getType(), arc->getMark())));
 
 			_determineRecur(machine, newState);
 		}
