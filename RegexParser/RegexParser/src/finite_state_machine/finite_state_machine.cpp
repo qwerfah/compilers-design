@@ -1,4 +1,5 @@
 #include "../../include/finite_state_machine/finite_state_machine.h"
+#include "../../include/interface.h"
 
 FiniteStateMachine::FiniteStateMachine() :
 	_initState(nullptr),
@@ -208,41 +209,25 @@ void FiniteStateMachine::determine()
 	_writeToFile();
 }
 
+void FiniteStateMachine::_execDebug(const std::function<void()>& action, const std::string& message)
+{
+	action();
+	_writeToFile();
+	if (!Interface::isDebugOn()) return;
+	std::cout << std::endl << message << std::endl;
+	system("pause");
+}
+
 void FiniteStateMachine::minimize()
 {
-	_writeToFile();
-	std::cout << std::endl << "Initial FSA printed to file" << std::endl;
-	system("pause");
+	_execDebug([&]() {}, "Initial FSA printed to file");
+	_execDebug([&]() { _reverse(); }, "Reversed FSA printed to file");
+	_execDebug([&]() { _removeLambda(); }, "FSA without lambdas printed to file");
+	_execDebug([&]() { _determine(); }, "Determined FSA printed to file");
 
-	_reverse();
-	_writeToFile();
-	std::cout << std::endl << "Reversed FSA printed to file" << std::endl;
-	system("pause");
-
-	_removeLambda();
-	_writeToFile();
-	std::cout << std::endl << "FSA without lambdas printed to file" << std::endl;
-	system("pause");
-
-	_determine();
-	_writeToFile();
-	std::cout << std::endl << "Determined FSA printed to file" << std::endl;
-	system("pause");
-
-	_reverse();
-	_writeToFile();
-	std::cout << std::endl << "Reversed FSA printed to file" << std::endl;
-	system("pause");
-
-	_removeLambda();
-	_writeToFile();
-	std::cout << std::endl << "FSA without lambdas printed to file" << std::endl;
-	system("pause");
-
-	_determine();
-	_writeToFile();
-	std::cout << std::endl << "Determined FSA printed to file" << std::endl;
-	system("pause");
+	_execDebug([&]() { _reverse(); }, "Reversed FSA printed to file");
+	_execDebug([&]() { _removeLambda(); }, "FSA without lambdas printed to file");
+	_execDebug([&]() { _determine(); }, "Determined FSA printed to file");
 }
 
 bool FiniteStateMachine::isInFinalState() const

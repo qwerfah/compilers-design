@@ -1,13 +1,20 @@
 #include "../include/interface.h"
 
+bool Interface::_isDebugOn = false;
+
 void Interface::loop()
 {
     unsigned short option = 0;
+    std::string garbage = "";
 
     while (true)
     {
         _printMenu();
+        std::cin.clear();
+        fflush(stdin);
         std::cin >> option;
+
+        system("cls");
 
         switch (option)
         {
@@ -17,10 +24,13 @@ void Interface::loop()
         case 2:
             _matchRegularExpression();
             break;
-        case 3: 
+        case 3:
+            _isDebugOn = !_isDebugOn;
+            break;
+        case 4:
             return;
         default:
-            std::cout << std::endl <<  "Bad option, try again" << std::endl;
+            std::cout << std::endl << "Bad option, try again" << std::endl;
             system("pause");
         }
     }
@@ -61,17 +71,24 @@ void Interface::printTree(const std::shared_ptr<RegularExpression>& tree, std::s
     }
 }
 
+bool Interface::isDebugOn()
+{
+    return _isDebugOn;
+}
+
 void Interface::_printMenu() const
 {
     system("cls");
 
     std::cout << std::endl;
+    std::cout << "Debug mode: " << (_isDebugOn ? "On" : "Off") << std::endl;
     std::cout << "Current expression: "
         << (_regex ? _regex->getExpression() : "none") << std::endl;
     std::cout << "*********** Menu ***********" << std::endl;
     std::cout << "1 --- Set regular expression" << std::endl;
     std::cout << "2 ---- Match regex to string" << std::endl;
-    std::cout << "3 --------------------- Exit" << std::endl;
+    std::cout << "3 -------------- Change mode" << std::endl;
+    std::cout << "4 --------------------- Exit" << std::endl;
     std::cout << "****************************" << std::endl;
     std::cout << "Enter option: ";
 }

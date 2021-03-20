@@ -17,6 +17,7 @@ bool Regex::match(const std::string& chain)
 
 void Regex::buildFSM(const std::string& expression)
 {
+	_expression = expression;
 	_buildFSM(expression);
 }
 

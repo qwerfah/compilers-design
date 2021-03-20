@@ -18,8 +18,11 @@ public:
 
 	void printTree(const std::shared_ptr<RegularExpression>& tree, std::string&& tabs = "");
 
+	static bool isDebugOn();
+
 private:
 	std::shared_ptr<Regex> _regex;
+	static bool _isDebugOn;
 
 	void _printMenu() const;
 

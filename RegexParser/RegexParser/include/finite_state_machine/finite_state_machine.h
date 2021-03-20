@@ -12,6 +12,7 @@
 #include <execution>
 #include <fstream>
 #include <iostream>
+#include <functional>
 
 /// <summary>
 /// Описывает конечный автомат.
@@ -201,5 +202,7 @@ private:
 	/// Осуществляет запись КА в файл в виде графа на языке разметки DOT.
 	/// </summary>
 	void _writeToFile();
+
+	void _execDebug(const std::function<void()>& action, const std::string& message);
 };
 
