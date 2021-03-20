@@ -32,7 +32,10 @@ public:
 	/// <param name="expression"> Строковое представление регулярного выражения. </param>
 	void buildFSM(const std::string& expression);
 
+	const std::string& getExpression() const;
+
 private:
+	std::string _expression;
 	/// <summary>
 	/// Текущий парсер для последнего регулярного выражения, переданного в функцию buildFSM или конструктор. 
 	/// </summary>

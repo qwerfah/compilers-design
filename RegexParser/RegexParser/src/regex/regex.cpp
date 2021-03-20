@@ -1,6 +1,6 @@
 #include "../../include/regex/regex.h"
 
-Regex::Regex(const std::string& expression)
+Regex::Regex(const std::string& expression) : _expression(expression)
 {
 	_buildFSM(expression);
 }
@@ -20,6 +20,11 @@ void Regex::buildFSM(const std::string& expression)
 	_buildFSM(expression);
 }
 
+const std::string& Regex::getExpression() const
+{
+	return _expression;
+}
+
 void Regex::_buildFSM(const std::string& expression)
 {
 	_parser = std::shared_ptr<RegexParser>(new RegexParser(expression));
@@ -36,7 +41,7 @@ void Regex::_buildFSM(const std::string& expression)
 		throw std::logic_error("Can't build FSM for expression tree.");
 	}
 
-	_machine->determine();
+	//_machine->determine();
 	_machine->minimize();
 }
 
@@ -196,10 +201,31 @@ std::shared_ptr<FiniteStateMachine> Regex::_buildRangeRepeat(const std::shared_p
 
 		if (i >= expr->getRangeFrom())
 		{
-			machine->addArc(std::shared_ptr<Arc>(new Arc(curr, out)));
+			try
+			{
+				machine->addArc(std::shared_ptr<Arc>(
+					new Arc(std::get<std::shared_ptr<State>>(prev), out)));
+			}
+			catch (std::exception _)
+			{
+				machine->addArc(std::shared_ptr<Arc>(
+					new Arc(std::get<std::shared_ptr<FiniteStateMachine>>(prev), out)));
+			}
+			//machine->addArc(std::shared_ptr<Arc>(new Arc(prev, out)));
 		}
 
 		prev = curr;
+	}
+
+	try
+	{
+		machine->addArc(std::shared_ptr<Arc>(
+			new Arc(std::get<std::shared_ptr<State>>(prev), out)));
+	}
+	catch (std::exception _)
+	{
+		machine->addArc(std::shared_ptr<Arc>(
+			new Arc(std::get<std::shared_ptr<FiniteStateMachine>>(prev), out)));
 	}
 
 	return machine;

@@ -11,6 +11,7 @@
 #include <iterator>
 #include <execution>
 #include <fstream>
+#include <iostream>
 
 /// <summary>
 /// Описывает конечный автомат.
@@ -184,6 +185,12 @@ private:
 	/// <param name="machine"> Детерминированный КА, получаемый в процессе построения из исходного КА. </param>
 	/// <param name="state"> Начальное состояние нового КА, с которого начинается его построение. </param>
 	void _determineRecur(FiniteStateMachine& machine, const std::shared_ptr<State>& state);
+
+	/// <summary>
+	/// Строит на основе данного КА обратный ему КА 
+	/// (реверсируются все переходы, а конечные состояния меняются с начальными).
+	/// </summary>
+	void _reverse();
 
 	/// <summary>
 	/// Удаление внутренних состояний всех состояний КА после детерминизации.

@@ -210,6 +210,39 @@ void FiniteStateMachine::determine()
 
 void FiniteStateMachine::minimize()
 {
+	_writeToFile();
+	std::cout << std::endl << "Initial FSA printed to file" << std::endl;
+	system("pause");
+
+	_reverse();
+	_writeToFile();
+	std::cout << std::endl << "Reversed FSA printed to file" << std::endl;
+	system("pause");
+
+	_removeLambda();
+	_writeToFile();
+	std::cout << std::endl << "FSA without lambdas printed to file" << std::endl;
+	system("pause");
+
+	_determine();
+	_writeToFile();
+	std::cout << std::endl << "Determined FSA printed to file" << std::endl;
+	system("pause");
+
+	_reverse();
+	_writeToFile();
+	std::cout << std::endl << "Reversed FSA printed to file" << std::endl;
+	system("pause");
+
+	_removeLambda();
+	_writeToFile();
+	std::cout << std::endl << "FSA without lambdas printed to file" << std::endl;
+	system("pause");
+
+	_determine();
+	_writeToFile();
+	std::cout << std::endl << "Determined FSA printed to file" << std::endl;
+	system("pause");
 }
 
 bool FiniteStateMachine::isInFinalState() const
@@ -301,9 +334,9 @@ void FiniteStateMachine::_removeLambda()
 		newArcs.insert(arcs.begin(), arcs.end());
 	}
 
-	_states = newStates;
-	_arcs = newArcs;
-	_finalStates = newFinalStates;
+	_states = std::move(newStates);
+	_arcs = std::move(newArcs);
+	_finalStates = std::move(newFinalStates);
 
 	_writeToFile();
 }
@@ -317,8 +350,8 @@ void FiniteStateMachine::_determine()
 	_determineRecur(machine, _initState);
 
 	std::copy_if(machine._states.begin(), machine._states.end(), 
-		std::inserter(machine._finalStates, machine._finalStates.end()), [&](auto v) {
-			return std::any_of(v->getInnerStates().begin(), v->getInnerStates().end(), [&](auto s) {
+		std::inserter(machine._finalStates, machine._finalStates.end()), [&](auto state) {
+			return std::any_of(state->getInnerStates().begin(), state->getInnerStates().end(), [&](auto s) {
 				return _finalStates.find(s) != _finalStates.end();
 			});
 		});
@@ -348,8 +381,13 @@ void FiniteStateMachine::_determineRecur(
 		});
 	}
 
+	std::set<char> marks;
+
 	for (auto& arc : arcs)
 	{
+		if (marks.find(arc->getMark()) != marks.end()) continue;
+		marks.insert(arc->getMark());
+
 		std::set<std::shared_ptr<Arc>> oneMarkArcs;
 		std::set<std::shared_ptr<State>> states;
 
@@ -390,6 +428,42 @@ void FiniteStateMachine::_determineRecur(
 	}
 }
 
+void FiniteStateMachine::_reverse()
+{
+	std::set<std::shared_ptr<Arc>> newArcs;
+
+	for (auto& arc : _arcs)
+	{
+		newArcs.insert(std::shared_ptr<Arc>(new Arc(
+			arc->getFinalState(), 
+			arc->getInitialState(),
+			arc->getType(), 
+			arc->getMark())));
+	}
+
+	_arcs = std::move(newArcs);
+
+	if (_finalStates.size() == 1)
+	{
+		auto state = _initState;
+		_initState = *_finalStates.begin();
+		_finalStates = { state };
+	}
+	else
+	{
+		auto state = _initState;
+		_initState = std::shared_ptr<State>(new State());
+		_states.insert(_initState);
+
+		for (auto& finalState : _finalStates)
+		{
+			_arcs.insert(std::shared_ptr<Arc>(new Arc(_initState, finalState)));
+		}
+
+		_finalStates = { state };
+	}
+}
+
 void FiniteStateMachine::_clearInnerStates()
 {
 	for (auto& state : _states) 
@@ -406,11 +480,14 @@ void FiniteStateMachine::_writeToFile()
 
 	if (out.is_open())
 	{
-		out << "digraph FSM {\n";
+		out << "digraph FSM {" << std::endl;
+		out << "In [shape=none fontcolor=white]" << std::endl;
+		out << "In -> " << _initState->getId() << std::endl;
 
-		for (auto& state : _states)
+		for (auto& state : _finalStates)
 		{
-			out << state->getId() << std::endl;
+			out << "Out" << state->getId() << " [shape=none fontcolor=white]" << std::endl;
+			out << state->getId() << " -> Out" << state->getId() << std::endl;
 		}
 
 		for (auto& arc : _arcs)
@@ -419,7 +496,9 @@ void FiniteStateMachine::_writeToFile()
 				<< " -> "
 				<< arc->getFinalState()->getId()
 				<< " [label="
-				<< (arc->getType() == ArcType::Lambda ? "lambda" : std::string({ arc->getMark() }))
+				<< (arc->getType() == ArcType::Lambda
+					? "lambda" 
+					: "\"" + std::string({ arc->getMark() }) +"\"")
 				<< "]" << std::endl;
 		}
 

@@ -1,25 +1,8 @@
 digraph FSM {
-25
-0
-20
-21
-23
-19
-24
-22
-18
-18 -> 19 [label=b]
-0 -> 18 [label=a]
-0 -> 20 [label=t]
-25 -> 24 [label=b]
-0 -> 24 [label=b]
-19 -> 20 [label=t]
-19 -> 24 [label=b]
-19 -> 18 [label=a]
-24 -> 25 [label=c]
-25 -> 20 [label=t]
-21 -> 22 [label=s]
-25 -> 18 [label=a]
-20 -> 21 [label=e]
-22 -> 23 [label=t]
+In [shape=none fontcolor=white]
+In -> 5
+Out7 [shape=none fontcolor=white]
+7 -> Out7
+5 -> 6 [label="b"]
+6 -> 7 [label="d"]
 }

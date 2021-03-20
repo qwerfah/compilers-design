@@ -21,6 +21,7 @@ void Interface::loop()
             return;
         default:
             std::cout << std::endl <<  "Bad option, try again" << std::endl;
+            system("pause");
         }
     }
 }
@@ -65,6 +66,8 @@ void Interface::_printMenu() const
     system("cls");
 
     std::cout << std::endl;
+    std::cout << "Current expression: "
+        << (_regex ? _regex->getExpression() : "none") << std::endl;
     std::cout << "*********** Menu ***********" << std::endl;
     std::cout << "1 --- Set regular expression" << std::endl;
     std::cout << "2 ---- Match regex to string" << std::endl;
