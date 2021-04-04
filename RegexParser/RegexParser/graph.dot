@@ -1,11 +1,14 @@
 digraph FSM {
 In [shape=none fontcolor=white]
-In -> 67
-Out69 [shape=none fontcolor=white]
-69 -> Out69
-67 -> 68 [label="a"]
-70 -> 69 [label="a"]
-67 -> 70 [label="c"]
-68 -> 69 [label="c"]
-67 -> 69 [label="b"]
+In -> 29
+Out32 [shape=none fontcolor=white]
+32 -> Out32
+32 -> 30 [label="a"]
+29 -> 30 [label="a"]
+30 -> 30 [label="a"]
+30 -> 31 [label="b"]
+31 -> 30 [label="a"]
+32 -> 29 [label="b"]
+29 -> 29 [label="b"]
+31 -> 32 [label="b"]
 }

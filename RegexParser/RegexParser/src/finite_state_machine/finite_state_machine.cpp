@@ -2,7 +2,7 @@
 #include "../../include/interface.h"
 
 FiniteStateMachine::FiniteStateMachine() :
-	_initState(nullptr),
+	_initStates(std::set<std::shared_ptr<State>>()),
 	_currentState(nullptr),
 	_finalStates(std::set<std::shared_ptr<State>>()),
 	_arcs(std::set<std::shared_ptr<Arc>>()),
@@ -14,7 +14,7 @@ FiniteStateMachine::FiniteStateMachine() :
 
 FiniteStateMachine& FiniteStateMachine::operator = (FiniteStateMachine&& machine)  
 {
-	_initState = std::move(machine._initState);
+	_initStates = std::move(machine._initStates);
 	_finalStates = std::move(machine._finalStates);
 	_states = std::move(machine._states);
 	_arcs = std::move(machine._arcs);
@@ -24,7 +24,7 @@ FiniteStateMachine& FiniteStateMachine::operator = (FiniteStateMachine&& machine
 	return *this;
 }
 
-void FiniteStateMachine::setInitState(const std::shared_ptr<State>& state)
+void FiniteStateMachine::addInitState(const std::shared_ptr<State>& state)
 {
 	if (state == nullptr)
 	{
@@ -32,7 +32,18 @@ void FiniteStateMachine::setInitState(const std::shared_ptr<State>& state)
 	}
 
 	_states.insert(state);
-	_initState = state;
+	_initStates.insert(state);
+}
+
+void FiniteStateMachine::addInitState(const std::set<std::shared_ptr<State>>& states)
+{
+	if (std::any_of(states.begin(), states.end(), [&](auto v) { return !v; }))
+	{
+		throw std::invalid_argument("One of inner states is null pointer.");
+	}
+
+	_states.insert(states.begin(), states.end());
+	_initStates.insert(states.begin(), states.end());
 }
 
 void FiniteStateMachine::addState(const std::shared_ptr<State>& state)
@@ -123,14 +134,19 @@ void FiniteStateMachine::addMachine(const std::shared_ptr<FiniteStateMachine>& m
 
 bool FiniteStateMachine::match(const std::string& expr)
 {
-
-	if (!_initState || _states.empty() || _finalStates.empty() || _arcs.empty())
+	if (_initStates.empty() || _states.empty() || _finalStates.empty() || _arcs.empty())
 	{
 		throw std::invalid_argument("Invalid finite-state machine configuration.");
 	}
 
 	std::string copy = expr.substr();
-	_currentState = _initState;
+	_currentState = *_initStates.begin();
+	_isInFinalState = _finalStates.find(_currentState) != _finalStates.end();
+
+	if (copy.empty() && _isInFinalState)
+	{
+		return true;
+	}
 
 	for ( ; ; )
 	{
@@ -152,7 +168,7 @@ bool FiniteStateMachine::match(const std::string& expr)
 
 TransitionType FiniteStateMachine::next(char ch)
 {
-	if (!_initState || _states.empty() || _finalStates.empty() || _arcs.empty())
+	if (_initStates.empty() || _states.empty() || _finalStates.empty() || _arcs.empty())
 	{
 		throw std::invalid_argument("Invalid finite-state machine configuration.");
 	}
@@ -235,9 +251,9 @@ bool FiniteStateMachine::isInFinalState() const
 	return _isInFinalState;
 }
 
-const std::shared_ptr<State>& FiniteStateMachine::getInitState() const
+const std::set<std::shared_ptr<State>>& FiniteStateMachine::getInitStates() const
 {
-	return _initState;
+	return _initStates;
 }
 
 const std::set<std::shared_ptr<State>>& FiniteStateMachine::getFinalStates() const
@@ -308,7 +324,7 @@ void FiniteStateMachine::_removeLambda()
 
 	std::copy_if(_states.begin(), _states.end(), 
 		std::inserter(newStates, newStates.end()), [&](auto state) {
-		return state == _initState || std::any_of(_arcs.begin(), _arcs.end(), [&](auto arc) {
+		return _initStates.find(state) != _initStates.end() || std::any_of(_arcs.begin(), _arcs.end(), [&](auto arc) {
 			return arc->getFinalState() == state && arc->getType() != ArcType::Lambda;
 		});
 	});
@@ -330,9 +346,10 @@ void FiniteStateMachine::_determine()
 {
 	FiniteStateMachine machine;
 
-	_initState->addInnerState(_initState);
-	machine._initState = _initState;
-	_determineRecur(machine, _initState);
+	auto initState = std::shared_ptr<State>(new State());
+	initState->addInnerState(_initStates);
+	machine._initStates = { initState };
+	_determineRecur(machine, initState);
 
 	std::copy_if(machine._states.begin(), machine._states.end(), 
 		std::inserter(machine._finalStates, machine._finalStates.end()), [&](auto state) {
@@ -428,25 +445,7 @@ void FiniteStateMachine::_reverse()
 
 	_arcs = std::move(newArcs);
 
-	if (_finalStates.size() == 1)
-	{
-		auto state = _initState;
-		_initState = *_finalStates.begin();
-		_finalStates = { state };
-	}
-	else
-	{
-		auto state = _initState;
-		_initState = std::shared_ptr<State>(new State());
-		_states.insert(_initState);
-
-		for (auto& finalState : _finalStates)
-		{
-			_arcs.insert(std::shared_ptr<Arc>(new Arc(_initState, finalState)));
-		}
-
-		_finalStates = { state };
-	}
+	std::swap(_initStates, _finalStates);
 }
 
 void FiniteStateMachine::_clearInnerStates()
@@ -467,7 +466,10 @@ void FiniteStateMachine::_writeToFile()
 	{
 		out << "digraph FSM {" << std::endl;
 		out << "In [shape=none fontcolor=white]" << std::endl;
-		out << "In -> " << _initState->getId() << std::endl;
+		for (auto& state : _initStates)
+		{
+			out << "In -> " << state->getId() << std::endl;
+		}
 
 		for (auto& state : _finalStates)
 		{

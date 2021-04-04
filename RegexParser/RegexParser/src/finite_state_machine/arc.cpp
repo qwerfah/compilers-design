@@ -37,13 +37,13 @@ Arc::Arc(const std::shared_ptr<State>& initialState,
     _type(type),
     _mark(mark)
 {
-    if (!initialState || !machine->getInitState())
+    if (!initialState || machine->getInitStates().size() != 1)
     {
         throw std::invalid_argument("State ptr is null.");
     }
 
     _initialState = initialState;
-    _finalState = machine->getInitState();
+    _finalState = *machine->getInitStates().begin();
 }
 
 Arc::Arc(const std::shared_ptr<FiniteStateMachine>& initMachine,
@@ -52,13 +52,13 @@ Arc::Arc(const std::shared_ptr<FiniteStateMachine>& initMachine,
     _type(type),
     _mark(mark)
 {
-    if (initMachine->getFinalStates().size() != 1 || !finalMachine->getInitState())
+    if (initMachine->getFinalStates().size() != 1 || finalMachine->getInitStates().size() != 1)
     {
         throw std::invalid_argument("No init or final state.");
     }
 
     _initialState = *initMachine->getFinalStates().begin();
-    _finalState = finalMachine->getInitState();
+    _finalState = *finalMachine->getInitStates().begin();
 }
 
 const std::shared_ptr<State>& Arc::getInitialState() const

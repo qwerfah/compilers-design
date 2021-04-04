@@ -6,6 +6,7 @@
 #include <memory>
 #include <exception>
 #include <iostream>
+#include <string>
 
 class Interface
 {

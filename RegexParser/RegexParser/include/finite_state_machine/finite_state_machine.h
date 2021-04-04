@@ -30,7 +30,8 @@ public:
 	/// (состояние добавляется в множество состояний КА).
 	/// </summary>
 	/// <param name="state"> Новое начальное состояние КА. </param>
-	void setInitState(const std::shared_ptr<State>& state);
+	void addInitState(const std::shared_ptr<State>& state);
+	void addInitState(const std::set<std::shared_ptr<State>>& states);
 
 	/// <summary>
 	/// Добавить новое состояние в множество состояний.
@@ -105,7 +106,7 @@ public:
 	/// Возвращает указатель на начальное состояние данного КА.
 	/// </summary>
 	/// <returns> Указатель на начальное состояние КА. </returns>
-	const std::shared_ptr<State>& getInitState() const;
+	const std::set<std::shared_ptr<State>>& getInitStates() const;
 
 	/// <summary>
 	/// Возвращает возвращает множество конечных состояний данного КА.
@@ -123,7 +124,7 @@ private:
 	/// <summary>
 	/// Указатель на начальное состояние данного КА.
 	/// </summary>
-	std::shared_ptr<State> _initState;
+	std::set<std::shared_ptr<State>> _initStates;
 
 	/// <summary>
 	/// Множество конечных состояний данного КА.

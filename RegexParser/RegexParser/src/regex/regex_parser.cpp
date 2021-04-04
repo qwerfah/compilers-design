@@ -19,7 +19,7 @@ std::shared_ptr<RegularExpression> RegexParser::_parse(const std::string& regex)
 {
 	if (!_checkBrackets(regex))
 	{
-		throw std::invalid_argument("Incorrect brackets placement.");
+		throw std::invalid_argument("Incorrect expression syntaxis.");
 	}
 
 	std::shared_ptr<RegularExpression> tree = _parseRecur(regex);
@@ -184,6 +184,11 @@ std::pair<size_t, size_t> RegexParser::_parseRange(const std::string& str)
 		throw std::invalid_argument("Invalid repeat range representation.");
 	}
 
+	if (range.first > range.second)
+	{
+		throw std::invalid_argument("Invalid range expression.");
+	}
+
 	return range;
 }
 
@@ -204,9 +209,16 @@ std::vector<std::string> RegexParser::_split(const std::string& str, char delim)
 bool RegexParser::_checkBrackets(const std::string& regex)
 {
 	auto stack = std::stack<char>();
+	char prev = regex[0];
 
 	for (auto ch : regex)
 	{
+		if ((_isIn(prev, UNARY_QUANTIFIERS) && prev == ch) || 
+			(_isIn(prev, UNARY_QUANTIFIERS) && _isIn(ch, UNARY_QUANTIFIERS)))
+		{
+			return false;
+		}
+
 		if (_isIn(ch, OPEN_BRACKETS))
 		{
 			stack.push(ch);
@@ -222,6 +234,8 @@ bool RegexParser::_checkBrackets(const std::string& regex)
 				return false;
 			}
 		}
+
+		prev = ch;
 	}
 
 	return true;

@@ -5,16 +5,24 @@ bool Interface::_isDebugOn = false;
 void Interface::loop()
 {
     unsigned short option = 0;
-    std::string garbage = "";
+    std::string temp = "";
 
     while (true)
     {
         _printMenu();
-        std::cin.clear();
-        fflush(stdin);
-        std::cin >> option;
+        std::cin >> temp;
 
-        system("cls");
+        try
+        {
+            system("cls");
+            option = std::stoi(temp);
+        }
+        catch (std::exception e)
+        {
+            std::cout << std::endl << "Bad option, try again" << std::endl;
+            system("pause");
+            continue;
+        }
 
         switch (option)
         {
@@ -29,9 +37,6 @@ void Interface::loop()
             break;
         case 4:
             return;
-        default:
-            std::cout << std::endl << "Bad option, try again" << std::endl;
-            system("pause");
         }
     }
 }
@@ -79,8 +84,6 @@ bool Interface::isDebugOn()
 void Interface::_printMenu() const
 {
     system("cls");
-
-    std::cout << std::endl;
     std::cout << "Debug mode: " << (_isDebugOn ? "On" : "Off") << std::endl;
     std::cout << "Current expression: "
         << (_regex ? _regex->getExpression() : "none") << std::endl;
@@ -98,11 +101,20 @@ void Interface::_setRegularExpression()
     std::string expression;
 
     std::cout << std::endl << "Enter regular expression: ";
-    std::cin >> expression;
+    std::cin.ignore();
+    std::getline(std::cin, expression);
 
     if (!_regex)
     {
-        _regex = std::shared_ptr<Regex>(new Regex(expression));
+        try
+        {
+            _regex = std::shared_ptr<Regex>(new Regex(expression));
+        }
+        catch (std::exception e)
+        {
+            std::cout << std::endl << e.what() << std::endl;
+            system("pause");
+        }
     }
     else
     {
@@ -130,7 +142,9 @@ void Interface::_matchRegularExpression()
     std::string input;
 
     std::cout << std::endl << "Enter string to match: ";
-    std::cin >> input;
+    std::cin.ignore();
+    std::getline(std::cin, input);
+
     try
     {
         std::cout << std::endl << (_regex->match(input) ? "Match" : "Not match") << std::endl;
