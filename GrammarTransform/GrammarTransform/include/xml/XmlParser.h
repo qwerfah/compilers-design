@@ -2,9 +2,10 @@
 
 #include <string>
 #include <stdexcept>
-#include <xmllite.h>
+#include <memory>
 
-#include "grammar/Grammar.h"
+#include "../grammar/Grammar.h"
+#include "tinyxml2.h"
 
 class XmlParser
 {
@@ -14,7 +15,7 @@ public:
 
 	void setFilename(const std::string& filename);
 
-	Grammar&& parse();
+	std::shared_ptr<Grammar> parse();
 
 private:
 	std::string _filename{};

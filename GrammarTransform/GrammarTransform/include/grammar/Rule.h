@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <stdexcept>
+#include <memory>
+#include <algorithm>
 
 #include "Symbol.h"
 
@@ -9,16 +11,19 @@ class Rule
 {
 public:
 	Rule() = default;
-	Rule(const std::vector<Symbol>& left, const std::vector<Symbol>& right);
+	Rule(const std::vector<std::shared_ptr<Symbol>>& left, 
+		 const std::vector<std::shared_ptr<Symbol>>& right);
 
-	void addToLeft(const Symbol& symbol);
-	void addToRight(const Symbol& symbol);
+	void addToLeft(const std::shared_ptr<Symbol>& symbol);
+	void addToRight(const std::shared_ptr<Symbol>& symbol);
 
-	const std::vector<Symbol>& getLeft() const;
-	const std::vector<Symbol>& getRight() const;
+	const std::vector<std::shared_ptr<Symbol>>& getLeft() const;
+	const std::vector<std::shared_ptr<Symbol>>& getRight() const;
+
+	friend bool operator < (const Rule& left, const Rule& right);
 
 private:
-	std::vector<Symbol> _left{};
-	std::vector<Symbol> _right{};
+	std::vector<std::shared_ptr<Symbol>> _left{};
+	std::vector<std::shared_ptr<Symbol>> _right{};
 };
 
