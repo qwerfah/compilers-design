@@ -140,7 +140,9 @@ void Grammar::_findRecursiveRules(
 	std::copy_if(_rules.begin(), _rules.end(),
 		std::back_inserter(rules), [&](auto rule)
 		{
-			return rule->getLeft()[0] == *it;
+			return (rule->getRight().empty())
+				? false
+				: rule->getLeft()[0] == *it && rule->getRight()[0] == *it;
 		});
 }
 
@@ -151,7 +153,7 @@ void Grammar::_findIndexedRules(
 	std::copy_if(_rules.begin(), _rules.end(), std::back_inserter(rules), 
 		[&](auto rule)
 		{
-			if (rule->getRight().empty()) return false;
+			if (rule->getRight().empty() || rule->getLeft()[0] != *it) return false;
 			auto s = std::find(_nonTerminals.begin(), 
 				_nonTerminals.end(), rule->getRight()[0]);
 			return s == _nonTerminals.end() || s > it;

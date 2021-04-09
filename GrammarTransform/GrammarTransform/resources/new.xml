@@ -19,6 +19,32 @@
             <lhs name="E"/>
             <rhs>
                 <symbol type="nonterm" name="T"/>
+            </rhs>
+        </production>
+        <production>
+            <lhs name="T"/>
+            <rhs>
+                <symbol type="nonterm" name="F"/>
+            </rhs>
+        </production>
+        <production>
+            <lhs name="F"/>
+            <rhs>
+                <symbol type="term" name="IDENT"/>
+            </rhs>
+        </production>
+        <production>
+            <lhs name="F"/>
+            <rhs>
+                <symbol type="term" name="LPAREN"/>
+                <symbol type="nonterm" name="E"/>
+                <symbol type="term" name="RPAREN"/>
+            </rhs>
+        </production>
+        <production>
+            <lhs name="E"/>
+            <rhs>
+                <symbol type="nonterm" name="T"/>
                 <symbol type="nonterm" name="E&apos;"/>
             </rhs>
         </production>
@@ -34,16 +60,6 @@
             <rhs>
                 <symbol type="term" name="ADD"/>
                 <symbol type="nonterm" name="T"/>
-                <symbol type="nonterm" name="E&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="E&apos;"/>
-            <rhs/>
-        </production>
-        <production>
-            <lhs name="E&apos;"/>
-            <rhs>
                 <symbol type="nonterm" name="E&apos;"/>
             </rhs>
         </production>
@@ -55,38 +71,6 @@
             </rhs>
         </production>
         <production>
-            <lhs name="T"/>
-            <rhs>
-                <symbol type="nonterm" name="F"/>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="T&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="E&apos;"/>
-            <rhs>
-                <symbol type="term" name="ADD"/>
-                <symbol type="nonterm" name="T"/>
-                <symbol type="nonterm" name="T&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="E&apos;"/>
-            <rhs>
-                <symbol type="term" name="ADD"/>
-                <symbol type="nonterm" name="T"/>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="T&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="E&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="T&apos;"/>
-            </rhs>
-        </production>
-        <production>
             <lhs name="T&apos;"/>
             <rhs>
                 <symbol type="term" name="MUL"/>
@@ -98,46 +82,6 @@
             <rhs>
                 <symbol type="term" name="MUL"/>
                 <symbol type="nonterm" name="F"/>
-                <symbol type="nonterm" name="T&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="T&apos;"/>
-            <rhs/>
-        </production>
-        <production>
-            <lhs name="T&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="T&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="T&apos;"/>
-            <rhs>
-                <symbol type="term" name="MUL"/>
-                <symbol type="nonterm" name="F"/>
-                <symbol type="nonterm" name="E&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="T&apos;"/>
-            <rhs>
-                <symbol type="term" name="MUL"/>
-                <symbol type="nonterm" name="F"/>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="T&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="T&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="T&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E&apos;"/>
                 <symbol type="nonterm" name="T&apos;"/>
             </rhs>
         </production>
@@ -154,290 +98,6 @@
                 <symbol type="term" name="LPAREN"/>
                 <symbol type="nonterm" name="E"/>
                 <symbol type="term" name="RPAREN"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F"/>
-            <rhs>
-                <symbol type="term" name="IDENT"/>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F"/>
-            <rhs>
-                <symbol type="term" name="LPAREN"/>
-                <symbol type="nonterm" name="E"/>
-                <symbol type="term" name="RPAREN"/>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="E&apos;"/>
-            <rhs>
-                <symbol type="term" name="ADD"/>
-                <symbol type="nonterm" name="T"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="E&apos;"/>
-            <rhs>
-                <symbol type="term" name="ADD"/>
-                <symbol type="nonterm" name="T"/>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="E&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F"/>
-            <rhs>
-                <symbol type="term" name="IDENT"/>
-                <symbol type="nonterm" name="T&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F"/>
-            <rhs>
-                <symbol type="term" name="LPAREN"/>
-                <symbol type="nonterm" name="E"/>
-                <symbol type="term" name="RPAREN"/>
-                <symbol type="nonterm" name="T&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F"/>
-            <rhs>
-                <symbol type="term" name="IDENT"/>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="T&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F"/>
-            <rhs>
-                <symbol type="term" name="LPAREN"/>
-                <symbol type="nonterm" name="E"/>
-                <symbol type="term" name="RPAREN"/>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="T&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="E&apos;"/>
-            <rhs>
-                <symbol type="term" name="ADD"/>
-                <symbol type="nonterm" name="T"/>
-                <symbol type="nonterm" name="T&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="E&apos;"/>
-            <rhs>
-                <symbol type="term" name="ADD"/>
-                <symbol type="nonterm" name="T"/>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="T&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="E&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="T&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="T&apos;"/>
-            <rhs>
-                <symbol type="term" name="MUL"/>
-                <symbol type="nonterm" name="F"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="T&apos;"/>
-            <rhs>
-                <symbol type="term" name="MUL"/>
-                <symbol type="nonterm" name="F"/>
-                <symbol type="nonterm" name="T&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="T&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="T&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="T&apos;"/>
-            <rhs>
-                <symbol type="term" name="MUL"/>
-                <symbol type="nonterm" name="F"/>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="T&apos;"/>
-            <rhs>
-                <symbol type="term" name="MUL"/>
-                <symbol type="nonterm" name="F"/>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="T&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="T&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="T&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="T&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F&apos;"/>
-            <rhs/>
-        </production>
-        <production>
-            <lhs name="F&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E"/>
-                <symbol type="term" name="RPAREN"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E"/>
-                <symbol type="term" name="RPAREN"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E"/>
-                <symbol type="term" name="RPAREN"/>
-                <symbol type="nonterm" name="E&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E"/>
-                <symbol type="term" name="RPAREN"/>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="T&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="T&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E"/>
-                <symbol type="term" name="RPAREN"/>
-                <symbol type="nonterm" name="T&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E"/>
-                <symbol type="term" name="RPAREN"/>
-                <symbol type="nonterm" name="T&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="T&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="T&apos;"/>
-                <symbol type="nonterm" name="F&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E"/>
-                <symbol type="term" name="RPAREN"/>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="T&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F&apos;"/>
-            <rhs>
-                <symbol type="nonterm" name="E"/>
-                <symbol type="term" name="RPAREN"/>
-                <symbol type="nonterm" name="E&apos;"/>
-                <symbol type="nonterm" name="T&apos;"/>
                 <symbol type="nonterm" name="F&apos;"/>
             </rhs>
         </production>
