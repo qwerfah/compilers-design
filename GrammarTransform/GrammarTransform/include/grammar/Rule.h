@@ -5,7 +5,7 @@
 #include <memory>
 #include <algorithm>
 
-#include "Symbol.h"
+#include "symbol.h"
 
 class Rule
 {

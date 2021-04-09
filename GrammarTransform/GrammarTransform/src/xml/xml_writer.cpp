@@ -1,6 +1,6 @@
-#include "..\..\include\xml\XMLWriter.h"
+#include "..\..\include\xml\xml_writer.h"
 
-XMLWriter::XMLWriter(const std::string& filename)
+XmlWriter::XmlWriter(const std::string& filename)
 {
 	if (filename.empty())
 	{
@@ -10,7 +10,7 @@ XMLWriter::XMLWriter(const std::string& filename)
 	_filename = filename;
 }
 
-void XMLWriter::setFilename(const std::string& filename)
+void XmlWriter::setFilename(const std::string& filename)
 {
 	if (filename.empty())
 	{
@@ -20,7 +20,7 @@ void XMLWriter::setFilename(const std::string& filename)
 	_filename = filename;
 }
 
-void XMLWriter::save(const std::shared_ptr<Grammar>& grammar)
+void XmlWriter::save(const std::shared_ptr<Grammar>& grammar)
 {
 	using namespace tinyxml2;
 
@@ -42,7 +42,7 @@ void XMLWriter::save(const std::shared_ptr<Grammar>& grammar)
 
 	// Добавляем терминалы
 	XMLElement* terminals = root->InsertNewChildElement("terminalsymbols");
-	for (auto& s : grammar->getTerminals())
+	for (auto& s : grammar->terminals)
 	{
 		XMLElement* term = terminals->InsertNewChildElement("term");
 		term->SetAttribute("name", s->getName().c_str());
@@ -51,7 +51,7 @@ void XMLWriter::save(const std::shared_ptr<Grammar>& grammar)
 
 	// Добавляем нетерминалы
 	XMLElement* nonTerminals = root->InsertNewChildElement("nonterminalsymbols");
-	for (auto& s : grammar->getNonTerminals())
+	for (auto& s : grammar->nonTerminals)
 	{
 		XMLElement* nonTerm = nonTerminals->InsertNewChildElement("nonterm");
 		nonTerm->SetAttribute("name", s->getName().c_str());
@@ -59,7 +59,7 @@ void XMLWriter::save(const std::shared_ptr<Grammar>& grammar)
 
 	// Добавляем правила
 	XMLElement* rules = root->InsertNewChildElement("productions");
-	for (auto& rule : grammar->getRules())
+	for (auto& rule : grammar->rules)
 	{
 		XMLElement* prod = rules->InsertNewChildElement("production");
 		prod->InsertNewChildElement("lhs")
@@ -77,7 +77,7 @@ void XMLWriter::save(const std::shared_ptr<Grammar>& grammar)
 
 	// Добавляем аксиому
 	root->InsertNewChildElement("startsymbol")
-		->SetAttribute("name", grammar->getAxiom()->getName().c_str());
+		->SetAttribute("name", grammar->axiom->getName().c_str());
 
 	std::cout << doc.SaveFile(_filename.c_str());
 }

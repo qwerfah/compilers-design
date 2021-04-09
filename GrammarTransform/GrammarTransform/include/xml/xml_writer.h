@@ -7,11 +7,11 @@
 #include "../grammar/Grammar.h"
 #include "tinyxml2.h"
 
-class XMLWriter
+class XmlWriter
 {
 public:
-	XMLWriter() = default;
-	XMLWriter(const std::string& filename);
+	XmlWriter() = default;
+	XmlWriter(const std::string& filename);
 
 	void setFilename(const std::string& filename);
 

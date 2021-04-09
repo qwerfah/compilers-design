@@ -1,4 +1,4 @@
-#include "../../include/grammar/Symbol.h"
+#include "../../include/grammar/symbol.h"
 
 Symbol::Symbol(const std::string& name, const std::string& spell, SymbolType type)
 	: _name{ name }, _spell{ spell }, _type{ type }

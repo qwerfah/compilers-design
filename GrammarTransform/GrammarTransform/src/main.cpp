@@ -1,18 +1,18 @@
 ﻿#include <iostream>
 #include <memory>
 
-#include "../include/xml/XmlParser.h"
-#include "../include/xml/XMLWriter.h"
+#include "../include/xml/xml_parser.h"
+#include "../include/xml/xml_writer.h"
 
 int main()
 {
     XmlParser parser{ "./resources/grammar.xml" };
-    XMLWriter writer{ "./resources/new.xml" };
+    XmlWriter writer{ "./resources/new.xml" };
 
     try
     {
         std::shared_ptr<Grammar> grammar{ parser.parse() };
-        grammar->removeRecursion();
+        *(grammar->removeLeftRecursion)();
         writer.save(grammar);
     }
     catch (std::exception e)

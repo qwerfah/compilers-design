@@ -1,4 +1,4 @@
-#include "../../include/XML/XmlParser.h"
+#include "../../include/XML/xml_parser.h"
 
 XmlParser::XmlParser(const std::string& filename)
 {
@@ -40,7 +40,7 @@ std::shared_ptr<Grammar> XmlParser::parse()
 		element; element = element->NextSiblingElement("term"))
 	{
 		
-		grammar->addTerminal(std::shared_ptr<Symbol>{ 
+		grammar->terminals.push_back(std::shared_ptr<Symbol>{ 
 			new Symbol{ element->FindAttribute("name")->Value(),
 				element->FindAttribute("spell")->Value(), SymbolType::Terminal } });
 	}
@@ -51,7 +51,7 @@ std::shared_ptr<Grammar> XmlParser::parse()
 		element; element = element->NextSiblingElement("nonterm"))
 	{
 
-		grammar->addNonTerminal(std::shared_ptr<Symbol>{ 
+		grammar->nonTerminals.push_back(std::shared_ptr<Symbol>{ 
 			new Symbol{ element->FindAttribute("name")->Value() } });
 	}
 
@@ -72,12 +72,12 @@ std::shared_ptr<Grammar> XmlParser::parse()
 			right.push_back(grammar->getSymbol(rhs->FindAttribute("name")->Value()));
 		}
 
-		grammar->addRule(std::shared_ptr<Rule>{ new Rule{ left, right } });
+		grammar->rules.push_back(std::shared_ptr<Rule>{ new Rule{ left, right } });
 	}
 
 	// Загружаем аксиому
 	std::string name = root->FirstChildElement("startsymbol")->FindAttribute("name")->Value();
-	grammar->setAxiom(grammar->getSymbol(name));
+	grammar->axiom = grammar->getSymbol(name);
 
 	return grammar;
 }

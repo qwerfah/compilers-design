@@ -140,22 +140,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\grammar\Rule.cpp" />
-    <ClCompile Include="src\grammar\Grammar.cpp" />
+    <ClCompile Include="src\grammar_transform\grammar_transform.cpp" />
+    <ClCompile Include="src\grammar_transform\left_recursion_remove.cpp" />
+    <ClCompile Include="src\grammar\rule.cpp" />
+    <ClCompile Include="src\grammar\grammar.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\grammar\Symbol.cpp" />
+    <ClCompile Include="src\grammar\symbol.cpp" />
     <ClCompile Include="src\xml\tinyxml2.cpp" />
-    <ClCompile Include="src\xml\XmlParser.cpp" />
-    <ClCompile Include="src\xml\XMLWriter.cpp" />
+    <ClCompile Include="src\xml\xml_parser.cpp" />
+    <ClCompile Include="src\xml\xml_writer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\grammar_transform\grammar_transform.h" />
     <ClInclude Include="include\enums.h" />
-    <ClInclude Include="include\grammar\Grammar.h" />
-    <ClInclude Include="include\grammar\Symbol.h" />
-    <ClInclude Include="include\grammar\Rule.h" />
+    <ClInclude Include="include\grammar\grammar.h" />
+    <ClInclude Include="include\grammar\symbol.h" />
+    <ClInclude Include="include\grammar\rule.h" />
     <ClInclude Include="include\xml\tinyxml2.h" />
-    <ClInclude Include="include\xml\XmlParser.h" />
-    <ClInclude Include="include\xml\XMLWriter.h" />
+    <ClInclude Include="include\xml\xml_parser.h" />
+    <ClInclude Include="include\xml\xml_writer.h" />
+    <ClInclude Include="include\grammar_transform\left_recursion_remove.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

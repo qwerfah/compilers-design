@@ -1,4 +1,4 @@
-#include "../../include/grammar/Rule.h"
+#include "../../include/grammar/rule.h"
 
 Rule::Rule(const std::vector<std::shared_ptr<Symbol>>& left, 
 	       const std::vector<std::shared_ptr<Symbol>>& right)
