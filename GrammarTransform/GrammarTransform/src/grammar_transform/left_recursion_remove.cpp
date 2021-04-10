@@ -51,26 +51,26 @@ std::shared_ptr<Symbol> LeftRecursionRemove::_removeDirectRecursion(
 {
 	std::vector<std::shared_ptr<Rule>> recRules;
 	std::vector<std::shared_ptr<Rule>> indRules;
-	// Ищем все Ai-правила
+	// Searching all Ai-rules
 	_findRecursiveRules(i, recRules);
 
 	if (recRules.empty())  return nullptr;
 
 	_findIndexedRules(i, indRules);
-	// Удаляем правила вида Ai -> Ai a
+	// Removing rules of type Ai -> Ai a
 	std::erase_if(_grammar.rules, [&](auto r) {
 		return std::find(recRules.begin(), recRules.end(), r) != recRules.end(); });
-	// Добавляем новый нетерминал Аi'
+	// Add new nonterminal symbol Аi'
 	std::shared_ptr<Symbol> symbol{ new Symbol{
 		(*i)->getName() + "'", (*i)->getSpell(), (*i)->getType()} };
-	// Добавляем правила вида Ai -> b Ai'
+	// Add rules of type Ai -> b Ai'
 	for (auto& rule : indRules)
 	{
 		std::vector<std::shared_ptr<Symbol>> right{ rule->getRight() };
 		right.push_back(symbol);
 		_grammar.rules.push_back(std::shared_ptr<Rule>{ new Rule{ rule->getLeft(), right } });
 	}
-	// Добавляем правила вида Ai' -> a | a Ai'
+	// Add rules of type Ai' -> a | a Ai'
 	for (auto& rule : recRules)
 	{
 		std::vector<std::shared_ptr<Symbol>> right{};

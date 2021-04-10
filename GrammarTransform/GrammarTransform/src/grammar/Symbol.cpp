@@ -34,34 +34,6 @@ SymbolType Symbol::getType() const
 	return _type;
 }
 
-Symbol& Symbol::operator = (Symbol&& symbol)
-{
-	if (this == &symbol) 
-	{
-		return *this;
-	}
-
-	_name = std::move(symbol._name);
-	_spell = std::move(symbol._spell);
-	_type = std::move(symbol._type);
-
-	return *this;
-}
-
-Symbol& Symbol::operator=(const Symbol& symbol)
-{
-	if (this == &symbol)
-	{
-		return *this;
-	}
-
-	_name = symbol._name;
-	_spell = symbol._spell;
-	_type = symbol._type;
-
-	return *this;
-}
-
 bool operator < (const Symbol& left, const Symbol& right)
 {
 	return left._name < right._name;
