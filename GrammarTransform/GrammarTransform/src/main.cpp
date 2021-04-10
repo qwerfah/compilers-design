@@ -3,6 +3,7 @@
 
 #include "../include/xml/xml_parser.h"
 #include "../include/xml/xml_writer.h"
+#include "../include/grammar_transform/grammar_transform.h"
 
 int main()
 {
@@ -12,7 +13,7 @@ int main()
     try
     {
         std::shared_ptr<Grammar> grammar{ parser.parse() };
-        *(grammar->removeLeftRecursion)();
+        (*grammar->algorithms["leftRecursionRemove"])();
         writer.save(grammar);
     }
     catch (std::exception e)

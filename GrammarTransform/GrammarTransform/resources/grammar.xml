@@ -1,89 +1,47 @@
 <grammar name="new_grammar">
     <terminalsymbols>
-        <term name="IDENT" spell="a" />
-        <term name="ADD" spell="+" />
-        <term name="MUL" spell="*" />
-        <term name="LPAREN" spell="(" />
-        <term name="RPAREN" spell=")" />
+        <term name="a" spell="a" />
+        <term name="b" spell="b" />
+        <term name="c" spell="c" />
+        <term name="d" spell="d" />
     </terminalsymbols>
     <nonterminalsymbols>
-        <nonterm name="E" />
-        <nonterm name="T" />
-        <nonterm name="F" />
-        <nonterm name="E'" />
-        <nonterm name="T'" />
+        <nonterm name="S" />
+        <nonterm name="A" />
     </nonterminalsymbols>
     <productions>
         <production>
-            <lhs name="E" />
+            <lhs name="S" />
             <rhs>
-                <symbol type="nonterm" name="T" />
+                <symbol type="nonterm" name="A" />
+                <symbol type="term" name="a" />
             </rhs>
         </production>
         <production>
-            <lhs name="T" />
+            <lhs name="S" />
             <rhs>
-                <symbol type="nonterm" name="F" />
+                <symbol type="term" name="b" />
             </rhs>
         </production>
         <production>
-            <lhs name="F" />
+            <lhs name="A" />
             <rhs>
-                <symbol type="term" name="IDENT" />
+                <symbol type="nonterm" name="A" />
+                <symbol type="term" name="c" />
             </rhs>
         </production>
         <production>
-            <lhs name="F" />
+            <lhs name="A" />
             <rhs>
-                <symbol type="term" name="LPAREN" />
-                <symbol type="nonterm" name="E" />
-                <symbol type="term" name="RPAREN" />
+                <symbol type="nonterm" name="S" />
+                <symbol type="term" name="d" />
             </rhs>
         </production>
         <production>
-            <lhs name="E'" />
+            <lhs name="A" />
             <rhs>
-                <symbol type="term" name="ADD" />
-                <symbol type="nonterm" name="T" />
-            </rhs>
-        </production>
-        <production>
-            <lhs name="E'" />
-            <rhs>
-                <symbol type="term" name="ADD" />
-                <symbol type="nonterm" name="T" />
-                <symbol type="nonterm" name="E'" />
-            </rhs>
-        </production>
-        <production>
-            <lhs name="E" />
-            <rhs>
-                <symbol type="nonterm" name="T" />
-                <symbol type="nonterm" name="E'" />
-            </rhs>
-        </production>
-        <production>
-            <lhs name="T'" />
-            <rhs>
-                <symbol type="term" name="MUL" />
-                <symbol type="nonterm" name="F" />
-            </rhs>
-        </production>
-        <production>
-            <lhs name="T'" />
-            <rhs>
-                <symbol type="term" name="MUL" />
-                <symbol type="nonterm" name="F" />
-                <symbol type="nonterm" name="T'" />
-            </rhs>
-        </production>
-        <production>
-            <lhs name="T" />
-            <rhs>
-                <symbol type="nonterm" name="F" />
-                <symbol type="nonterm" name="T'" />
             </rhs>
         </production>
     </productions>
-    <startsymbol name="E" />
+    <startsymbol name="S" />
 </grammar>

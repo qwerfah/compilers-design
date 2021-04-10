@@ -1,7 +1,6 @@
 #pragma once
 
 #include "grammar_transform.h"
-#include "../grammar/grammar.h"
 
 class LeftRecursionRemove : GrammarTransform
 {

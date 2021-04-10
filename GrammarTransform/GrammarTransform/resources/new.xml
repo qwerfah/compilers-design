@@ -1,106 +1,142 @@
 <grammar name="G0">
     <terminalsymbols>
-        <term name="IDENT" spell="a"/>
-        <term name="ADD" spell="+"/>
-        <term name="MUL" spell="*"/>
-        <term name="LPAREN" spell="("/>
-        <term name="RPAREN" spell=")"/>
+        <term name="a" spell="a"/>
+        <term name="b" spell="b"/>
+        <term name="c" spell="c"/>
+        <term name="d" spell="d"/>
     </terminalsymbols>
     <nonterminalsymbols>
-        <nonterm name="E"/>
-        <nonterm name="T"/>
-        <nonterm name="F"/>
-        <nonterm name="E&apos;"/>
-        <nonterm name="T&apos;"/>
-        <nonterm name="F&apos;"/>
+        <nonterm name="S"/>
+        <nonterm name="A"/>
+        <nonterm name="S&apos;"/>
+        <nonterm name="A&apos;"/>
     </nonterminalsymbols>
     <productions>
         <production>
-            <lhs name="E"/>
+            <lhs name="S"/>
             <rhs>
-                <symbol type="nonterm" name="T"/>
+                <symbol type="nonterm" name="A"/>
+                <symbol type="term" name="a"/>
             </rhs>
         </production>
         <production>
-            <lhs name="T"/>
+            <lhs name="S"/>
             <rhs>
-                <symbol type="nonterm" name="F"/>
+                <symbol type="term" name="b"/>
             </rhs>
         </production>
         <production>
-            <lhs name="F"/>
+            <lhs name="A"/>
+            <rhs/>
+        </production>
+        <production>
+            <lhs name="S"/>
             <rhs>
-                <symbol type="term" name="IDENT"/>
+                <symbol type="nonterm" name="A"/>
+                <symbol type="term" name="a"/>
+                <symbol type="nonterm" name="S&apos;"/>
             </rhs>
         </production>
         <production>
-            <lhs name="F"/>
+            <lhs name="S"/>
             <rhs>
-                <symbol type="term" name="LPAREN"/>
-                <symbol type="nonterm" name="E"/>
-                <symbol type="term" name="RPAREN"/>
+                <symbol type="term" name="b"/>
+                <symbol type="nonterm" name="S&apos;"/>
             </rhs>
         </production>
         <production>
-            <lhs name="E"/>
+            <lhs name="A"/>
             <rhs>
-                <symbol type="nonterm" name="T"/>
-                <symbol type="nonterm" name="E&apos;"/>
+                <symbol type="term" name="b"/>
+                <symbol type="term" name="b"/>
+                <symbol type="term" name="d"/>
             </rhs>
         </production>
         <production>
-            <lhs name="E&apos;"/>
+            <lhs name="A"/>
             <rhs>
-                <symbol type="term" name="ADD"/>
-                <symbol type="nonterm" name="T"/>
+                <symbol type="term" name="b"/>
+                <symbol type="nonterm" name="S&apos;"/>
+                <symbol type="term" name="b"/>
+                <symbol type="nonterm" name="S&apos;"/>
+                <symbol type="term" name="d"/>
             </rhs>
         </production>
         <production>
-            <lhs name="E&apos;"/>
+            <lhs name="A"/>
             <rhs>
-                <symbol type="term" name="ADD"/>
-                <symbol type="nonterm" name="T"/>
-                <symbol type="nonterm" name="E&apos;"/>
+                <symbol type="term" name="b"/>
+                <symbol type="term" name="b"/>
+                <symbol type="term" name="d"/>
+                <symbol type="nonterm" name="A&apos;"/>
             </rhs>
         </production>
         <production>
-            <lhs name="T"/>
+            <lhs name="A"/>
             <rhs>
-                <symbol type="nonterm" name="F"/>
-                <symbol type="nonterm" name="T&apos;"/>
+                <symbol type="term" name="b"/>
+                <symbol type="nonterm" name="S&apos;"/>
+                <symbol type="term" name="b"/>
+                <symbol type="nonterm" name="S&apos;"/>
+                <symbol type="term" name="d"/>
+                <symbol type="nonterm" name="A&apos;"/>
             </rhs>
         </production>
         <production>
-            <lhs name="T&apos;"/>
+            <lhs name="A&apos;"/>
             <rhs>
-                <symbol type="term" name="MUL"/>
-                <symbol type="nonterm" name="F"/>
+                <symbol type="term" name="c"/>
             </rhs>
         </production>
         <production>
-            <lhs name="T&apos;"/>
+            <lhs name="A&apos;"/>
             <rhs>
-                <symbol type="term" name="MUL"/>
-                <symbol type="nonterm" name="F"/>
-                <symbol type="nonterm" name="T&apos;"/>
+                <symbol type="term" name="c"/>
+                <symbol type="nonterm" name="A&apos;"/>
             </rhs>
         </production>
         <production>
-            <lhs name="F"/>
+            <lhs name="A&apos;"/>
             <rhs>
-                <symbol type="term" name="IDENT"/>
-                <symbol type="nonterm" name="F&apos;"/>
+                <symbol type="term" name="a"/>
+                <symbol type="nonterm" name="A"/>
+                <symbol type="term" name="a"/>
+                <symbol type="term" name="d"/>
             </rhs>
         </production>
         <production>
-            <lhs name="F"/>
+            <lhs name="A&apos;"/>
             <rhs>
-                <symbol type="term" name="LPAREN"/>
-                <symbol type="nonterm" name="E"/>
-                <symbol type="term" name="RPAREN"/>
-                <symbol type="nonterm" name="F&apos;"/>
+                <symbol type="term" name="a"/>
+                <symbol type="nonterm" name="A"/>
+                <symbol type="term" name="a"/>
+                <symbol type="term" name="d"/>
+                <symbol type="nonterm" name="A&apos;"/>
+            </rhs>
+        </production>
+        <production>
+            <lhs name="A&apos;"/>
+            <rhs>
+                <symbol type="term" name="a"/>
+                <symbol type="nonterm" name="S&apos;"/>
+                <symbol type="nonterm" name="A"/>
+                <symbol type="term" name="a"/>
+                <symbol type="nonterm" name="S&apos;"/>
+                <symbol type="term" name="d"/>
+            </rhs>
+        </production>
+        <production>
+            <lhs name="A&apos;"/>
+            <rhs>
+                <symbol type="term" name="a"/>
+                <symbol type="nonterm" name="S&apos;"/>
+                <symbol type="nonterm" name="A"/>
+                <symbol type="term" name="a"/>
+                <symbol type="nonterm" name="S&apos;"/>
+                <symbol type="term" name="d"/>
+                <symbol type="nonterm" name="A&apos;"/>
             </rhs>
         </production>
     </productions>
-    <startsymbol name="E"/>
+    <startsymbol name="S"/>
 </grammar>

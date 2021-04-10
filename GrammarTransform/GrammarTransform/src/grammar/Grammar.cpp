@@ -1,11 +1,14 @@
 #include "../../include/grammar/grammar.h"
 #include "../../include/grammar_transform/grammar_transform.h"
+#include "../../include/grammar_transform/left_recursion_remove.h"
+#include "../../include/grammar_transform/epsilon_rule_remove.h"
 
-Grammar::Grammar(
-	const std::shared_ptr<GrammarTransform>& removeRec, 
-	const std::shared_ptr<GrammarTransform>& removeEps)
-	: removeLeftRecursion{ removeRec }, removeEpsilon{ removeEps }
+Grammar::Grammar()
 {
+	algorithms["leftRecursionRemove"] = std::shared_ptr<GrammarTransform>{ 
+		(GrammarTransform*) new LeftRecursionRemove{ *this } };
+	algorithms["epsilonRuleRemove"] = std::shared_ptr<GrammarTransform>{ 
+		(GrammarTransform*) new EpsilonRuleRemove{ *this } };
 }
 
 const std::shared_ptr<Symbol>& Grammar::getSymbol(const std::string& name) const

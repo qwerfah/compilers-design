@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\grammar_transform\epsilon_rule_remove.cpp" />
     <ClCompile Include="src\grammar_transform\grammar_transform.cpp" />
     <ClCompile Include="src\grammar_transform\left_recursion_remove.cpp" />
     <ClCompile Include="src\grammar\rule.cpp" />
@@ -151,6 +152,7 @@
     <ClCompile Include="src\xml\xml_writer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\grammar_transform\epsilon_rule_remove.h" />
     <ClInclude Include="include\grammar_transform\grammar_transform.h" />
     <ClInclude Include="include\enums.h" />
     <ClInclude Include="include\grammar\grammar.h" />
