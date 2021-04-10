@@ -8,7 +8,6 @@
     <nonterminalsymbols>
         <nonterm name="S"/>
         <nonterm name="A"/>
-        <nonterm name="S&apos;"/>
         <nonterm name="A&apos;"/>
     </nonterminalsymbols>
     <productions>
@@ -30,24 +29,8 @@
             <rhs/>
         </production>
         <production>
-            <lhs name="S"/>
-            <rhs>
-                <symbol type="nonterm" name="A"/>
-                <symbol type="term" name="a"/>
-                <symbol type="nonterm" name="S&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="S"/>
-            <rhs>
-                <symbol type="term" name="b"/>
-                <symbol type="nonterm" name="S&apos;"/>
-            </rhs>
-        </production>
-        <production>
             <lhs name="A"/>
             <rhs>
-                <symbol type="term" name="b"/>
                 <symbol type="term" name="b"/>
                 <symbol type="term" name="d"/>
             </rhs>
@@ -56,28 +39,6 @@
             <lhs name="A"/>
             <rhs>
                 <symbol type="term" name="b"/>
-                <symbol type="nonterm" name="S&apos;"/>
-                <symbol type="term" name="b"/>
-                <symbol type="nonterm" name="S&apos;"/>
-                <symbol type="term" name="d"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="A"/>
-            <rhs>
-                <symbol type="term" name="b"/>
-                <symbol type="term" name="b"/>
-                <symbol type="term" name="d"/>
-                <symbol type="nonterm" name="A&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="A"/>
-            <rhs>
-                <symbol type="term" name="b"/>
-                <symbol type="nonterm" name="S&apos;"/>
-                <symbol type="term" name="b"/>
-                <symbol type="nonterm" name="S&apos;"/>
                 <symbol type="term" name="d"/>
                 <symbol type="nonterm" name="A&apos;"/>
             </rhs>
@@ -99,8 +60,6 @@
             <lhs name="A&apos;"/>
             <rhs>
                 <symbol type="term" name="a"/>
-                <symbol type="nonterm" name="A"/>
-                <symbol type="term" name="a"/>
                 <symbol type="term" name="d"/>
             </rhs>
         </production>
@@ -108,31 +67,6 @@
             <lhs name="A&apos;"/>
             <rhs>
                 <symbol type="term" name="a"/>
-                <symbol type="nonterm" name="A"/>
-                <symbol type="term" name="a"/>
-                <symbol type="term" name="d"/>
-                <symbol type="nonterm" name="A&apos;"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="A&apos;"/>
-            <rhs>
-                <symbol type="term" name="a"/>
-                <symbol type="nonterm" name="S&apos;"/>
-                <symbol type="nonterm" name="A"/>
-                <symbol type="term" name="a"/>
-                <symbol type="nonterm" name="S&apos;"/>
-                <symbol type="term" name="d"/>
-            </rhs>
-        </production>
-        <production>
-            <lhs name="A&apos;"/>
-            <rhs>
-                <symbol type="term" name="a"/>
-                <symbol type="nonterm" name="S&apos;"/>
-                <symbol type="nonterm" name="A"/>
-                <symbol type="term" name="a"/>
-                <symbol type="nonterm" name="S&apos;"/>
                 <symbol type="term" name="d"/>
                 <symbol type="nonterm" name="A&apos;"/>
             </rhs>

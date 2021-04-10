@@ -12,7 +12,10 @@ void LeftRecursionRemove::operator()()
 	for (auto i = _grammar.nonTerminals.begin(); i != _grammar.nonTerminals.end(); i++)
 	{
 		_unfoldRules(i);
-		symbols.push_back(_removeDirectRecursion(i));
+		if (auto symbol = _removeDirectRecursion(i))
+		{
+			symbols.push_back(symbol);
+		}
 	}
 
 	_grammar.nonTerminals.insert(_grammar.nonTerminals.end(), symbols.begin(), symbols.end());
@@ -36,7 +39,6 @@ void LeftRecursionRemove::_unfoldRules(const std::vector<std::shared_ptr<Symbol>
 			for (auto& jRule : jRules)
 			{
 				std::vector<std::shared_ptr<Symbol>> right{ jRule->getRight() };
-				right.insert(right.begin(), jRule->getRight().begin(), jRule->getRight().end());
 				right.insert(right.end(), ++(ijRule->getRight().begin()), ijRule->getRight().end());
 				_grammar.rules.push_back(std::shared_ptr<Rule>{ new Rule{ ijRule->getLeft(), right } });
 			}
@@ -51,6 +53,9 @@ std::shared_ptr<Symbol> LeftRecursionRemove::_removeDirectRecursion(
 	std::vector<std::shared_ptr<Rule>> indRules;
 	// »щем все Ai-правила
 	_findRecursiveRules(i, recRules);
+
+	if (recRules.empty())  return nullptr;
+
 	_findIndexedRules(i, indRules);
 	// ”дал€ем правила вида Ai -> Ai a
 	std::erase_if(_grammar.rules, [&](auto r) {
