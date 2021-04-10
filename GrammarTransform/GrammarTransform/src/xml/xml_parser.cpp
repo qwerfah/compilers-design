@@ -20,7 +20,7 @@ void XmlParser::setFilename(const std::string& filename)
 	_filename = filename;
 }
 
-std::shared_ptr<Grammar> XmlParser::parse()
+grammar_ptr XmlParser::parse()
 {
 	using namespace tinyxml2;
 
@@ -30,17 +30,17 @@ std::shared_ptr<Grammar> XmlParser::parse()
 	}
 
 	XMLDocument doc;
-	std::shared_ptr<Grammar> grammar{ new Grammar{} };
+	grammar_ptr grammar{ new Grammar{} };
 	doc.LoadFile(_filename.c_str());
-	XMLElement* root = doc.FirstChildElement("grammar");
+	XMLElement* root{ doc.FirstChildElement("grammar") };
 
 	// Загружаем терминалы
-	for (XMLElement* element = 
+	for (XMLElement* element =
 		root->FirstChildElement("terminalsymbols")->FirstChildElement("term");
 		element; element = element->NextSiblingElement("term"))
 	{
 		
-		grammar->terminals.push_back(std::shared_ptr<Symbol>{ 
+		grammar->terminals.push_back(symbol_ptr{ 
 			new Symbol{ element->FindAttribute("name")->Value(),
 				element->FindAttribute("spell")->Value(), SymbolType::Terminal } });
 	}
@@ -51,7 +51,7 @@ std::shared_ptr<Grammar> XmlParser::parse()
 		element; element = element->NextSiblingElement("nonterm"))
 	{
 
-		grammar->nonTerminals.push_back(std::shared_ptr<Symbol>{ 
+		grammar->nonTerminals.push_back(symbol_ptr{ 
 			new Symbol{ element->FindAttribute("name")->Value() } });
 	}
 
@@ -60,7 +60,7 @@ std::shared_ptr<Grammar> XmlParser::parse()
 		root->FirstChildElement("productions")->FirstChildElement("production");
 		element; element = element->NextSiblingElement("production"))
 	{
-		std::vector<std::shared_ptr<Symbol>> left{}, right{};
+		symbol_vector left{}, right{};
 		XMLElement* lhs = element->FirstChildElement("lhs");
 		// Левая часть правила
 		left.push_back(grammar->getSymbol(lhs->FindAttribute("name")->Value()));
@@ -72,7 +72,7 @@ std::shared_ptr<Grammar> XmlParser::parse()
 			right.push_back(grammar->getSymbol(rhs->FindAttribute("name")->Value()));
 		}
 
-		grammar->rules.push_back(std::shared_ptr<Rule>{ new Rule{ left, right } });
+		grammar->rules.push_back(rule_ptr{ new Rule{ left, right } });
 	}
 
 	// Загружаем аксиому

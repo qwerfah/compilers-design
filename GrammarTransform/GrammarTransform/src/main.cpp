@@ -12,7 +12,8 @@ int main()
 
     try
     {
-        std::shared_ptr<Grammar> grammar{ parser.parse() };
+        grammar_ptr grammar{ parser.parse() };
+        (*grammar->algorithms["epsilonRuleRemove"])();
         (*grammar->algorithms["leftRecursionRemove"])();
         writer.save(grammar);
     }

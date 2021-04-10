@@ -1,9 +1,5 @@
 #pragma once
 
-#include <set>
-#include <algorithm>
-#include <iterator>
-
 #include "../grammar/symbol.h"
 #include "../grammar/rule.h"
 #include "grammar_transform.h"
@@ -26,6 +22,12 @@ private:
 	/// Build Ne set of nonterminals from which an empty chain is reachable.
 	/// </summary>
 	/// <param name="ne"> Set of nonterminals from which an empty chain is reachable. </param>
-	void _buildNeSet(std::set<std::shared_ptr<Symbol>>& ne);
+	void _buildNeSet(symbol_set& ne);
+
+	void _replaceEpsilonRules(const symbol_ptr& symbol);
+	void _findAllOccurrences(
+		const symbol_ptr& symbol,
+		const symbol_vector& symbols,
+		symbol_iterator_vector& occurrences);
 };
 

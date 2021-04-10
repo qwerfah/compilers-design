@@ -1,11 +1,10 @@
 #pragma once
 
-#include <vector>
 #include <stdexcept>
-#include <memory>
 #include <algorithm>
 
 #include "symbol.h"
+#include "../typedefs.h"
 
 /// <summary>
 /// Grammar withdrawal rule.
@@ -14,32 +13,32 @@ class Rule
 {
 public:
 	Rule() = default;
-	Rule(const std::vector<std::shared_ptr<Symbol>>& left, 
-		 const std::vector<std::shared_ptr<Symbol>>& right);
+	Rule(const symbol_vector& left, 
+		 const symbol_vector& right);
 
 	/// <summary>
 	/// Add new symbol to left part of the rule.
 	/// </summary>
 	/// <param name="symbol"> New symbol. </param>
-	void addToLeft(const std::shared_ptr<Symbol>& symbol);
+	void addToLeft(const symbol_ptr& symbol);
 
 	/// <summary>
 	/// Add new symbol to right part of the rule.
 	/// </summary>
 	/// <param name="symbol"> New symbol. </param>
-	void addToRight(const std::shared_ptr<Symbol>& symbol);
+	void addToRight(const symbol_ptr& symbol);
 
 	/// <summary>
 	/// Get left part of the rule.
 	/// </summary>
 	/// <returns></returns>
-	const std::vector<std::shared_ptr<Symbol>>& getLeft() const;
+	const symbol_vector& getLeft() const;
 
 	/// <summary>
 	/// Get right part of the rule.
 	/// </summary>
 	/// <returns></returns>
-	const std::vector<std::shared_ptr<Symbol>>& getRight() const;
+	const symbol_vector& getRight() const;
 
 	friend bool operator < (const Rule& left, const Rule& right);
 
@@ -47,11 +46,11 @@ private:
 	/// <summary>
 	/// Left part of the rule.
 	/// </summary>
-	std::vector<std::shared_ptr<Symbol>> _left{};
+	symbol_vector _left{};
 
 	/// <summary>
 	/// Right part of the rule.
 	/// </summary>
-	std::vector<std::shared_ptr<Symbol>> _right{};
+	symbol_vector _right{};
 };
 

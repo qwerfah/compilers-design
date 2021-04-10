@@ -5,13 +5,13 @@
 
 Grammar::Grammar()
 {
-	algorithms["leftRecursionRemove"] = std::shared_ptr<GrammarTransform>{ 
+	algorithms["leftRecursionRemove"] = transform_ptr{ 
 		(GrammarTransform*) new LeftRecursionRemove{ *this } };
-	algorithms["epsilonRuleRemove"] = std::shared_ptr<GrammarTransform>{ 
+	algorithms["epsilonRuleRemove"] = transform_ptr{
 		(GrammarTransform*) new EpsilonRuleRemove{ *this } };
 }
 
-const std::shared_ptr<Symbol>& Grammar::getSymbol(const std::string& name) const
+const symbol_ptr& Grammar::getSymbol(const std::string& name) const
 {
 	for (auto& s : terminals) { if (s->getName() == name) return s; }
 	for (auto& s : nonTerminals) { if (s->getName() == name) return s; }

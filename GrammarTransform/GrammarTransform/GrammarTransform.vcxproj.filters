@@ -77,5 +77,8 @@
     <ClInclude Include="include\grammar_transform\epsilon_rule_remove.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="include\typedefs.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

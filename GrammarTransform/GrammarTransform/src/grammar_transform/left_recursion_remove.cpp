@@ -7,7 +7,7 @@ LeftRecursionRemove::LeftRecursionRemove(Grammar& grammar)
 
 void LeftRecursionRemove::operator()()
 {
-	std::vector<std::shared_ptr<Symbol>> symbols;
+	symbol_vector symbols;
 
 	for (auto i = _grammar.nonTerminals.begin(); i != _grammar.nonTerminals.end(); i++)
 	{
@@ -21,12 +21,12 @@ void LeftRecursionRemove::operator()()
 	_grammar.nonTerminals.insert(_grammar.nonTerminals.end(), symbols.begin(), symbols.end());
 }
 
-void LeftRecursionRemove::_unfoldRules(const std::vector<std::shared_ptr<Symbol>>::iterator& i)
+void LeftRecursionRemove::_unfoldRules(const symbol_iterator& i)
 {
 	for (auto j = _grammar.nonTerminals.begin(); j != i; j++)
 	{
-		std::vector<std::shared_ptr<Rule>> ijRules;
-		std::vector<std::shared_ptr<Rule>> jRules;
+		rule_vector ijRules;
+		rule_vector jRules;
 
 		_findIjRules(i, j, ijRules);
 		_findIndexedRules(j, jRules);
@@ -38,19 +38,18 @@ void LeftRecursionRemove::_unfoldRules(const std::vector<std::shared_ptr<Symbol>
 		{
 			for (auto& jRule : jRules)
 			{
-				std::vector<std::shared_ptr<Symbol>> right{ jRule->getRight() };
+				symbol_vector right{ jRule->getRight() };
 				right.insert(right.end(), ++(ijRule->getRight().begin()), ijRule->getRight().end());
-				_grammar.rules.push_back(std::shared_ptr<Rule>{ new Rule{ ijRule->getLeft(), right } });
+				_grammar.rules.push_back(rule_ptr{ new Rule{ ijRule->getLeft(), right } });
 			}
 		}
 	}
 }
 
-std::shared_ptr<Symbol> LeftRecursionRemove::_removeDirectRecursion(
-	const std::vector<std::shared_ptr<Symbol>>::iterator& i)
+symbol_ptr LeftRecursionRemove::_removeDirectRecursion(const symbol_iterator& i)
 {
-	std::vector<std::shared_ptr<Rule>> recRules;
-	std::vector<std::shared_ptr<Rule>> indRules;
+	rule_vector recRules;
+	rule_vector indRules;
 	// Searching all Ai-rules
 	_findRecursiveRules(i, recRules);
 
@@ -61,31 +60,28 @@ std::shared_ptr<Symbol> LeftRecursionRemove::_removeDirectRecursion(
 	std::erase_if(_grammar.rules, [&](auto r) {
 		return std::find(recRules.begin(), recRules.end(), r) != recRules.end(); });
 	// Add new nonterminal symbol Ài'
-	std::shared_ptr<Symbol> symbol{ new Symbol{
-		(*i)->getName() + "'", (*i)->getSpell(), (*i)->getType()} };
+	symbol_ptr symbol{ new Symbol{ (*i)->getName() + "'", (*i)->getSpell(), (*i)->getType()} };
 	// Add rules of type Ai -> b Ai'
 	for (auto& rule : indRules)
 	{
-		std::vector<std::shared_ptr<Symbol>> right{ rule->getRight() };
+		symbol_vector right{ rule->getRight() };
 		right.push_back(symbol);
-		_grammar.rules.push_back(std::shared_ptr<Rule>{ new Rule{ rule->getLeft(), right } });
+		_grammar.rules.push_back(rule_ptr{ new Rule{ rule->getLeft(), right } });
 	}
 	// Add rules of type Ai' -> a | a Ai'
 	for (auto& rule : recRules)
 	{
-		std::vector<std::shared_ptr<Symbol>> right{};
+		symbol_vector right{};
 		right.insert(right.begin(), ++(rule->getRight().begin()), rule->getRight().end());
-		_grammar.rules.push_back(std::shared_ptr<Rule>{ new Rule{ { symbol }, right } });
+		_grammar.rules.push_back(rule_ptr{ new Rule{ { symbol }, right } });
 		right.push_back(symbol);
-		_grammar.rules.push_back(std::shared_ptr<Rule>{ new Rule{ { symbol }, right } });
+		_grammar.rules.push_back(rule_ptr{ new Rule{ { symbol }, right } });
 	}
 
 	return symbol;
 }
 
-void LeftRecursionRemove::_findRecursiveRules(
-	const std::vector<std::shared_ptr<Symbol>>::iterator& it,
-	std::vector<std::shared_ptr<Rule>>& rules)
+void LeftRecursionRemove::_findRecursiveRules(const symbol_iterator& it, rule_vector& rules)
 {
 	std::copy_if(_grammar.rules.begin(), _grammar.rules.end(),
 		std::back_inserter(rules), [&](auto rule)
@@ -96,9 +92,7 @@ void LeftRecursionRemove::_findRecursiveRules(
 		});
 }
 
-void LeftRecursionRemove::_findIndexedRules(
-	const std::vector<std::shared_ptr<Symbol>>::iterator& it,
-	std::vector<std::shared_ptr<Rule>>& rules)
+void LeftRecursionRemove::_findIndexedRules(const symbol_iterator& it, rule_vector& rules)
 {
 	std::copy_if(_grammar.rules.begin(), _grammar.rules.end(), std::back_inserter(rules),
 		[&](auto rule)
@@ -110,10 +104,7 @@ void LeftRecursionRemove::_findIndexedRules(
 		});
 }
 
-void LeftRecursionRemove::_findIjRules(
-	const std::vector<std::shared_ptr<Symbol>>::iterator& i,
-	const std::vector<std::shared_ptr<Symbol>>::iterator& j,
-	std::vector<std::shared_ptr<Rule>>& rules)
+void LeftRecursionRemove::_findIjRules(const symbol_iterator& i, const symbol_iterator& j, rule_vector& rules)
 {
 	std::copy_if(_grammar.rules.begin(), _grammar.rules.end(), std::back_inserter(rules),
 		[&](auto rule)

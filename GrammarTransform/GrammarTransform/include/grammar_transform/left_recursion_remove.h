@@ -19,7 +19,7 @@ private:
 	/// Unfold indirect recursion.
 	/// </summary>
 	/// <param name="i"> Nonterminal from which starts unfolding. </param>
-	void _unfoldRules(const std::vector<std::shared_ptr<Symbol>>::iterator& i);
+	void _unfoldRules(const symbol_iterator& i);
 	
 	/// <summary>
 	/// Remove direct recursion starting from specified nonterminal.
@@ -27,26 +27,21 @@ private:
 	/// <param name="i"> Nonterminal from which starts delition. </param>
 	/// <returns> New nonterminal produced as the result of delition
 	/// or nullptr if there were no direct recursive rules. </returns>
-	std::shared_ptr<Symbol> _removeDirectRecursion(
-		const std::vector<std::shared_ptr<Symbol>>::iterator& i);
+	symbol_ptr _removeDirectRecursion(const symbol_iterator& i);
 
 	/// <summary>
 	/// Find rules with direct recursion.
 	/// </summary>
 	/// <param name="it"> Nonterminal for which searching recursive rules. </param>
 	/// <param name="rules"> Vector to save the result. </param>
-	void _findRecursiveRules(
-		const std::vector<std::shared_ptr<Symbol>>::iterator& it,
-		std::vector<std::shared_ptr<Rule>>& rules);
+	void _findRecursiveRules(const symbol_iterator& it, rule_vector& rules);
 
 	/// <summary>
 	/// Find rules of type Ai -> B, where B starts from terminal or Ak and k > i.
 	/// </summary>
 	/// <param name="it"> Nonterminal Ai. </param>
 	/// <param name="rules"> Vector to save the result. </param>
-	void _findIndexedRules(
-		const std::vector<std::shared_ptr<Symbol>>::iterator& it,
-		std::vector<std::shared_ptr<Rule>>& rules);
+	void _findIndexedRules(const symbol_iterator& it, rule_vector& rules);
 
 	/// <summary>
 	/// Find rules of type Ai -> Aj B.
@@ -54,9 +49,6 @@ private:
 	/// <param name="i"> Iterator for nonterminal Ai. </param>
 	/// <param name="j"> Iterator for nonterminal Aj.</param>
 	/// <param name="rules"> Vector to save the result. </param>
-	void _findIjRules(
-		const std::vector<std::shared_ptr<Symbol>>::iterator& i,
-		const std::vector<std::shared_ptr<Symbol>>::iterator& j,
-		std::vector<std::shared_ptr<Rule>>& rules);
+	void _findIjRules(const symbol_iterator& i, const symbol_iterator& j, rule_vector& rules);
 };
 

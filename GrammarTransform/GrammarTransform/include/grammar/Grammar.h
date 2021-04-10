@@ -1,9 +1,6 @@
 #pragma once
 
-#include <vector>
-#include <map>
 #include <algorithm>
-#include <memory>
 #include <iterator>
 
 #include "symbol.h"
@@ -24,22 +21,22 @@ public:
 	/// </summary>
 	/// <param name="name"> Name of the symbol. </param>
 	/// <returns> Symbol with specified name. </returns>
-	const std::shared_ptr<Symbol>& getSymbol(const std::string& name) const;
+	const symbol_ptr& getSymbol(const std::string& name) const;
 
 	/// <summary>
 	/// Terminal symbols (occur in the output).
 	/// </summary>
-	std::vector<std::shared_ptr<Symbol>> terminals{};
+	symbol_vector terminals{};
 
 	/// <summary>
 	/// Nonterminal symbols (occur in left part of grammar rule).
 	/// </summary>
-	std::vector<std::shared_ptr<Symbol>> nonTerminals{};
+	symbol_vector nonTerminals{};
 
 	/// <summary>
 	/// Start symbol of grammar.
 	/// </summary>
-	std::shared_ptr<Symbol> axiom{};
+	symbol_ptr axiom{};
 
 	/// <summary>
 	/// Set of withdrawal rules.
@@ -49,6 +46,6 @@ public:
 	/// <summary>
 	/// Thramsform algorithms.
 	/// </summary>
-	std::map<std::string, std::shared_ptr<GrammarTransform>> algorithms{};
+	transform_map algorithms{};
 };
 

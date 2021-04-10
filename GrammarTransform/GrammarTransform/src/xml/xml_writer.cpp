@@ -20,7 +20,7 @@ void XmlWriter::setFilename(const std::string& filename)
 	_filename = filename;
 }
 
-void XmlWriter::save(const std::shared_ptr<Grammar>& grammar)
+void XmlWriter::save(const grammar_ptr& grammar)
 {
 	using namespace tinyxml2;
 

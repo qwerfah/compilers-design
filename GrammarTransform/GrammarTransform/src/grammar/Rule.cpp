@@ -1,10 +1,10 @@
 #include "../../include/grammar/rule.h"
 
-Rule::Rule(const std::vector<std::shared_ptr<Symbol>>& left, 
-	       const std::vector<std::shared_ptr<Symbol>>& right)
+Rule::Rule(const symbol_vector& left,
+	       const symbol_vector& right)
 {
 	if (left.empty())
-	{
+	{ 
 		throw std::invalid_argument("Left part of rule is empty.");
 	}
 
@@ -22,22 +22,22 @@ Rule::Rule(const std::vector<std::shared_ptr<Symbol>>& left,
 	_right = right;
 }
 
-void Rule::addToLeft(const std::shared_ptr<Symbol>& symbol)
+void Rule::addToLeft(const symbol_ptr& symbol)
 {
 	_left.push_back(symbol);
 }
 
-void Rule::addToRight(const std::shared_ptr<Symbol>& symbol)
+void Rule::addToRight(const symbol_ptr& symbol)
 {
 	_right.push_back(symbol);
 }
 
-const std::vector<std::shared_ptr<Symbol>>& Rule::getLeft() const
+const symbol_vector& Rule::getLeft() const
 {
 	return _left;
 }
 
-const std::vector<std::shared_ptr<Symbol>>& Rule::getRight() const
+const symbol_vector& Rule::getRight() const
 {
 	return _right;
 }

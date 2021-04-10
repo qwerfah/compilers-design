@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-#include <stdexcept>
 #include <iostream>
 
 #include "../grammar/Grammar.h"
@@ -26,7 +24,7 @@ public:
 	/// Serialize grammar to XML and save to XML file.
 	/// </summary>
 	/// <param name="grammar"> Grammar to serialize. </param>
-	void save(const std::shared_ptr<Grammar>& grammar);
+	void save(const grammar_ptr& grammar);
 
 private:
 	/// <summary>
