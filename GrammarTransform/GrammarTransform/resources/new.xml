@@ -1,72 +1,89 @@
 <grammar name="G0">
     <terminalsymbols>
-        <term name="a" spell="a"/>
-        <term name="b" spell="b"/>
+        <term name="IDENT" spell="a"/>
+        <term name="ADD" spell="+"/>
+        <term name="MUL" spell="*"/>
+        <term name="LPAREN" spell="("/>
+        <term name="RPAREN" spell=")"/>
     </terminalsymbols>
     <nonterminalsymbols>
-        <nonterm name="S"/>
-        <nonterm name="S&apos;"/>
+        <nonterm name="E"/>
+        <nonterm name="T"/>
+        <nonterm name="F"/>
+        <nonterm name="E&apos;"/>
+        <nonterm name="T&apos;"/>
     </nonterminalsymbols>
     <productions>
         <production>
-            <lhs name="S"/>
+            <lhs name="E"/>
             <rhs>
-                <symbol type="term" name="a"/>
-                <symbol type="nonterm" name="S"/>
-                <symbol type="term" name="b"/>
-                <symbol type="nonterm" name="S"/>
+                <symbol type="nonterm" name="T"/>
             </rhs>
         </production>
         <production>
-            <lhs name="S"/>
+            <lhs name="T"/>
             <rhs>
-                <symbol type="term" name="a"/>
-                <symbol type="term" name="b"/>
-                <symbol type="nonterm" name="S"/>
+                <symbol type="nonterm" name="F"/>
             </rhs>
         </production>
         <production>
-            <lhs name="S"/>
+            <lhs name="F"/>
             <rhs>
-                <symbol type="term" name="a"/>
-                <symbol type="nonterm" name="S"/>
-                <symbol type="term" name="b"/>
+                <symbol type="term" name="IDENT"/>
             </rhs>
         </production>
         <production>
-            <lhs name="S"/>
+            <lhs name="F"/>
             <rhs>
-                <symbol type="term" name="a"/>
-                <symbol type="term" name="b"/>
+                <symbol type="term" name="LPAREN"/>
+                <symbol type="nonterm" name="E"/>
+                <symbol type="term" name="RPAREN"/>
             </rhs>
         </production>
         <production>
-            <lhs name="S"/>
+            <lhs name="E"/>
             <rhs>
-                <symbol type="nonterm" name="S"/>
-                <symbol type="term" name="a"/>
-                <symbol type="term" name="b"/>
-                <symbol type="nonterm" name="S"/>
+                <symbol type="nonterm" name="T"/>
+                <symbol type="nonterm" name="E&apos;"/>
             </rhs>
         </production>
         <production>
-            <lhs name="S"/>
+            <lhs name="E&apos;"/>
             <rhs>
-                <symbol type="nonterm" name="S"/>
-                <symbol type="term" name="a"/>
-                <symbol type="term" name="b"/>
+                <symbol type="term" name="ADD"/>
+                <symbol type="nonterm" name="T"/>
             </rhs>
         </production>
         <production>
-            <lhs name="S&apos;"/>
-            <rhs/>
+            <lhs name="E&apos;"/>
+            <rhs>
+                <symbol type="term" name="ADD"/>
+                <symbol type="nonterm" name="T"/>
+                <symbol type="nonterm" name="E&apos;"/>
+            </rhs>
         </production>
         <production>
-            <lhs name="S&apos;"/>
+            <lhs name="T"/>
             <rhs>
-                <symbol type="nonterm" name="S"/>
+                <symbol type="nonterm" name="F"/>
+                <symbol type="nonterm" name="T&apos;"/>
+            </rhs>
+        </production>
+        <production>
+            <lhs name="T&apos;"/>
+            <rhs>
+                <symbol type="term" name="MUL"/>
+                <symbol type="nonterm" name="F"/>
+            </rhs>
+        </production>
+        <production>
+            <lhs name="T&apos;"/>
+            <rhs>
+                <symbol type="term" name="MUL"/>
+                <symbol type="nonterm" name="F"/>
+                <symbol type="nonterm" name="T&apos;"/>
             </rhs>
         </production>
     </productions>
-    <startsymbol name="S&apos;"/>
+    <startsymbol name="E"/>
 </grammar>

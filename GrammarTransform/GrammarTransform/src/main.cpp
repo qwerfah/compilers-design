@@ -13,8 +13,8 @@ int main()
     try
     {
         grammar_ptr grammar{ parser.parse() };
-        (*grammar->algorithms["epsilonRuleRemove"])();
-        //(*grammar->algorithms["leftRecursionRemove"])();
+        //(*grammar->algorithms["epsilonRuleRemove"])();
+        (*grammar->algorithms["leftRecursionRemove"])();
         writer.save(grammar);
     }
     catch (std::exception e)
