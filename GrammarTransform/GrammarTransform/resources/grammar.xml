@@ -3,49 +3,31 @@
     <terminalsymbols>
         <term name="a" spell="a" />
         <term name="b" spell="b" />
-        <term name="c" spell="c" />
-        <term name="d" spell="d" />
     </terminalsymbols>
     <nonterminalsymbols>
         <nonterm name="S" />
-        <nonterm name="A" />
     </nonterminalsymbols>
     <productions>
         <production>
             <lhs name="S" />
             <rhs>
-                <symbol type="nonterm" name="A" />
                 <symbol type="term" name="a" />
-            </rhs>
-        </production>
-        <production>
-            <lhs name="S" />
-            <rhs>
-                <symbol type="nonterm" name="A" />
-            </rhs>
-        </production>
-        <production>
-            <lhs name="S" />
-            <rhs>
+                <symbol type="nonterm" name="S" />
                 <symbol type="term" name="b" />
+                <symbol type="nonterm" name="S" />
             </rhs>
         </production>
         <production>
-            <lhs name="A" />
-            <rhs>
-                <symbol type="nonterm" name="A" />
-                <symbol type="term" name="c" />
-            </rhs>
-        </production>
-        <production>
-            <lhs name="A" />
+            <lhs name="S" />
             <rhs>
                 <symbol type="nonterm" name="S" />
-                <symbol type="term" name="d" />
+                <symbol type="term" name="a" />
+                <symbol type="term" name="b" />
+                <symbol type="nonterm" name="S" />
             </rhs>
         </production>
         <production>
-            <lhs name="A" />
+            <lhs name="S" />
             <rhs>
             </rhs>
         </production>

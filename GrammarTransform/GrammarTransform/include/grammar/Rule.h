@@ -41,6 +41,7 @@ public:
 	const symbol_vector& getRight() const;
 
 	friend bool operator < (const Rule& left, const Rule& right);
+	friend bool operator == (const Rule& left, const Rule& right);
 
 private:
 	/// <summary>

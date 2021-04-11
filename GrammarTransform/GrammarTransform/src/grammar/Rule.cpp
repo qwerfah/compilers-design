@@ -46,3 +46,8 @@ bool operator < (const Rule& left, const Rule& right)
 {
 	return left._left.size() < right._left.size();
 }
+
+bool operator==(const Rule& left, const Rule& right)
+{
+	return (left._left == right._left) && (left._right == right._right);
+}

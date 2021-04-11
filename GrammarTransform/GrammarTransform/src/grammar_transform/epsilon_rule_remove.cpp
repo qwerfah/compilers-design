@@ -49,25 +49,64 @@ void EpsilonRuleRemove::_replaceEpsilonRules(const symbol_set& symbols)
 
 	for (size_t i = 0; i < size; i++)
 	{
+		const symbol_vector& right = _grammar.rules[i]->getRight();
 		index_vector occurrences{};
-		index_combination_vector combinations{};
 
-		_findAllOccurrences(symbols, _grammar.rules[i]->getRight(), occurrences);
+		if (!right.empty())
+		{
+			rules.push_back(_grammar.rules[i]);
+		}
+		_findAllOccurrences(symbols, right, occurrences);
+		if (occurrences.empty())
+		{
+			continue;
+		}
+
+		index_combination_vector combinations{};
 		_findAllCombinations(occurrences, combinations);
 
 		for (auto& combination : combinations)
 		{
-			symbol_vector right{ _grammar.rules[i]->getRight() };
+			symbol_vector newRight{  };
 
-			for (auto index : combination)
+			for (size_t i = 0; i < right.size(); i++)
 			{
-				right.erase(right.begin() + index);
+				if (std::find(combination.begin(), combination.end(), i) == combination.end())
+				{
+					newRight.push_back(right[i]);
+				}
 			}
 
-			rule_ptr rule{ new Rule{ _grammar.rules[i]->getLeft(), right } };
-			_grammar.rules.push_back(rule);
+			if (!newRight.empty())
+			{
+				rule_ptr rule{ new Rule{ _grammar.rules[i]->getLeft(), newRight } };
+
+				if (std::none_of(rules.begin(), rules.end(), [&](auto r) { return *r == *rule; }))
+				{
+					rules.push_back(rule);
+				}
+			}
 		}
 	}
+
+	// If axiom contains in epsilon-reachable symbol set, add new axiom
+	if (symbols.contains(_grammar.axiom))
+	{
+		symbol_ptr symbol{ new Symbol{ 
+			_grammar.axiom->getName() + "'", 
+			_grammar.axiom->getSpell(), 
+			_grammar.axiom->getType() } };
+
+		rule_ptr rule1{ new Rule{ { symbol }, {} } };
+		rule_ptr rule2{ new Rule{ { symbol }, { _grammar.axiom } } };
+
+		_grammar.nonTerminals.push_back(symbol);
+		_grammar.axiom = symbol;
+		rules.push_back(rule1);
+		rules.push_back(rule2);
+	}
+
+	_grammar.rules = rules;
 }
 
 void EpsilonRuleRemove::_findAllOccurrences(
@@ -75,7 +114,7 @@ void EpsilonRuleRemove::_findAllOccurrences(
 	const symbol_vector& right,
 	index_vector& occurrences)
 {
-	if (!std::any_of(symbols.begin(), symbols.end(), [&](auto s) { return !s; }))
+	if (std::any_of(symbols.begin(), symbols.end(), [&](auto s) { return !s; }))
 	{
 		throw std::invalid_argument{ "Null symbol pointer in symbol vector." };
 	}
