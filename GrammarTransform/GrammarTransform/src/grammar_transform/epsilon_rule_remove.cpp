@@ -142,7 +142,7 @@ void EpsilonRuleRemove::_findAllCombinations(
 	const index_vector& indexes, 
 	index_combination_vector& combinations)
 {
-	int n = indexes.size(); 
+	size_t n = indexes.size(); 
 	for (int r = 1; r <= n; r++)
 	{
 		std::vector<bool> v(n);
