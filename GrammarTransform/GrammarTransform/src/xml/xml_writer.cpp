@@ -79,5 +79,5 @@ void XmlWriter::save(const grammar_ptr& grammar)
 	root->InsertNewChildElement("startsymbol")
 		->SetAttribute("name", grammar->axiom->getName().c_str());
 
-	std::cout << doc.SaveFile(_filename.c_str());
+	doc.SaveFile(_filename.c_str());
 }

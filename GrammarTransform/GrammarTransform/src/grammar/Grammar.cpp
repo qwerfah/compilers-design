@@ -5,9 +5,9 @@
 
 Grammar::Grammar()
 {
-	algorithms["leftRecursionRemove"] = transform_ptr{ 
+	algorithms["recursion"] = transform_ptr{ 
 		(GrammarTransform*) new LeftRecursionRemove{ *this } };
-	algorithms["epsilonRuleRemove"] = transform_ptr{
+	algorithms["epsilon"] = transform_ptr{
 		(GrammarTransform*) new EpsilonRuleRemove{ *this } };
 }
 

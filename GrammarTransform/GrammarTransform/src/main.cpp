@@ -5,27 +5,29 @@
 #include "../include/xml/xml_writer.h"
 #include "../include/grammar_transform/grammar_transform.h"
 
-
-template<typename TArg1, typename TArg2>
-bool func(TArg1 arg1, TArg2 arg2)
-{
-    return arg1 > arg2;
-}
-
-using temp = std::vector<int>;
-
 int main()
 {
-    XmlParser parser{ "./resources/grammar.xml" };
-    XmlWriter writer{ "./resources/new.xml" };
+    std::string inputFile{};
+    std::string outputFile{};
+    std::string algorithm{};
 
-    temp vec{1, 2, 3};
+    std::cout << "Enter input file name [./resources/grammar.xml]: ";
+    std::getline(std::cin, inputFile);
+
+    std::cout << "Enter input file name [./resources/new.xml]: ";
+    std::getline(std::cin, outputFile);
+
+    std::cout << "Enter transform algorithm [recursion]: ";
+    std::getline(std::cin, algorithm);
 
     try
     {
+        XmlParser parser{ inputFile.empty() ? "./resources/grammar.xml" : inputFile };
+        XmlWriter writer{ outputFile.empty() ? "./resources/new.xml" : outputFile };
+
         grammar_ptr grammar{ parser.parse() };
-        //(*grammar->algorithms["epsilonRuleRemove"])();
-        (*grammar->algorithms["leftRecursionRemove"])();
+        //(*grammar->algorithms["epsilon"])();
+        (*grammar->algorithms[ algorithm.empty() ? "recursion" : algorithm ])();
         writer.save(grammar);
     }
     catch (std::exception e)
