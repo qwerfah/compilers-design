@@ -12,7 +12,13 @@
 class Grammar
 {
 public:
-	Grammar();
+	Grammar() noexcept = default;
+
+	Grammar(
+		const symbol_vector& nonTerms, 
+		const symbol_vector& terms, 
+		const symbol_ptr& start, 
+		const rule_vector& prods);
 
 	/// <summary>
 	/// Get symbol from grammar alphabet by its name.
@@ -39,6 +45,6 @@ public:
 	/// <summary>
 	/// Set of withdrawal rules.
 	/// </summary>
-	std::vector<std::shared_ptr<Rule>> rules{};
+	rule_vector rules{};
 };
 

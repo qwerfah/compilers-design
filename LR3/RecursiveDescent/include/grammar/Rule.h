@@ -12,7 +12,7 @@
 class Rule
 {
 public:
-	Rule() = default;
+	Rule() noexcept = default;
 	Rule(const symbol_vector& left, 
 		 const symbol_vector& right);
 

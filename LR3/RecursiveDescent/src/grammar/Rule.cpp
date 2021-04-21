@@ -1,7 +1,7 @@
 #include "../../include/grammar/rule.h"
 
 Rule::Rule(const symbol_vector& left,
-	       const symbol_vector& right)
+	       const symbol_vector& right) : Rule()
 {
 	if (left.empty())
 	{ 
