@@ -1,5 +1,8 @@
 package parser
 
+import java.io.PrintWriter
+import java.io.File
+
 /** Tree serializer which converts 
   * parse tree to DOT notation and save to file.
   *
@@ -11,6 +14,18 @@ class TreeSerializer(val filename: String) {
     }
 
     def serialize(tree: Node) {
+        val writer = new PrintWriter(new File(filename))
 
+        writer.write("digraph ParseTree {\n")
+        _serialize(tree, writer)
+        writer.write("}\n")
+        writer.close
+    }
+
+    private def _serialize(node: Node, writer: PrintWriter) {
+        for (child <- node.childs) {
+            writer.write(s""""${node.symbol.name}" -> "${child.symbol.name}"\n""")
+            _serialize(child, writer)
+        }
     }
 }

@@ -1,6 +1,7 @@
 import parser._
 
 object Main extends App {
-    val parser: Parser = new Parser("" :: Nil)
-    println(parser.parse.isSuccess)
+    val a = 4
+    val b = 6
+    println(s""""$a" -> "$b"""")
 }
