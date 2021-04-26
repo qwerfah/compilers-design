@@ -1,25 +1,31 @@
 package grammar
 
-// Grammar symbol type
-object SymbolType extends Enumeration {
-    type SymbolType = Value
-    val Term, NonTerm, Eps = Value
-}
+/** Describes context-free grammar which represents a tuple of four elements.
+  *
+  * @param terms Set of terminal symbols.
+  * @param nonTerms Set of nonterminal symbols.
+  * @param rules Set of production rules.
+  * @param axiom Start symbol of grammar.
+  */
+class Grammar(
+    val terms: Set[Symbol], 
+    val nonTerms: Set[Symbol], 
+    val rules: Set[Rule], 
+    val axiom: Symbol) {
 
-// Grammar symbol
-class Symbol(val name: String, val spell: Option[String], val stype: SymbolType.SymbolType = SymbolType.Term) {
-    if (name == null || name.isBlank()) throw new Exception("Invalid name")
-    if (stype == null) throw new Exception("Invalid symbol type")
-}
+    if (terms == null || terms.isEmpty) {
+        throw new Exception("Invalid terms list")
+    }
 
-class Rule(val lhs: List[Symbol], val rhs: List[Symbol]) {
-    if (lhs == null || lhs.isEmpty) throw new Exception("Invalid left-hand side of the rule")
-    if (rhs == null) throw new Exception("Invalid right-hand side of the rule")
-}
+    if (nonTerms == null || nonTerms.isEmpty) {
+        throw new Exception("Invalid nonterms list")
+    }
 
-class Grammar(val terms: List[Symbol], val nonTerms: List[Symbol], val rules: List[Rule], val axiom: Symbol) {
-    if (terms == null || terms.isEmpty) throw new Exception("Invalid terms list")
-    if (nonTerms == null || nonTerms.isEmpty) throw new Exception("Invalid nonterms list")
-    if (rules == null || rules.isEmpty) throw new Exception("Invalid rules list")
-    if (axiom == null) throw new Exception("Invalid axiom")
+    if (rules == null || rules.isEmpty) {
+        throw new Exception("Invalid rules list")
+    }
+    
+    if (axiom == null) {
+        throw new Exception("Invalid axiom")
+    }
 }
