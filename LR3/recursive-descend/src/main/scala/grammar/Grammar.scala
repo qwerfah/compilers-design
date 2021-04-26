@@ -8,10 +8,10 @@ package grammar
   * @param axiom Start symbol of grammar.
   */
 class Grammar(
-    val terms: Set[Symbol], 
-    val nonTerms: Set[Symbol], 
-    val rules: Set[Rule], 
-    val axiom: Symbol) {
+    val terms: Set[GrammarSymbol], 
+    val nonTerms: Set[GrammarSymbol], 
+    val rules: Set[GrammarRule], 
+    val axiom: GrammarSymbol) {
 
     if (terms == null || terms.isEmpty) {
         throw new Exception("Invalid terms list")

@@ -1,6 +1,6 @@
 package parser
 
-import grammar.Symbol
+import grammar.GrammarSymbol
 
 /** Describes node of parse tree.
   * 
@@ -8,4 +8,7 @@ import grammar.Symbol
   * @param symbol symbol (terminal or nonterminal), decribed by this node.
   * @param childs child nodes of this node in parse tree.
   */
-class Node(val id: Int, val symbol: Symbol, val childs: List[Node])
+class Node(val symbol: GrammarSymbol, val childs: Option[List[Node]] = None) {
+  private val _id: Symbol = Symbol(symbol.name)
+  def id = _id
+}

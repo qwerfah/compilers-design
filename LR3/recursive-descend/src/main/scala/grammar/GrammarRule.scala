@@ -6,7 +6,7 @@ package grammar
   * @param lhs Left-hand side of the rule.
   * @param rhs Right-hand-side of the rule.
   */
-class Rule(val lhs: List[Symbol], val rhs: List[Symbol]) {
+class GrammarRule(val lhs: List[GrammarSymbol], val rhs: List[GrammarSymbol]) {
     if (lhs == null || lhs.isEmpty) {
         throw new Exception("Invalid left-hand side of the rule")
     }

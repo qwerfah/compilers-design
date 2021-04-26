@@ -23,7 +23,8 @@ class TreeSerializer(val filename: String) {
     }
 
     private def _serialize(node: Node, writer: PrintWriter) {
-        for (child <- node.childs) {
+        if (!node.childs.isDefined) return
+        for (child <- node.childs.get) {
             writer.write(s""""${node.symbol.name}" -> "${child.symbol.name}"\n""")
             _serialize(child, writer)
         }
