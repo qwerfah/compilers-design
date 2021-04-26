@@ -8,9 +8,9 @@ package grammar
   * @param axiom Start symbol of grammar.
   */
 class Grammar(
-    val terms: Set[GrammarSymbol], 
-    val nonTerms: Set[GrammarSymbol], 
-    val rules: Set[GrammarRule], 
+    val terms: Set[GrammarSymbol],
+    val nonTerms: Set[GrammarSymbol],
+    val rules: Set[GrammarRule],
     val axiom: GrammarSymbol) {
 
     if (terms == null || terms.isEmpty) {

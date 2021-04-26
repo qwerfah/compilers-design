@@ -1,6 +1,7 @@
 package parser
 
 import grammar.GrammarSymbol
+import grammar.Grammar
 
 /** Describes node of parse tree.
   * 
@@ -11,4 +12,39 @@ import grammar.GrammarSymbol
 class Node(val symbol: GrammarSymbol, val childs: Option[List[Node]] = None) {
   private val _id: Symbol = Symbol(symbol.name)
   def id = _id
+
+  /** Constructor for tree leaf without childs.
+    *
+    * @param symbol Symbol represented by this node.
+    */
+  def this(symbol: GrammarSymbol) {
+    this(symbol, None)
+  }
+
+  /** Constructor for tree leaf without childs.
+    *
+    * @param name Name of symbol represented by this node 
+    * (default nonterminal without spell).
+    */
+  def this(name: String) {
+    this(new GrammarSymbol(name), None)
+  }
+
+  /** Constructor for tree node with childs.
+    *
+    * @param symbol Symbol represented by this node.
+    * @param childs Child nodes list.
+    */
+  def this(symbol: GrammarSymbol, childs: List[Node]) {
+    this(symbol, Option(childs))
+  } 
+
+  /** Constructor for tree node with childs.
+    *
+    * @param name Name of symbol represented by this node.
+    * @param childs Child nodes list.
+    */
+  def this(name: String, childs: List[Node]) {
+    this(new GrammarSymbol(name), Option(childs))
+  } 
 }

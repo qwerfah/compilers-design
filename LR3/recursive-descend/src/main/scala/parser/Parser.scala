@@ -19,9 +19,11 @@ class Parser(val tokens: List[String]) {
       */
     def parse: ParseResult = {
         val result = parseExpr
-        if (result.isSuccess) result
+        if (result.isSuccess) {
+          result
+        }
         else {
-            new ParseResult(s"Position $pos: error while parsing expression", Option(result))
+            new ParseResult(s"Position $pos: error while parsing expression", result)
         }
     }
 
@@ -36,14 +38,16 @@ class Parser(val tokens: List[String]) {
             result = parseRelOp
             if (result.isSuccess) {
                 result = parseSimpleExpr
-                if (result.isSuccess) result 
+                if (result.isSuccess) {
+                  new ParseResult(new Node("expr", result.tree.get :: Nil))
+                }
                 else {
-                    new ParseResult(s"Position $pos: second simple expression required", Option(result))
+                    new ParseResult(s"Position $pos: second simple expression required", result)
                 }
             }
         }
         else {
-            new ParseResult(s"Position $pos: simple expression required", Option(result))
+            new ParseResult(s"Position $pos: simple expression required", result)
         }
         
         new ParseResult
