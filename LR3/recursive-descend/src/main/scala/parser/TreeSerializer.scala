@@ -4,7 +4,7 @@ import java.io.PrintWriter
 import java.io.File
 
 /** Tree serializer which converts 
-  * parse tree to DOT notation and save to file.
+  * parse tree to DOT notation and saves to file.
   *
   * @param filename File name to save serialized parse tree.
   */
@@ -13,20 +13,28 @@ class TreeSerializer(val filename: String) {
         throw new Exception("Invalid filename.")
     }
 
-    def serialize(tree: Node) {
-        val writer = new PrintWriter(new File(filename))
+    private val _writer = new PrintWriter(new File(filename))
 
-        writer.write("digraph ParseTree {\n")
-        _serialize(tree, writer)
-        writer.write("}\n")
-        writer.close
+    /** Serialize parse tree to file in DOT notation.
+      *
+      * @param tree Parse tree to serialize.
+      */
+    def serialize(tree: Node) {
+        _writer.write("digraph ParseTree {\n")
+        _serialize(tree)
+        _writer.write("}\n")
+        _writer.close
     }
 
-    private def _serialize(node: Node, writer: PrintWriter) {
+    /** Recursive tree serialization from node to its childs.
+      *
+      * @param node Current serializable node.
+      */
+    private def _serialize(node: Node) {
         if (!node.childs.isDefined) return
         for (child <- node.childs.get) {
-            writer.write(s""""${node.symbol.name}" -> "${child.symbol.name}"\n""")
-            _serialize(child, writer)
+            _writer.write(s""""${node.symbol.name}" -> "${child.symbol.name}"\n""")
+            _serialize(child)
         }
     }
 }
