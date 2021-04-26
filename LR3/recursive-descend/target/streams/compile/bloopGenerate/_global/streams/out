@@ -1,4 +1,0 @@
-[debug] [recursive-descend] Classpath dependencies List()
-[debug] [recursive-descend] Dependencies from configurations List()
-[debug] Bloop wrote the configuration of project 'recursive-descend' to '/home/qwerheh/src/scala/recursive-descend/.bloop/recursive-descend.json'
-[success] Generated .bloop/recursive-descend.json
