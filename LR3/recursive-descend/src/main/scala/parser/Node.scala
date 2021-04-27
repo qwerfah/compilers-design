@@ -4,7 +4,7 @@ import grammar.GrammarSymbol
 import grammar.Grammar
 
 /** Describes node of parse tree.
-  * 
+  *
   * @param id Id of parse tree node.
   * @param symbol symbol (terminal or nonterminal), decribed by this node.
   * @param childs child nodes of this node in parse tree.
@@ -23,7 +23,7 @@ class Node(val symbol: GrammarSymbol, val childs: Option[List[Node]] = None) {
 
   /** Constructor for tree leaf without childs.
     *
-    * @param name Name of symbol represented by this node 
+    * @param name Name of symbol represented by this node
     * (default nonterminal without spell).
     */
   def this(name: String) {
@@ -37,7 +37,7 @@ class Node(val symbol: GrammarSymbol, val childs: Option[List[Node]] = None) {
     */
   def this(symbol: GrammarSymbol, childs: List[Node]) {
     this(symbol, Option(childs))
-  } 
+  }
 
   /** Constructor for tree node with childs.
     *
@@ -46,5 +46,5 @@ class Node(val symbol: GrammarSymbol, val childs: Option[List[Node]] = None) {
     */
   def this(name: String, childs: List[Node]) {
     this(new GrammarSymbol(name), Option(childs))
-  } 
+  }
 }

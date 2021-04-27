@@ -7,15 +7,16 @@ package grammar
   * @param stype Symbol type.
   */
 class GrammarSymbol(
-    val name: String, 
-    val spell: Option[String] = None, 
-    val stype: SymbolType.SymbolType = SymbolType.Term) {
-        
-    if (name == null || name.isBlank()) {
-        throw new Exception("Invalid name")
-    }
+    val name: String,
+    val spell: Option[String] = None,
+    val stype: SymbolType.SymbolType = SymbolType.Term
+) {
 
-    if (stype == null) {
-        throw new Exception("Invalid symbol type")
-    }
+  if (name == null || name.isBlank()) {
+    throw new Exception("Invalid name")
+  }
+
+  if (stype == null) {
+    throw new Exception("Invalid symbol type")
+  }
 }

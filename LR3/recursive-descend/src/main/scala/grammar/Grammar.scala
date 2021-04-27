@@ -11,21 +11,21 @@ class Grammar(
     val terms: Set[GrammarSymbol],
     val nonTerms: Set[GrammarSymbol],
     val rules: Set[GrammarRule],
-    val axiom: GrammarSymbol) {
+    val axiom: GrammarSymbol
+) {
+  if (terms == null || terms.isEmpty) {
+    throw new Exception("Invalid terms list")
+  }
 
-    if (terms == null || terms.isEmpty) {
-        throw new Exception("Invalid terms list")
-    }
+  if (nonTerms == null || nonTerms.isEmpty) {
+    throw new Exception("Invalid nonterms list")
+  }
 
-    if (nonTerms == null || nonTerms.isEmpty) {
-        throw new Exception("Invalid nonterms list")
-    }
+  if (rules == null || rules.isEmpty) {
+    throw new Exception("Invalid rules list")
+  }
 
-    if (rules == null || rules.isEmpty) {
-        throw new Exception("Invalid rules list")
-    }
-    
-    if (axiom == null) {
-        throw new Exception("Invalid axiom")
-    }
+  if (axiom == null) {
+    throw new Exception("Invalid axiom")
+  }
 }
