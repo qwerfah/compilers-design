@@ -87,7 +87,13 @@ class Parser(val tokens: List[String]) {
     * @return Parse result which contains parse tree or parsing errors.
     */
   def parseSign: ParseResult = {
-    new ParseResult
+    val signRegex: Regex = "+|-".r
+
+    if (signRegex.matches(tokens(pos))) {
+      new ParseResult(new Node("sign", tokens(pos)))
+    } else {
+      new ParseResult(s"Position $pos: sign expected")
+    }
   }
 
   /** Parse relation operation from input
@@ -97,7 +103,13 @@ class Parser(val tokens: List[String]) {
     * @return Parse result which contains parse tree or parsing errors.
     */
   def parseRelOp: ParseResult = {
-    new ParseResult
+    val relOpRegex: Regex = "=|<>|<|<=|>|>=".r
+
+    if (relOpRegex.matches(tokens(pos))) {
+      new ParseResult(new Node("rel_op", tokens(pos)))
+    } else {
+      new ParseResult(s"Position $pos: relation operation expected")
+    }
   }
 
   /** Parse sum operation from input token stream according to the grammar rule:
@@ -106,7 +118,13 @@ class Parser(val tokens: List[String]) {
     * @return Parse result which contains parse tree or parsing errors.
     */
   def parseSumOp: ParseResult = {
-    new ParseResult
+    val sumOpRegex: Regex = "\\+|-|or".r
+
+    if (sumOpRegex.matches(tokens(pos))) {
+      new ParseResult(new Node("sum_op", tokens(pos)))
+    } else {
+      new ParseResult(s"Position $pos: sum operation expected")
+    }
   }
 
   /** Parse multiplication operation from input
@@ -116,7 +134,13 @@ class Parser(val tokens: List[String]) {
     * @return Parse result which contains parse tree or parsing errors.
     */
   def parseMulOp: ParseResult = {
-    new ParseResult
+    val mulOpRegex: Regex = "\\*|/|div|mod|and".r
+
+    if (mulOpRegex.matches(tokens(pos))) {
+      new ParseResult(new Node("mul_op", tokens(pos)))
+    } else {
+      new ParseResult(s"Position $pos: multiplication operation expected")
+    }
   }
 
   /** Parse identifier from input token stream according to the grammar rule:
@@ -125,8 +149,13 @@ class Parser(val tokens: List[String]) {
     * @return Parse result which contains parse tree or parsing errors.
     */
   def parseId: ParseResult = {
-    val numberPattern: Regex = "[0-9]".r
-    new ParseResult
+    val idRegex: Regex = "[_a-zA-Z][_a-zA-Z0-9]{0,30}".r
+
+    if (idRegex.matches(tokens(pos))) {
+      new ParseResult(new Node("id", tokens(pos)))
+    } else {
+      new ParseResult(s"Position $pos: invalid identifier")
+    }
   }
 
   /** Parse constant from input token stream according to the grammar rule:

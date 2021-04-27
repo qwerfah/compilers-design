@@ -2,6 +2,7 @@ package parser
 
 import grammar.GrammarSymbol
 import grammar.Grammar
+import grammar.SymbolType
 
 /** Describes node of parse tree.
   *
@@ -28,6 +29,10 @@ class Node(val symbol: GrammarSymbol, val childs: Option[List[Node]] = None) {
     */
   def this(name: String) {
     this(new GrammarSymbol(name), None)
+  }
+
+  def this(name: String, spell: String) {
+    this(new GrammarSymbol(name, Option(spell), SymbolType.Term), None)
   }
 
   /** Constructor for tree node with childs.

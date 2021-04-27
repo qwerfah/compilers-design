@@ -1,5 +1,7 @@
 package parser
 
+import grammar.GrammarSymbol
+
 /** Result of pasing operation (contains parse tree or pasing errors).
   *
   * @param isSuccess Shows whether the result of parsing operation is parse tree or error.
