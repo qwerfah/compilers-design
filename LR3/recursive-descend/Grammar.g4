@@ -1,5 +1,15 @@
 grammar Grammar;
 
+program : block;
+
+block : '{' operator_list '}';
+
+operator_list : operator tail;
+
+tail : ';' operator tail | ;
+
+operator : id '=' expr;
+
 expr : simple_expr | simple_expr rel_op simple_expr;
 
 simple_expr : term | sign term | simple_expr sum_op term;
