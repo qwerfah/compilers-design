@@ -2,6 +2,7 @@
 #include "../../include/grammar_transform/grammar_transform.h"
 #include "../../include/grammar_transform/left_recursion_remove.h"
 #include "../../include/grammar_transform/epsilon_rule_remove.h"
+#include "../../include/grammar_transform/left_factorization.h"
 
 Grammar::Grammar()
 {
@@ -9,6 +10,8 @@ Grammar::Grammar()
 		(GrammarTransform*) new LeftRecursionRemove{ *this } };
 	algorithms["epsilon"] = transform_ptr{
 		(GrammarTransform*) new EpsilonRuleRemove{ *this } };
+	algorithms["fact"] = transform_ptr{
+		(GrammarTransform*) new LeftFactorization{ *this } };
 }
 
 const symbol_ptr& Grammar::getSymbol(const std::string& name) const

@@ -1,60 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <grammar name="G0">
     <terminalsymbols>
-        <term name="IDENT" spell="a" />
-        <term name="ADD" spell="+" />
-        <term name="MUL" spell="*" />
-        <term name="LPAREN" spell="(" />
-        <term name="RPAREN" spell=")" />
+        <term name="i" spell="i" />
+        <term name="t" spell="t" />
+        <term name="e" spell="e" />
+        <term name="a" spell="a" />
+        <term name="b" spell="b" />
     </terminalsymbols>
     <nonterminalsymbols>
+        <nonterm name="S" />
         <nonterm name="E" />
-        <nonterm name="T" />
-        <nonterm name="F" />
     </nonterminalsymbols>
     <productions>
         <production>
+            <lhs name="S" />
+            <rhs>
+                <symbol type="term" name="i" />
+                <symbol type="nonterm" name="E" />
+                <symbol type="term" name="t" />
+                <symbol type="nonterm" name="S" />
+            </rhs>
+        </production>
+        <production>
+            <lhs name="S" />
+            <rhs>
+                <symbol type="term" name="i" />
+                <symbol type="nonterm" name="E" />
+                <symbol type="term" name="t" />
+                <symbol type="nonterm" name="S" />
+                <symbol type="term" name="e" />
+                <symbol type="nonterm" name="S" />
+            </rhs>
+        </production>
+        <production>
+            <lhs name="S" />
+            <rhs>
+                <symbol type="term" name="a" />
+            </rhs>
+        </production>
+        <production>
             <lhs name="E" />
             <rhs>
-                <symbol type="nonterm" name="E" />
-                <symbol type="term" name="ADD" />
-                <symbol type="nonterm" name="T" />
-            </rhs>
-        </production>
-        <production>
-            <lhs name="E" />
-            <rhs>
-                <symbol type="nonterm" name="T" />
-            </rhs>
-        </production>
-        <production>
-            <lhs name="T" />
-            <rhs>
-                <symbol type="nonterm" name="T" />
-                <symbol type="term" name="MUL" />
-                <symbol type="nonterm" name="F" />
-            </rhs>
-        </production>
-        <production>
-            <lhs name="T" />
-            <rhs>
-                <symbol type="nonterm" name="F" />
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F" />
-            <rhs>
-                <symbol type="term" name="IDENT" />
-            </rhs>
-        </production>
-        <production>
-            <lhs name="F" />
-            <rhs>
-                <symbol type="term" name="LPAREN" />
-                <symbol type="nonterm" name="E" />
-                <symbol type="term" name="RPAREN" />
+                <symbol type="nonterm" name="b" />
             </rhs>
         </production>
     </productions>
-    <startsymbol name="E" />
+    <startsymbol name="S" />
 </grammar>

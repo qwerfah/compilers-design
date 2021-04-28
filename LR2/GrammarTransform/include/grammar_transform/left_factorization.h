@@ -23,7 +23,7 @@ private:
 	/// <param name="symbol"> Nonterminal symbol that expected 
 	/// in left-hand side of the rule. </param>
 	/// <returns></returns>
-	bool _replaceRules(const symbol_ptr& symbol);
+	symbol_ptr _replaceRules(const symbol_ptr& symbol);
 
 	/// <summary>
 	/// Find all rules with common symbol on specified position in right-hand side.
