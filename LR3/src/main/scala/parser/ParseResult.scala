@@ -6,12 +6,15 @@ import grammar.GrammarSymbol
   *
   * @param isSuccess Shows whether the result of parsing operation is parse tree or error.
   * @param tree Parse tree which built as a result of parseing operation.
+  * @param pos Position after last parsed token 
+  *            (specifies next token to parse or token which raises the error).
   * @param message Error message (in case of error).
   * @param inner Inner results that contain inner errors.
   */
 class ParseResult(
     val isSuccess: Boolean = true,
     val tree: Option[Node] = None,
+    val pos: Int = 0,
     val message: Option[String] = None,
     val inner: Option[ParseResult] = None
 ) {
@@ -20,8 +23,8 @@ class ParseResult(
     *
     * @param tree Parse tree.
     */
-  def this(tree: Node) {
-    this(true, Option(tree), None, None)
+  def this(tree: Node, pos: Int) {
+    this(true, Option(tree), pos, None, None)
   }
 
   /** Constructor for error result of parsing operation.
@@ -29,15 +32,15 @@ class ParseResult(
     * @param message Error message.
     * @param inner Inner errors.
     */
-  def this(message: String, inner: ParseResult) {
-    this(false, None, Option(message), Option(inner))
+  def this(message: String, pos: Int, inner: ParseResult) {
+    this(false, None, pos, Option(message), Option(inner))
   }
 
   /** Constructor for error result without inner errors.
     *
     * @param message Error message.
     */
-  def this(message: String) {
-    this(false, None, Option(message), None)
+  def this(message: String, pos: Int) {
+    this(false, None, pos, Option(message), None)
   }
 }
