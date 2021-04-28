@@ -92,10 +92,15 @@ void EpsilonRuleRemove::_replaceEpsilonRules(const symbol_set& symbols)
 	// If axiom contains in epsilon-reachable symbol set, add new axiom
 	if (symbols.contains(_grammar.axiom))
 	{
-		symbol_ptr symbol{ new Symbol{ 
-			_grammar.axiom->getName() + "'", 
-			_grammar.axiom->getSpell(), 
-			_grammar.axiom->getType() } };
+		symbol_ptr symbol
+		{ 
+			new Symbol
+			{ 
+				_grammar.axiom->getName() + "\'", 
+				_grammar.axiom->getSpell(), 
+				_grammar.axiom->getType() 
+			} 
+		};
 
 		rule_ptr rule1{ new Rule{ { symbol }, {} } };
 		rule_ptr rule2{ new Rule{ { symbol }, { _grammar.axiom } } };

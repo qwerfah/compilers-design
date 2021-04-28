@@ -60,7 +60,7 @@ symbol_ptr LeftRecursionRemove::_removeDirectRecursion(const symbol_iterator& i)
 	std::erase_if(_grammar.rules, [&](auto r) {
 		return std::find(recRules.begin(), recRules.end(), r) != recRules.end(); });
 	// Add new nonterminal symbol Ài'
-	symbol_ptr symbol{ new Symbol{ (*i)->getName() + "'", (*i)->getSpell(), (*i)->getType()} };
+	symbol_ptr symbol{ new Symbol{ (*i)->getName() + "\'", (*i)->getSpell(), (*i)->getType()} };
 	// Add rules of type Ai -> b Ai'
 	for (auto& rule : indRules)
 	{
