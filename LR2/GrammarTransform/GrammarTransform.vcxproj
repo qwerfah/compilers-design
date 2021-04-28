@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\grammar_transform\left_factorization.cpp" />
     <ClCompile Include="src\grammar_transform\epsilon_rule_remove.cpp" />
     <ClCompile Include="src\grammar_transform\grammar_transform.cpp" />
     <ClCompile Include="src\grammar_transform\left_recursion_remove.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="include\xml\xml_parser.h" />
     <ClInclude Include="include\xml\xml_writer.h" />
     <ClInclude Include="include\grammar_transform\left_recursion_remove.h" />
+    <ClInclude Include="include\grammar_transform\left_factorization.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

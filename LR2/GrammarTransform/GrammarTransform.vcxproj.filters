@@ -45,6 +45,9 @@
     <ClCompile Include="src\grammar_transform\epsilon_rule_remove.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="src\grammar_transform\left_factorization.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\enums.h">
@@ -78,6 +81,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="include\typedefs.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\grammar_transform\left_factorization.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
