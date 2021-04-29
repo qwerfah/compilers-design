@@ -1,28 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <grammar name="G0">
     <terminalsymbols>
-        <term name="i" spell="i" />
-        <term name="t" spell="t" />
-        <term name="e" spell="e" />
-        <term name="a" spell="a" />
-        <term name="b" spell="b" />
+        <term name="{" spell="{" />
+        <term name="}" spell="}" />
+        <term name="(" spell="(" />
+        <term name=")" spell=")" />
+        <term name=";" spell=";" />
+        <term name="=" spell="=" />
+        <term name="+" spell="+" />
+        <term name="-" spell="-" />
+        <term name="<" spell="<" />
+        <term name=">" spell=">" />
+        <term name="<=" spell="<=" />
+        <term name=">=" spell=">=" />
+        <term name="<>" spell="<>" />
+        <term name="or" spell="or" />
+        <term name="and" spell="and" />
+        <term name="div" spell="div" />
+        <term name="mod" spell="mod" />
+        <term name="or" spell="or" />
     </terminalsymbols>
     <nonterminalsymbols>
-        <nonterm name="S" />
-        <nonterm name="E" />
+        <nonterm name="program" />
+        <nonterm name="block" />
+        <nonterm name="operator_list" />
+        <nonterm name="tail" />
+        <nonterm name="operator" />
+        <nonterm name="expr" />
+        <nonterm name="simple_expr" />
+        <nonterm name="term" />
+        <nonterm name="factor" />
+        <nonterm name="sign" />
+        <nonterm name="rel_op" />
+        <nonterm name="sum_op" />
+        <nonterm name="mul_op" />
+        <nonterm name="id" />
+        <nonterm name="const" />
     </nonterminalsymbols>
     <productions>
         <production>
-            <lhs name="S" />
+            <lhs name="program" />
             <rhs>
-                <symbol type="term" name="i" />
-                <symbol type="nonterm" name="E" />
-                <symbol type="term" name="t" />
-                <symbol type="nonterm" name="S" />
+                <symbol type="nonterm" name="block" />
             </rhs>
         </production>
         <production>
-            <lhs name="S" />
+            <lhs name="block" />
             <rhs>
                 <symbol type="term" name="i" />
                 <symbol type="nonterm" name="E" />
