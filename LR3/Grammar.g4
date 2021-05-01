@@ -6,15 +6,19 @@ block : '{' operator_list '}';
 
 operator_list : operator tail;
 
-tail : ';' operator tail | ;
+tail : ';' operator tail | ; 
 
 operator : id '=' expr;
 
 expr : simple_expr | simple_expr rel_op simple_expr;
 
-simple_expr : term | sign term | simple_expr sum_op term;
+simple_expr : term | sign term | term simpe_expr' | sign term simple_expr';
 
-term : factor | term mul_op factor;
+simple_expr' : sum_op term | sum_op term simple_expr';
+
+term : factor | factor term';
+
+term' : mul_op factor | mul_op factor term';
 
 factor : id | const | '(' simple_expr ')' | 'not' factor;
 
