@@ -218,7 +218,7 @@ class Parser(
     val seResult = parseSimpleExpr(pos)
 
     if (seResult.isSuccess) {
-      val eaResult = parseExprA(seResult.pos)
+      val eaResult = parseExpr_0(seResult.pos)
 
       if (eaResult.isSuccess) {
         new ParseResult(
@@ -250,7 +250,7 @@ class Parser(
     * @param pos Position from which parsing begins.
     * @return Parse result which contains parse tree or parsing errors.
     */
-  private def parseExprA(pos: Int): ParseResult = {
+  private def parseExpr_0(pos: Int): ParseResult = {
     val relOpResult = parseRelOp(pos)
 
     if (relOpResult.isSuccess) {
@@ -299,6 +299,7 @@ class Parser(
       s"Position $pos: error while parsing " +
         s"simple expression - term expected",
       pos
+      // Which one of copies results should be returned as inner
     )
   }
 
@@ -329,16 +330,18 @@ class Parser(
           )
         } else {
           new ParseResult(
-            s"Position $pos: error while parsing " +
+            s"Position ${termResult.pos}: error while parsing " +
               s"simple expression - simple_expr#1 expected",
-            termResult.pos
+            termResult.pos,
+            seResult
           )
         }
       } else {
         new ParseResult(
-          s"Position $pos: error while parsing " +
+          s"Position ${signResult.pos}: error while parsing " +
             s"simple expression - term expected",
-          signResult.pos
+          signResult.pos,
+          termResult
         )
       }
     }
@@ -346,7 +349,8 @@ class Parser(
     new ParseResult(
       s"Position $pos: error while parsing " +
         s"simple expression - sign expected",
-      pos
+      pos,
+      signResult
     )
   }
 
@@ -360,7 +364,7 @@ class Parser(
     val termResult = parseTerm(pos)
 
     if (termResult.isSuccess) {
-      val seResult = parseSimpleExpr_2(pos)
+      val seResult = parseSimpleExpr_2(termResult.pos)
 
       if (seResult.isSuccess) {
         new ParseResult(
@@ -372,9 +376,10 @@ class Parser(
         )
       } else {
         new ParseResult(
-          s"Position $pos: error while parsing simple " +
+          s"Position ${termResult.pos}: error while parsing simple " +
             s"expression - simple_expr#2 expected",
-          pos
+          termResult.pos,
+          seResult
         )
       }
     }
@@ -382,7 +387,8 @@ class Parser(
     new ParseResult(
       s"Position $pos: error while parsing " +
         s"simple expression - term expected",
-      pos
+      pos,
+      termResult
     )
   }
 
@@ -397,10 +403,10 @@ class Parser(
     val sumOpResult = parseSumOp(pos)
 
     if (sumOpResult.isSuccess) {
-      val termResult = parseTerm(pos)
+      val termResult = parseTerm(sumOpResult.pos)
 
       if (termResult.isSuccess) {
-        val seResult = parseSimpleExpr_3(pos)
+        val seResult = parseSimpleExpr_3(termResult.pos)
 
         if (seResult.isSuccess) {
           new ParseResult(
@@ -414,16 +420,18 @@ class Parser(
           )
         } else {
           new ParseResult(
-            s"Position $pos: error while parsing " +
+            s"Position ${termResult.pos}: error while parsing " +
               s"simple_expr#0 - simple_expr#3 expected",
-            termResult.pos
+            termResult.pos,
+            seResult
           )
         }
       } else {
         new ParseResult(
-          s"Position $pos: error while parsing " +
+          s"Position ${sumOpResult.pos}: error while parsing " +
             s"simple_expr#0 - term expected",
-          sumOpResult.pos
+          sumOpResult.pos,
+          termResult
         )
       }
     }
@@ -431,7 +439,8 @@ class Parser(
     new ParseResult(
       s"Position $pos: error while parsing " +
         s"simple_expr#0 - sum operation expected",
-      pos
+      pos,
+      sumOpResult
     )
   }
 
@@ -454,7 +463,7 @@ class Parser(
 
     new ParseResult(
       new Node("simple_expr#1"),
-      result.pos
+      pos
     )
   }
 
@@ -477,7 +486,7 @@ class Parser(
 
     new ParseResult(
       new Node("simple_expr#2"),
-      result.pos
+      pos
     )
   }
 
@@ -500,7 +509,7 @@ class Parser(
 
     new ParseResult(
       new Node("simple_expr#3"),
-      result.pos
+      pos
     )
   }
 
@@ -511,7 +520,32 @@ class Parser(
     * @return Parse result which contains parse tree or parsing errors.
     */
   private def parseTerm(pos: Int): ParseResult = {
-    new ParseResult
+    val factorResult = parseFactor(pos)
+
+    if (factorResult.isSuccess) {
+      val termResult = parseTerm_1(factorResult.pos)
+
+      if (termResult.isSuccess) {
+        new ParseResult(
+          new Node("term", factorResult.tree.get :: termResult.tree.get :: Nil),
+          termResult.pos
+        )
+      } else {
+        new ParseResult(
+          s"Position $pos: error while parsing " +
+            s"term - term#1 expected",
+          factorResult.pos,
+          termResult
+        )
+      }
+    }
+
+    new ParseResult(
+      s"Position $pos: error while parsing " +
+        s"term - factor expected",
+      pos,
+      factorResult
+    )
   }
 
   /** Parse factor from input token stream according to the grammar rule:
