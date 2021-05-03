@@ -1,4 +1,4 @@
-// Generated from /home/qwerheh/src/compilers-design/LR3/recursive-descend/Grammar.g4 by ANTLR 4.8
+// Generated from /home/qwerheh/src/compilers-design/LR3/Grammar.g4 by ANTLR 4.8
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

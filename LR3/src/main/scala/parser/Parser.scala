@@ -3,21 +3,46 @@ package parser
 import scala.util.matching.Regex
 import grammar._
 import java.security.DrbgParameters.Reseed
+import scala.reflect.runtime.{universe => ru}
 
 /** Perform parseing of input token stream and build
   * parse tree according to the specified grammar rules.
   *
   * @param tokens Input token stream.
   */
-class Parser(val tokens: List[String]) {
+class Parser(
+    val tokens: List[String]
+) {
   if (tokens == null || tokens.isEmpty)
     throw new Exception("Invalid token stream")
+
+  private var method: Seq[Any] => Any = null
+
+  def this(tokens: List[String], methodName: String = "parseProgram") {
+    this(tokens)
+
+    val m = ru.runtimeMirror(getClass.getClassLoader)
+    val methodSymbol = ru.typeOf[Parser].decl(ru.TermName(methodName)).asMethod
+    val instanceMirror = m.reflect(this)
+    val methodMirror = instanceMirror.reflectMethod(methodSymbol)
+
+    method = methodMirror.apply(_)
+  }
 
   /** Launch parsing process for current token stream.
     *
     * @return Parse result which contains parse tree or parsing errors.
     */
-  def parse(pos: Int = 0): ParseResult = {
+  def parse(pos: Int = 0): ParseResult =
+    method(Seq(pos)).asInstanceOf[ParseResult]
+
+  /** Parse program from rule:
+    * program : block;
+    *
+    * @param pos Position from which parsing begins.
+    * @return Parse result which contains parse tree or parsing errors.
+    */
+  def parseProgram(pos: Int): ParseResult = {
     val result = parseBlock(pos)
 
     if (result.isSuccess) {
@@ -185,35 +210,127 @@ class Parser(val tokens: List[String]) {
     * @return Parse result which contains parse tree or parsing errors.
     */
   private def parseExpr(pos: Int): ParseResult = {
-    val parser = new Parser(tokens.drop(pos))
-    var result: ParseResult = parser.parse()
-    if (result.isSuccess) {
-      result = parseRelOp
-      if (result.isSuccess) {
-        result = parseSimpleExpr
-        if (result.isSuccess) {
-          new ParseResult(new Node("expr", result.tree.get :: Nil))
-        } else {
-          new ParseResult(
-            s"Position $pos: second simple expression required",
-            result
-          )
-        }
+    val seResult = parseSimpleExpr(pos)
+
+    if (seResult.isSuccess) {
+      val eaResult = parseExprA(seResult.pos)
+
+      if (eaResult.isSuccess) {
+        new ParseResult(
+          new Node("expr", seResult.tree.get :: eaResult.tree.get :: Nil),
+          eaResult.pos
+        )
+      } else {
+        new ParseResult(
+          s"Position ${seResult.pos}: error while parsing expression - expr_a expected",
+          seResult.pos,
+          eaResult
+        )
       }
-    } else {
-      new ParseResult(s"Position $pos: simple expression required", result)
     }
 
-    new ParseResult
+    new ParseResult(
+      s"Position $pos: error while parsing expression - simple expression expected",
+      pos,
+      seResult
+    )
+  }
+
+  /** Parse additional symbol expr_a according to the grammar rule:
+    * expr_a : rel_op simple_expr | ;
+    * Nonterminal expr_a added to remove ambiguity in expr rule.
+    *
+    * @param pos Position from which parsing begins.
+    * @return Parse result which contains parse tree or parsing errors.
+    */
+  private def parseExprA(pos: Int): ParseResult = {
+    val relOpResult = parseRelOp(pos)
+
+    if (relOpResult.isSuccess) {
+      val seResult = parseSimpleExpr(relOpResult.pos)
+      if (seResult.isSuccess) {
+        new ParseResult(
+          new Node("expr_a", relOpResult.tree.get :: seResult.tree.get :: Nil),
+          seResult.pos
+        )
+      } else {
+        new ParseResult(
+          s"Position ${relOpResult.pos}: error while parsing expr_a - simple expression expected",
+          relOpResult.pos,
+          seResult
+        )
+      }
+    }
+
+    // expr_a allowed to be empty
+    new ParseResult(new Node("expr_a"), pos)
   }
 
   /** Parse simple expression from token stream accoridng to the grammar rule:
-    * simple_expr : term | sign term | simple_expr sum_op term;
+    * simple_expr : term | sign term | term simple_expr_a | sign term simple_expr_a;
     *
     * @param pos Position from which parsing begins.
     * @return Parse result which contains parse tree or parsing errors.
     */
   private def parseSimpleExpr(pos: Int): ParseResult = {
+    val parsers =
+      new Parser(tokens.drop(pos), "parseSimpleExpr_1") ::
+        new Parser(tokens.drop(pos), "parseSimpleExpr_2") ::
+        new Parser(tokens.drop(pos), "parseSimpleExpr_3") ::
+        new Parser(tokens.drop(pos), "parseSimpleExpr_4") ::
+        Nil
+
+    for (parser <- parsers) {
+      val result = parser.parse()
+
+      if (result.isSuccess) {
+        result
+      }
+    }
+
+    new ParseResult(
+      s"Position $pos: error while parsing simple expression - term expected",
+      pos
+    )
+  }
+
+  /** Parse simple expression from token stream accoridng to the grammar rule:
+    * simple_expr : term;
+    *
+    * @param pos Position from which parsing begins.
+    * @return Parse result which contains parse tree or parsing errors.
+    */
+  private def parseSimpleExpr_1(pos: Int): ParseResult = {
+    new ParseResult
+  }
+
+  /** Parse simple expression from token stream accoridng to the grammar rule:
+    * simple_expr : sign term;
+    *
+    * @param pos Position from which parsing begins.
+    * @return Parse result which contains parse tree or parsing errors.
+    */
+  private def parseSimpleExpr_2(pos: Int): ParseResult = {
+    new ParseResult
+  }
+
+  /** Parse simple expression from token stream accoridng to the grammar rule:
+    * simple_expr : term simple_expr_a;
+    *
+    * @param pos Position from which parsing begins.
+    * @return Parse result which contains parse tree or parsing errors.
+    */
+  private def parseSimpleExpr_3(pos: Int): ParseResult = {
+    new ParseResult
+  }
+
+  /** Parse simple expression from token stream accoridng to the grammar rule:
+    * simple_expr : sign term simple_expr_a;
+    *
+    * @param pos Position from which parsing begins.
+    * @return Parse result which contains parse tree or parsing errors.
+    */
+  private def parseSimpleExpr_4(pos: Int): ParseResult = {
     new ParseResult
   }
 

@@ -10,15 +10,17 @@ tail : ';' operator tail | ;
 
 operator : id '=' expr;
 
-expr : simple_expr | simple_expr rel_op simple_expr;
+expr : simple_expr expr_a;
 
-simple_expr : term | sign term | term simpe_expr' | sign term simple_expr';
+expr_a : rel_op simple_expr | ;
 
-simple_expr' : sum_op term | sum_op term simple_expr';
+simple_expr : term | sign term | term simple_expr_a | sign term simple_expr_a;
 
-term : factor | factor term';
+simple_expr_a : sum_op term | sum_op term simple_expr_a;
 
-term' : mul_op factor | mul_op factor term';
+term : factor | factor term_a;
+
+term_a : mul_op factor | mul_op factor term_a;
 
 factor : id | const | '(' simple_expr ')' | 'not' factor;
 
