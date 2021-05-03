@@ -118,7 +118,8 @@ class Parser(
         )
       } else {
         new ParseResult(
-          s"Position ${opResult.pos}: error while parsing operator list - tail expected",
+          s"Position ${opResult.pos}: error while " +
+            s"parsing operator list - tail expected",
           opResult.pos,
           tailResult
         )
@@ -126,7 +127,8 @@ class Parser(
     }
 
     new ParseResult(
-      s"Position ${pos}: error while parsing operator list - operator expected",
+      s"Position ${pos}: error while " +
+        s"parsing operator list - operator expected",
       pos,
       opResult
     )
@@ -155,21 +157,24 @@ class Parser(
           )
         } else {
           new ParseResult(
-            s"Position ${idResult.pos + 1}: error while parsing operator - expression expected",
+            s"Position ${idResult.pos + 1}: error while " +
+              s"parsing operator - expression expected",
             idResult.pos + 1,
             exprResult
           )
         }
       } else {
         new ParseResult(
-          s"Position ${idResult.pos + 1}: error while parsing operator - '=' expected",
+          s"Position ${idResult.pos + 1}: error while " +
+            s"parsing operator - '=' expected",
           idResult.pos
         )
       }
     }
 
     new ParseResult(
-      s"Position ${pos}: error while parsing operator - identifier expected",
+      s"Position ${pos}: error while " +
+        s"parsing operator - identifier expected",
       pos,
       idResult
     )
@@ -222,7 +227,8 @@ class Parser(
         )
       } else {
         new ParseResult(
-          s"Position ${seResult.pos}: error while parsing expression - expr_a expected",
+          s"Position ${seResult.pos}: error while " +
+            s"parsing expression - expr_a expected",
           seResult.pos,
           eaResult
         )
@@ -230,7 +236,8 @@ class Parser(
     }
 
     new ParseResult(
-      s"Position $pos: error while parsing expression - simple expression expected",
+      s"Position $pos: error while parsing " +
+        s"expression - simple expression expected",
       pos,
       seResult
     )
@@ -255,7 +262,8 @@ class Parser(
         )
       } else {
         new ParseResult(
-          s"Position ${relOpResult.pos}: error while parsing expr_a - simple expression expected",
+          s"Position ${relOpResult.pos}: error while " +
+            s"parsing expr_a - simple expression expected",
           relOpResult.pos,
           seResult
         )
@@ -267,19 +275,18 @@ class Parser(
   }
 
   /** Parse simple expression from token stream accoridng to the grammar rule:
-    * simple_expr : term | sign term | term simple_expr_a | sign term simple_expr_a;
+    * simple_expr : sign term simple_expr#1 | term simple_expr#2 ;
     *
     * @param pos Position from which parsing begins.
     * @return Parse result which contains parse tree or parsing errors.
     */
   private def parseSimpleExpr(pos: Int): ParseResult = {
     val parsers =
-      new Parser(tokens.drop(pos), "parseSimpleExpr_1") ::
-        new Parser(tokens.drop(pos), "parseSimpleExpr_2") ::
-        new Parser(tokens.drop(pos), "parseSimpleExpr_3") ::
-        new Parser(tokens.drop(pos), "parseSimpleExpr_4") ::
+      new Parser(tokens.drop(pos), "parseSimpleExpr_var1") ::
+        new Parser(tokens.drop(pos), "parseSimpleExpr_var2") ::
         Nil
 
+    // Recursive descend with rollback
     for (parser <- parsers) {
       val result = parser.parse()
 
@@ -289,49 +296,212 @@ class Parser(
     }
 
     new ParseResult(
-      s"Position $pos: error while parsing simple expression - term expected",
+      s"Position $pos: error while parsing " +
+        s"simple expression - term expected",
       pos
     )
   }
 
   /** Parse simple expression from token stream accoridng to the grammar rule:
-    * simple_expr : term;
+    * simple_expr : sign term simple_expr#1 ;
+    *
+    * @param pos Position from which parsing begins.
+    * @return Parse result which contains parse tree or parsing errors.
+    */
+  private def parseSimpleExpr_var1(pos: Int): ParseResult = {
+    val signResult = parseSign(pos)
+
+    if (signResult.isSuccess) {
+      val termResult = parseTerm(signResult.pos)
+
+      if (termResult.isSuccess) {
+        val seResult = parseSimpleExpr_1(termResult.pos)
+
+        if (seResult.isSuccess) {
+          new ParseResult(
+            new Node(
+              "simple_expr",
+              signResult.tree.get ::
+                termResult.tree.get ::
+                seResult.tree.get :: Nil
+            ),
+            seResult.pos
+          )
+        } else {
+          new ParseResult(
+            s"Position $pos: error while parsing " +
+              s"simple expression - simple_expr#1 expected",
+            termResult.pos
+          )
+        }
+      } else {
+        new ParseResult(
+          s"Position $pos: error while parsing " +
+            s"simple expression - term expected",
+          signResult.pos
+        )
+      }
+    }
+
+    new ParseResult(
+      s"Position $pos: error while parsing " +
+        s"simple expression - sign expected",
+      pos
+    )
+  }
+
+  /** Parse simple expression from token stream accoridng to the grammar rule:
+    * simple_expr : term simple_expr#2 ;
+    *
+    * @param pos Position from which parsing begins.
+    * @return Parse result which contains parse tree or parsing errors.
+    */
+  private def parseSimpleExpr_var2(pos: Int): ParseResult = {
+    val termResult = parseTerm(pos)
+
+    if (termResult.isSuccess) {
+      val seResult = parseSimpleExpr_2(pos)
+
+      if (seResult.isSuccess) {
+        new ParseResult(
+          new Node(
+            "simple_expr",
+            termResult.tree.get :: seResult.tree.get :: Nil
+          ),
+          seResult.pos
+        )
+      } else {
+        new ParseResult(
+          s"Position $pos: error while parsing simple " +
+            s"expression - simple_expr#2 expected",
+          pos
+        )
+      }
+    }
+
+    new ParseResult(
+      s"Position $pos: error while parsing " +
+        s"simple expression - term expected",
+      pos
+    )
+  }
+
+  /** Parse additional nonterminal sim[ple_expr#0
+    * from input token stream according to the grammar rule:
+    * simple_expr#0 : sum_op term simple_expr#3;
+    *
+    * @param pos Position from which parsing begins.
+    * @return Parse result which contains parse tree or parsing errors.
+    */
+  private def parseSimpleExpr_0(pos: Int): ParseResult = {
+    val sumOpResult = parseSumOp(pos)
+
+    if (sumOpResult.isSuccess) {
+      val termResult = parseTerm(pos)
+
+      if (termResult.isSuccess) {
+        val seResult = parseSimpleExpr_3(pos)
+
+        if (seResult.isSuccess) {
+          new ParseResult(
+            new Node(
+              "simple_expr#0",
+              sumOpResult.tree.get ::
+                termResult.tree.get ::
+                seResult.tree.get :: Nil
+            ),
+            seResult.pos
+          )
+        } else {
+          new ParseResult(
+            s"Position $pos: error while parsing " +
+              s"simple_expr#0 - simple_expr#3 expected",
+            termResult.pos
+          )
+        }
+      } else {
+        new ParseResult(
+          s"Position $pos: error while parsing " +
+            s"simple_expr#0 - term expected",
+          sumOpResult.pos
+        )
+      }
+    }
+
+    new ParseResult(
+      s"Position $pos: error while parsing " +
+        s"simple_expr#0 - sum operation expected",
+      pos
+    )
+  }
+
+  /** Parse additional nonterminal simple_expr#1
+    * from input token stream according to the grammar rule:
+    * simple_expr#1 : simple_expr#0 | ;
     *
     * @param pos Position from which parsing begins.
     * @return Parse result which contains parse tree or parsing errors.
     */
   private def parseSimpleExpr_1(pos: Int): ParseResult = {
-    new ParseResult
+    val result = parseSimpleExpr_0(pos)
+
+    if (result.isSuccess) {
+      new ParseResult(
+        new Node("simple_expr#1", result.tree.get :: Nil),
+        result.pos
+      )
+    }
+
+    new ParseResult(
+      new Node("simple_expr#1"),
+      result.pos
+    )
   }
 
-  /** Parse simple expression from token stream accoridng to the grammar rule:
-    * simple_expr : sign term;
+  /** Parse additional nonterminal simple_expr#2
+    * from input token stream according to the grammar rule:
+    * simple_expr#2 : simple_expr#0 | ;
     *
     * @param pos Position from which parsing begins.
     * @return Parse result which contains parse tree or parsing errors.
     */
   private def parseSimpleExpr_2(pos: Int): ParseResult = {
-    new ParseResult
+    val result = parseSimpleExpr_0(pos)
+
+    if (result.isSuccess) {
+      new ParseResult(
+        new Node("simple_expr#2", result.tree.get :: Nil),
+        result.pos
+      )
+    }
+
+    new ParseResult(
+      new Node("simple_expr#2"),
+      result.pos
+    )
   }
 
-  /** Parse simple expression from token stream accoridng to the grammar rule:
-    * simple_expr : term simple_expr_a;
+  /** Parse additional nonterminal simple_expr#3
+    * from input token stream according to the grammar rule:
+    * simple_expr#3 : simple_expr#0 | ;
     *
     * @param pos Position from which parsing begins.
     * @return Parse result which contains parse tree or parsing errors.
     */
   private def parseSimpleExpr_3(pos: Int): ParseResult = {
-    new ParseResult
-  }
+    val result = parseSimpleExpr_0(pos)
 
-  /** Parse simple expression from token stream accoridng to the grammar rule:
-    * simple_expr : sign term simple_expr_a;
-    *
-    * @param pos Position from which parsing begins.
-    * @return Parse result which contains parse tree or parsing errors.
-    */
-  private def parseSimpleExpr_4(pos: Int): ParseResult = {
-    new ParseResult
+    if (result.isSuccess) {
+      new ParseResult(
+        new Node("simple_expr#3", result.tree.get :: Nil),
+        result.pos
+      )
+    }
+
+    new ParseResult(
+      new Node("simple_expr#3"),
+      result.pos
+    )
   }
 
   /** Parse term from input token stream according to the grammar rule:
