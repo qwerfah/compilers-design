@@ -2,7 +2,7 @@
 #include <memory>
 
 #include "../include/xml/xml_parser.h"
-#include "../include/xml/xml_writer.h"
+#include "../include/xml/antlr_writer.h"
 #include "../include/grammar_transform/grammar_transform.h"
 
 int main()
@@ -13,8 +13,8 @@ int main()
     std::string algorithm{};
 
     std::string defaultInputFile{ "./resources/grammar.xml" };
-    std::string defaultOutputFile1{ "./resources/recursion_deleted.xml" };
-    std::string defaultOutputFile2{ "./resources/left_factorized.xml" };
+    std::string defaultOutputFile1{ "./resources/recursion_deleted.g4" };
+    std::string defaultOutputFile2{ "./resources/left_factorized.g4" };
     std::string defaultAlgorithm{ "fact" };
 
     std::cout << "Enter input file name [" << defaultInputFile << "]: ";
@@ -32,7 +32,7 @@ int main()
     try
     {
         XmlParser parser{ inputFile.empty() ? defaultInputFile : inputFile };
-        XmlWriter writer{ outputFile1.empty() ? defaultOutputFile1 : outputFile1 };
+        AntlrWriter writer{ outputFile1.empty() ? defaultOutputFile1 : outputFile1 };
         grammar_ptr grammar{ parser.parse() };
 
         //(*grammar->algorithms["epsilon"])();
