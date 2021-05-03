@@ -10,17 +10,25 @@ tail : ';' operator tail | ;
 
 operator : id '=' expr;
 
+<<<<<<< HEAD:LR3/left_factorized.g4
 expr : simple_expr expr#0;
 
 expr#0 : rel_op simple_expr | ;
 
 simple_expr : term simpe_expr';
+=======
+expr : simple_expr expr_a;
 
-simple_expr' : sum_op term | sum_op term simple_expr';
+expr_a : rel_op simple_expr | ;
+>>>>>>> 3881ef6f6a5a8c328492b2183e5651aeda67b25f:LR3/Grammar.g4
 
-term : factor | factor term';
+simple_expr : term | sign term | term simple_expr_a | sign term simple_expr_a;
 
-term' : mul_op factor | mul_op factor term';
+simple_expr_a : sum_op term | sum_op term simple_expr_a;
+
+term : factor | factor term_a;
+
+term_a : mul_op factor | mul_op factor term_a;
 
 factor : id | const | '(' simple_expr ')' | 'not' factor;
 
