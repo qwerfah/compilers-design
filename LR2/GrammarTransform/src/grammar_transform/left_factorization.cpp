@@ -59,11 +59,14 @@ symbol_ptr LeftFactorization::_replaceRules(const symbol_ptr& symbol)
 	{
 		new Symbol
 		{
-			symbol->getName() + "\'",
+			symbol->getName().substr(0, symbol->getName().rfind('#')) + "#" + std::to_string(*symbol->count),
 			symbol->getSpell(),
-			symbol->getType()
+			symbol->getType(),
+			symbol->count
 		}
 	};
+
+	(*symbol->count)++;
 
 	// New rule A -> aA' where a - common prefix
 	decltype(auto) right = (*rules.begin())->getRight();

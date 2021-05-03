@@ -50,17 +50,24 @@ symbol_ptr LeftRecursionRemove::_removeDirectRecursion(const symbol_iterator& i)
 {
 	rule_vector recRules;
 	rule_vector indRules;
+
 	// Searching all Ai-rules
 	_findRecursiveRules(i, recRules);
-
 	if (recRules.empty())  return nullptr;
-
 	_findIndexedRules(i, indRules);
+
 	// Removing rules of type Ai -> Ai a
 	std::erase_if(_grammar.rules, [&](auto r) {
 		return std::find(recRules.begin(), recRules.end(), r) != recRules.end(); });
+
 	// Add new nonterminal symbol Ài'
-	symbol_ptr symbol{ new Symbol{ (*i)->getName() + "\'", (*i)->getSpell(), (*i)->getType()} };
+	symbol_ptr symbol{ new Symbol
+	{ 
+		(*i)->getName().substr(0, (*i)->getName().rfind('#')) + "#" + std::to_string(*(*i)->count) ,
+		(*i)->getSpell(), (*i)->getType(), (*i)->count}
+	};
+	(*(*i)->count)++;
+
 	// Add rules of type Ai -> b Ai'
 	for (auto& rule : indRules)
 	{
@@ -68,6 +75,7 @@ symbol_ptr LeftRecursionRemove::_removeDirectRecursion(const symbol_iterator& i)
 		right.push_back(symbol);
 		_grammar.rules.push_back(rule_ptr{ new Rule{ rule->getLeft(), right } });
 	}
+
 	// Add rules of type Ai' -> a | a Ai'
 	for (auto& rule : recRules)
 	{

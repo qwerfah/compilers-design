@@ -10,9 +10,11 @@ tail : ';' operator tail | ;
 
 operator : id '=' expr;
 
-expr : simple_expr | simple_expr rel_op simple_expr;
+expr : simple_expr expr#0;
 
-simple_expr : term | sign term | term simpe_expr' | sign term simple_expr';
+expr#0 : rel_op simple_expr | ;
+
+simple_expr : term simpe_expr';
 
 simple_expr' : sum_op term | sum_op term simple_expr';
 

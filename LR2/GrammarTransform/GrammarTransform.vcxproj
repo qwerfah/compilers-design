@@ -131,6 +131,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\xml\antlr_writer.cpp" />
     <ClCompile Include="src\grammar_transform\left_factorization.cpp" />
     <ClCompile Include="src\grammar_transform\epsilon_rule_remove.cpp" />
     <ClCompile Include="src\grammar_transform\grammar_transform.cpp" />
@@ -153,6 +155,7 @@
     <ClCompile Include="src\xml\xml_writer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\xml\antlr_writer.h" />
     <ClInclude Include="include\grammar_transform\epsilon_rule_remove.h" />
     <ClInclude Include="include\grammar_transform\grammar_transform.h" />
     <ClInclude Include="include\enums.h" />

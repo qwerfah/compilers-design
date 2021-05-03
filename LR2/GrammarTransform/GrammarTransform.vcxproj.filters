@@ -48,6 +48,9 @@
     <ClCompile Include="src\grammar_transform\left_factorization.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="src\xml\antlr_writer.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\enums.h">
@@ -84,6 +87,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="include\grammar_transform\left_factorization.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xml\antlr_writer.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

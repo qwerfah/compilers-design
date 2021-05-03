@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 #include "../enums.h"
 
@@ -10,7 +11,12 @@
 class Symbol
 {
 public:
-	Symbol(const std::string& name = "", const std::string& spell = "", SymbolType type = SymbolType::NonTerminal);
+	Symbol(
+		const std::string& name = "", 
+		const std::string& spell = "", 
+		SymbolType type = SymbolType::NonTerminal, 
+		const std::shared_ptr<uint8_t>& c = nullptr
+	);
 	Symbol(const Symbol& symbol);
 	Symbol(Symbol&& symbol);
 
@@ -33,6 +39,8 @@ public:
 	SymbolType getType() const;
 
 	friend bool operator < (const Symbol& left, const Symbol& right);
+
+	std::shared_ptr<uint8_t> count = nullptr;
 
 private:
 	/// <summary>
