@@ -548,6 +548,55 @@ class Parser(
     )
   }
 
+  private def parseTerm_0(pos: Int): ParseResult = {
+    val mulOpResult = parseMulOp(pos)
+
+    if (mulOpResult.isSuccess) {
+      val factorResult = parseFactor(mulOpResult.pos)
+
+      if (factorResult.isSuccess) {
+        val termResult = parseTerm_2(factorResult.pos)
+
+        if (factorResult.isSuccess) {
+          new ParseResult(
+            new Node(
+              "term#0",
+              mulOpResult.tree.get ::
+                factorResult.tree.get ::
+                termResult.tree.get :: Nil
+            ),
+            termResult.pos
+          )
+        } else {
+          new ParseResult(
+            s"Position ${factorResult.pos,}: error while parsing " +
+              s"term#0 - term#2 expected",
+            factorResult.pos,
+            termResult
+          )
+        }
+      } else {
+        new ParseResult(
+          s"Position ${mulOpResult.pos}: error while parsing " +
+            s"term#0 - factor expected",
+          mulOpResult.pos,
+          factorResult
+        )
+      }
+    }
+
+    new ParseResult(
+      s"Position $pos: error while parsing " +
+        s"term#0 - multiplication operation expected",
+      pos,
+      mulOpResult
+    )
+  }
+
+  private def parseTerm_1(pos: Int): ParseResult = {}
+
+  private def parseTerm_2(pos: Int): ParseResult = {}
+
   /** Parse factor from input token stream according to the grammar rule:
     * factor : id | const | '(' simple_expr ')' | 'not' factor;
     *
