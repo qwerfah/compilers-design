@@ -489,21 +489,89 @@ class Parser(
     )
   }
 
-  /** Parse additional nonterminal sim[ple_expr#0
+  /** Parse additional nonterminal simple_expr#0
     * from input token stream according to the grammar rule:
-    * simple_expr#0 : sum_op term simple_expr#3;
+    * simple_expr#0 : sum_op term | sum_op term simple_expr#0;
     *
     * @param pos Position from which parsing begins.
     * @return Parse result which contains parse tree or parsing errors.
     */
-  private def simpleExpr_0(pos: Int): ParseResult = {
+  def simpleExpr_0(pos: Int): ParseResult = {
+    val parsers =
+      new Parser(tokens.drop(pos), "simpleExpr_0_var1") ::
+        new Parser(tokens.drop(pos), "simpleExpr_0_var2") ::
+        Nil
+
+    // Recursive descend with rollback
+    for (parser <- parsers) {
+      val result = parser.parse()
+
+      if (result.isSuccess) {
+        result
+      }
+    }
+
+    new ParseResult(
+      s"Position $pos: error while parsing " +
+        s"simple_expr#0 - sum_op expected",
+      pos
+    )
+  }
+
+  /** Parse additional nonterminal simple_expr#0
+    * from input token stream according to the grammar rule:
+    * simple_expr#0 : sum_op term;
+    *
+    * @param pos Position from which parsing begins.
+    * @return Parse result which contains parse tree or parsing errors.
+    */
+  private def simpleExpr_0_var1(pos: Int): ParseResult = {
     val sumOpResult = sumOp(pos)
 
     if (sumOpResult.isSuccess) {
       val termResult = term(sumOpResult.pos)
 
       if (termResult.isSuccess) {
-        val seResult = simpleExpr_3(termResult.pos)
+        new ParseResult(
+          new Node(
+            "simple_expr#0",
+            sumOpResult.tree.get :: termResult.tree.get :: Nil
+          ),
+          termResult.pos
+        )
+      } else {
+        new ParseResult(
+          s"Position ${sumOpResult.pos}: error while parsing " +
+            s"simple_expr#0 - sum_op expected",
+          sumOpResult.pos,
+          termResult
+        )
+      }
+    }
+
+    new ParseResult(
+      s"Position $pos: error while parsing " +
+        s"simple_expr#0 - sum_op expected",
+      pos,
+      sumOpResult
+    )
+  }
+
+  /** Parse additional nonterminal simple_expr#0
+    * from input token stream according to the grammar rule:
+    * simple_expr#0 : sum_op term simple_expr#0;
+    *
+    * @param pos Position from which parsing begins.
+    * @return Parse result which contains parse tree or parsing errors.
+    */
+  private def simpleExpr_0_var2(pos: Int): ParseResult = {
+    val sumOpResult = sumOp(pos)
+
+    if (sumOpResult.isSuccess) {
+      val termResult = term(sumOpResult.pos)
+
+      if (termResult.isSuccess) {
+        val seResult = simpleExpr_0(termResult.pos)
 
         if (seResult.isSuccess) {
           new ParseResult(
@@ -541,86 +609,69 @@ class Parser(
     )
   }
 
-  /** Parse additional nonterminal simple_expr#1
-    * from input token stream according to the grammar rule:
-    * simple_expr#1 : simple_expr#0 | ;
+  /** Parse term from input token stream according to the grammar rule:
+    * term : factor | factor term#0;
     *
     * @param pos Position from which parsing begins.
     * @return Parse result which contains parse tree or parsing errors.
     */
-  private def simpleExpr_1(pos: Int): ParseResult = {
-    val result = simpleExpr_0(pos)
+  def term(pos: Int): ParseResult = {
+    val parsers =
+      new Parser(tokens.drop(pos), "term_var1") ::
+        new Parser(tokens.drop(pos), "term_var2") ::
+        Nil
 
-    if (result.isSuccess) {
-      new ParseResult(
-        new Node("simple_expr#1", result.tree.get :: Nil),
-        result.pos
-      )
+    // Recursive descend with rollback
+    for (parser <- parsers) {
+      val result = parser.parse()
+
+      if (result.isSuccess) {
+        result
+      }
     }
 
     new ParseResult(
-      new Node("simple_expr#1"),
-      pos
-    )
-  }
-
-  /** Parse additional nonterminal simple_expr#2
-    * from input token stream according to the grammar rule:
-    * simple_expr#2 : simple_expr#0 | ;
-    *
-    * @param pos Position from which parsing begins.
-    * @return Parse result which contains parse tree or parsing errors.
-    */
-  private def simpleExpr_2(pos: Int): ParseResult = {
-    val result = simpleExpr_0(pos)
-
-    if (result.isSuccess) {
-      new ParseResult(
-        new Node("simple_expr#2", result.tree.get :: Nil),
-        result.pos
-      )
-    }
-
-    new ParseResult(
-      new Node("simple_expr#2"),
-      pos
-    )
-  }
-
-  /** Parse additional nonterminal simple_expr#3
-    * from input token stream according to the grammar rule:
-    * simple_expr#3 : simple_expr#0 | ;
-    *
-    * @param pos Position from which parsing begins.
-    * @return Parse result which contains parse tree or parsing errors.
-    */
-  private def simpleExpr_3(pos: Int): ParseResult = {
-    val result = simpleExpr_0(pos)
-
-    if (result.isSuccess) {
-      new ParseResult(
-        new Node("simple_expr#3", result.tree.get :: Nil),
-        result.pos
-      )
-    }
-
-    new ParseResult(
-      new Node("simple_expr#3"),
+      s"Position $pos: error while parsing " +
+        s"term - factor expected",
       pos
     )
   }
 
   /** Parse term from input token stream according to the grammar rule:
-    * term : factor | term mul_op factor;
+    * term : factor;
     *
     * @param pos Position from which parsing begins.
     * @return Parse result which contains parse tree or parsing errors.
     */
-  private def term(pos: Int): ParseResult = {
+  private def term_var1(pos: Int): ParseResult = {
+    var result = factor(pos)
+
+    if (result.isSuccess) {
+      new ParseResult(
+        new Node("term", result.tree.get :: Nil),
+        result.pos
+      )
+    }
+
+    new ParseResult(
+      s"Position $pos: error while parsing " +
+        s"term - factor expected",
+      pos,
+      result
+    )
+  }
+
+  /** Parse term from input token stream according to the grammar rule:
+    * term : factor term#0;
+    *
+    * @param pos Position from which parsing begins.
+    * @return Parse result which contains parse tree or parsing errors.
+    */
+  private def term_var2(pos: Int): ParseResult = {
     val factorResult = factor(pos)
 
     if (factorResult.isSuccess) {
-      val termResult = term_1(factorResult.pos)
+      val termResult = term_0(factorResult.pos)
 
       if (termResult.isSuccess) {
         new ParseResult(
@@ -630,7 +681,7 @@ class Parser(
       } else {
         new ParseResult(
           s"Position $pos: error while parsing " +
-            s"term - term#1 expected",
+            s"term - term#0 expected",
           factorResult.pos,
           termResult
         )
@@ -645,14 +696,88 @@ class Parser(
     )
   }
 
+  /** Parse term from input token stream according to the grammar rule:
+    * term : mul_op factor | mul_op factor term#0;
+    *
+    * @param pos Position from which parsing begins.
+    * @return Parse result which contains parse tree or parsing errors.
+    */
   private def term_0(pos: Int): ParseResult = {
+    val parsers =
+      new Parser(tokens.drop(pos), "term_0_var1") ::
+        new Parser(tokens.drop(pos), "term_0_var2") ::
+        Nil
+
+    // Recursive descend with rollback
+    for (parser <- parsers) {
+      val result = parser.parse()
+
+      if (result.isSuccess) {
+        result
+      }
+    }
+
+    new ParseResult(
+      s"Position $pos: error while parsing " +
+        s"term#0 - mul_op expected",
+      pos
+    )
+  }
+
+  /** Parse term from input token stream according to the grammar rule:
+    * term : mul_op factor;
+    *
+    * @param pos Position from which parsing begins.
+    * @return Parse result which contains parse tree or parsing errors.
+    */
+  private def term_0_var1(pos: Int): ParseResult = {
     val mulOpResult = mulOp(pos)
 
     if (mulOpResult.isSuccess) {
       val factorResult = factor(mulOpResult.pos)
 
       if (factorResult.isSuccess) {
-        val termResult = term_2(factorResult.pos)
+        new ParseResult(
+          new Node(
+            "term#0",
+            mulOpResult.tree.get ::
+              factorResult.tree.get ::
+              Nil
+          ),
+          factorResult.pos
+        )
+      } else {
+        new ParseResult(
+          s"Position ${mulOpResult.pos}: error while parsing " +
+            s"term#0 - factor expected",
+          mulOpResult.pos,
+          factorResult
+        )
+      }
+    }
+
+    new ParseResult(
+      s"Position $pos: error while parsing " +
+        s"term#0 - multiplication operation expected",
+      pos,
+      mulOpResult
+    )
+  }
+
+  /** Parse term from input token stream according to the grammar rule:
+    * term : mul_op factor term#0;
+    *
+    * @param pos Position from which parsing begins.
+    * @return Parse result which contains parse tree or parsing errors.
+    */
+  private def term_0_var2(pos: Int): ParseResult = {
+    val mulOpResult = mulOp(pos)
+
+    if (mulOpResult.isSuccess) {
+      val factorResult = factor(mulOpResult.pos)
+
+      if (factorResult.isSuccess) {
+        val termResult = term_0(factorResult.pos)
 
         if (factorResult.isSuccess) {
           new ParseResult(
@@ -667,7 +792,7 @@ class Parser(
         } else {
           new ParseResult(
             s"Position ${factorResult.pos}: error while parsing " +
-              s"term#0 - term#2 expected",
+              s"term#0 - term#0 expected",
             factorResult.pos,
             termResult
           )
@@ -690,10 +815,6 @@ class Parser(
     )
   }
 
-  private def term_1(pos: Int): ParseResult = {}
-
-  private def term_2(pos: Int): ParseResult = {}
-
   /** Parse factor from input token stream according to the grammar rule:
     * factor : id | const | '(' simple_expr ')' | 'not' factor;
     *
@@ -701,7 +822,76 @@ class Parser(
     * @return Parse result which contains parse tree or parsing errors.
     */
   private def factor(pos: Int): ParseResult = {
-    new ParseResult
+    val idResult = id(pos)
+
+    if (idResult.isSuccess) {
+      new ParseResult(
+        new Node("factor", idResult.tree.get :: Nil),
+        idResult.pos
+      )
+    }
+
+    val constResult = const(pos)
+
+    if (constResult.isSuccess) {
+      new ParseResult(
+        new Node("factor", constResult.tree.get :: Nil),
+        constResult.pos
+      )
+    }
+
+    if (tokens(pos) == "(") {
+      val seResult = simpleExpr(pos + 1)
+
+      if (seResult.isSuccess) {
+        if (tokens(seResult.pos) == ")") {
+          new ParseResult(
+            new Node(
+              "factor",
+              new Node("(") :: constResult.tree.get :: new Node(")") :: Nil
+            ),
+            seResult.pos + 1
+          )
+        } else {
+          new ParseResult(
+            s"Position ${seResult.pos}: error while parsing " +
+              s"factor - ')' expected",
+            seResult.pos
+          )
+        }
+      } else {
+        new ParseResult(
+          s"Position ${pos + 1}: error while parsing " +
+            s"factor - simple_expr expected",
+          pos + 1,
+          seResult
+        )
+      }
+    }
+
+    if (tokens(pos) == "not") {
+      val factorResult = factor(pos + 3)
+
+      if (factorResult.isSuccess) {
+        new ParseResult(
+          new Node("factor", new Node("not") :: factorResult.tree.get :: Nil),
+          factorResult.pos
+        )
+      } else {
+        new ParseResult(
+          s"Position ${pos + 3}: error while parsing " +
+            s"factor - factor expected",
+          pos + 3,
+          factorResult
+        )
+      }
+    }
+
+    new ParseResult(
+      s"Position $pos: error while parsing " +
+        s"factor - id or const or '(' or 'not' expected",
+      pos
+    )
   }
 
   /** Parse sign from input token stream according to the grammar rule:

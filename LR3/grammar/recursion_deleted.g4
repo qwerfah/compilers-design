@@ -4,7 +4,7 @@ program :
   block ;
 
 block : 
-  { operator_list } ;
+  "{" operator_list "}" ;
 
 operator_list : 
   operator tail ;
@@ -42,8 +42,8 @@ term#0 :
 factor : 
   id | 
   const | 
-  ( simple_expr ) | 
-  not factor ;
+  "(" simple_expr ")" | 
+  "not" factor ;
 
 sign : 
   "+" |
