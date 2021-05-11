@@ -14,7 +14,7 @@ tail :
   ;
 
 operator : 
-  id = expr ;
+  id = expr | block;
 
 expr : 
   simple_expr expr#0 ;

@@ -8,7 +8,7 @@ operator_list : operator tail;
 
 tail : ';' operator tail | ; 
 
-operator : id '=' expr;
+operator : id '=' expr | block;
 
 expr : simple_expr | simple_expr rel_op simple_expr;
 
@@ -20,7 +20,7 @@ factor : id | const | '(' simple_expr ')' | 'not' factor;
 
 sign :'+' | '-';
 
-rel_op : '=' | '<>' | '<' | '<=' | '>' | '>=';
+rel_op : '==' | '<>' | '<' | '<=' | '>' | '>=';
 
 sum_op : '+' | '-' | 'or';
 

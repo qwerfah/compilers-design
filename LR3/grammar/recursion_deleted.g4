@@ -1,4 +1,6 @@
-grammar G1program : 
+grammar G1
+
+program : 
   block ;
 
 block : 
@@ -12,7 +14,8 @@ tail :
   ;
 
 operator : 
-  id = expr ;
+  id = expr | 
+  block ;
 
 expr : 
   simple_expr | 
@@ -24,9 +27,17 @@ simple_expr :
   term simple_expr#0 | 
   sign term simple_expr#0 ;
 
+simple_expr#0 : 
+  sum_op term | 
+  sum_op term simple_expr#0 ;
+
 term : 
   factor | 
   factor term#0 ;
+
+term#0 : 
+  mul_op factor | 
+  mul_op factor term#0 ;
 
 factor : 
   id | 
@@ -35,22 +46,25 @@ factor :
   not factor ;
 
 sign : 
-  + - ;
+  "+" |
+  "-" ;
 
 rel_op : 
-  = <> < <= > >= ;
+  "==" |
+  "<>" |
+  "<"  |
+  "<=" |
+  ">"  |
+  ">=" ;
 
 sum_op : 
-  + - or ;
+  "+" |
+  "-" |
+  "or" ;
 
 mul_op : 
-  * / div mod and ;
-
-simple_expr#0 : 
-  sum_op term | 
-  sum_op term simple_expr#0 ;
-
-term#0 : 
-  mul_op factor | 
-  mul_op factor term#0 ;
-
+  "*"   |
+  "/"   |
+  "div" |
+  "mod" |
+  "and" ;

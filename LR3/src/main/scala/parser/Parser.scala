@@ -569,7 +569,7 @@ class Parser(
           )
         } else {
           new ParseResult(
-            s"Position ${factorResult.pos,}: error while parsing " +
+            s"Position ${factorResult.pos}: error while parsing " +
               s"term#0 - term#2 expected",
             factorResult.pos,
             termResult
