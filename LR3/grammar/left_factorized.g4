@@ -1,4 +1,6 @@
-grammar G1program : 
+grammar G1
+
+program : 
   block ;
 
 block : 
