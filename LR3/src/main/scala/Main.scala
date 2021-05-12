@@ -3,11 +3,7 @@ import grammar._
 import scala.util.matching.Regex
 
 object Main extends App {
-  val idRegex: Regex = "=|<>|<|<=|>|>=".r
+  val string: String = "a b df   ff        as\nk\nrt e \n   bg"
 
-  if (idRegex.matches("<=")) {
-    println("Valid identifier")
-  } else {
-    println("Invalid identifier")
-  }
+  
 }
