@@ -1,4 +1,4 @@
-package parser
+package data
 
 import java.io.PrintWriter
 import java.io.File

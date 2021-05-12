@@ -1,9 +1,11 @@
-package parser
+package analysis
 
 import scala.util.matching.Regex
-import grammar._
 import java.security.DrbgParameters.Reseed
 import scala.reflect.runtime.{universe => ru}
+
+import grammar._
+import data._
 
 /** Perform parseing of input token stream and build
   * parse tree according to the specified grammar rules.
@@ -13,11 +15,20 @@ import scala.reflect.runtime.{universe => ru}
 class Parser(
     val tokens: List[String]
 ) {
-  if (tokens == null || tokens.isEmpty)
+  if (tokens == null || tokens.isEmpty) {
     throw new Exception("Invalid token stream")
+  }
 
+  /** Method that should be called at parse
+    * method i. e. symbol from which parsing starts.
+    */
   private var method: Seq[Any] => Any = null
 
+  /** Custom constructor for parsing from particular symbol.
+    *
+    * @param tokens Input token stream.
+    * @param methodName Name of the method from which parsing starts.
+    */
   def this(tokens: List[String], methodName: String = "parseProgram") {
     this(tokens)
 

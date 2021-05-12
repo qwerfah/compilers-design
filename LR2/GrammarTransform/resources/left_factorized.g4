@@ -12,7 +12,8 @@ tail :
   ;
 
 operator : 
-  id = expr ;
+  id = expr | 
+  { operator_list } ;
 
 expr : 
   simple_expr expr#0 ;
@@ -34,7 +35,7 @@ sign :
   + - ;
 
 rel_op : 
-  = <> < <= > >= ;
+  == <> < <= > >= ;
 
 sum_op : 
   + - or ;
@@ -49,26 +50,26 @@ term#0 :
   mul_op factor term#2 ;
 
 expr#0 : 
-  rel_op simple_expr | 
-  ;
+  | 
+  rel_op simple_expr ;
 
 simple_expr#1 : 
-  simple_expr#0 | 
-  ;
+  | 
+  simple_expr#0 ;
 
 simple_expr#2 : 
-  simple_expr#0 | 
-  ;
+  | 
+  simple_expr#0 ;
 
 term#1 : 
   term#0 | 
   ;
 
 simple_expr#3 : 
-  simple_expr#0 | 
-  ;
+  | 
+  simple_expr#0 ;
 
 term#2 : 
-  term#0 | 
-  ;
+  | 
+  term#0 ;
 

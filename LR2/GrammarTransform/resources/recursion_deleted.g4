@@ -12,7 +12,8 @@ tail :
   ;
 
 operator : 
-  id = expr ;
+  id = expr | 
+  { operator_list } ;
 
 expr : 
   simple_expr | 
@@ -38,7 +39,7 @@ sign :
   + - ;
 
 rel_op : 
-  = <> < <= > >= ;
+  == <> < <= > >= ;
 
 sum_op : 
   + - or ;

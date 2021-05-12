@@ -16,6 +16,7 @@
         <term name="<=" spell="<=" />
         <term name=">=" spell=">=" />
         <term name="<>" spell="<>" />
+        <term name="==" spell="==" />
         <term name="or" spell="or" />
         <term name="not" spell="not" />
         <term name="and" spell="and" />
@@ -78,9 +79,15 @@
         <production>
             <lhs name="operator" />
             <rhs>
-                <symbol type="nonterm" name="id" />
+                <symbol type="term" name="id" />
                 <symbol type="term" name="=" />
-                <symbol type="nonterm" name="expr" />
+                <symbol type="term" name="expr" />
+            </rhs>
+        </production>
+        <production>
+            <lhs name="operator" />
+            <rhs>
+                <symbol type="nonterm" name="block" />
             </rhs>
         </production>
         <production>
@@ -169,7 +176,7 @@
         <production>
             <lhs name="rel_op" />
             <rhs>
-                <symbol type="term" name="=" />
+                <symbol type="term" name="==" />
                 <symbol type="term" name="<>" />
                 <symbol type="term" name="<" />
                 <symbol type="term" name="<=" />
