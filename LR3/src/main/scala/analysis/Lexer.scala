@@ -25,6 +25,6 @@ class Lexer(filename: String) {
       try source.mkString
       finally source.close()
 
-    lines.split("( +)|(\n)").toList
+    lines.split("( +)|(\n)").filter(!_.isBlank).toList
   }
 }

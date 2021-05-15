@@ -22,30 +22,36 @@ class Parser(
   /** Method that should be called at parse
     * method i. e. symbol from which parsing starts.
     */
-  private var method: Seq[Any] => Any = null
+  private var method: Seq[Any] => Any = getMethodByName("program")
 
   /** Custom constructor for parsing from particular symbol.
     *
     * @param tokens Input token stream.
     * @param methodName Name of the method from which parsing starts.
     */
-  def this(tokens: List[String], methodName: String = "parseProgram") {
+  def this(tokens: List[String], methodName: String = "program") {
     this(tokens)
+    method = getMethodByName(methodName)
+  }
 
-    val m = ru.runtimeMirror(getClass.getClassLoader)
+  private def getMethodByName(methodName: String): Seq[Any] => Any = {
+    val runtimeMirror = ru.runtimeMirror(getClass.getClassLoader)
     val methodSymbol = ru.typeOf[Parser].decl(ru.TermName(methodName)).asMethod
-    val instanceMirror = m.reflect(this)
+    val instanceMirror = runtimeMirror.reflect(this)
+    val paramTypes = methodSymbol.paramLists.head.map(x => x.typeSignature)
     val methodMirror = instanceMirror.reflectMethod(methodSymbol)
 
-    method = methodMirror.apply(_)
+    methodMirror(_)
   }
 
   /** Launch parsing process for current token stream.
     *
     * @return Parse result which contains parse tree or parsing errors.
     */
-  def parse(pos: Int = 0): ParseResult =
-    method(Seq(pos)).asInstanceOf[ParseResult]
+  def parse(pos: Int = 0): ParseResult = {
+    val result = method(Seq(pos.asInstanceOf[Any]))
+    result.asInstanceOf[ParseResult]
+  }
 
   /** Parse program from rule:
     * program : block;
