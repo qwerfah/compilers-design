@@ -6,7 +6,7 @@ import grammar.GrammarSymbol
   *
   * @param isSuccess Shows whether the result of parsing operation is parse tree or error.
   * @param tree Parse tree which built as a result of parseing operation.
-  * @param pos Position after last parsed token 
+  * @param pos Position after last parsed token
   *            (specifies next token to parse or token which raises the error).
   * @param message Error message (in case of error).
   * @param inner Inner results that contain inner errors.
@@ -42,5 +42,24 @@ class ParseResult(
     */
   def this(message: String, pos: Int) {
     this(false, None, pos, Option(message), None)
+  }
+
+  def +(p: Int): ParseResult =
+    new ParseResult(isSuccess, tree, pos + p, message, inner)
+
+  /** Print all errors recursively.
+    *
+    * @param result Error parsing result.
+    */
+  def printErrors(result: Option[ParseResult] = None) {
+    if (!result.isDefined) {
+      return printErrors(Option(this))
+    }
+
+    println(result.get.message.get)
+
+    if (result.get.inner.isDefined) {
+      printErrors(result.get.inner)
+    }
   }
 }

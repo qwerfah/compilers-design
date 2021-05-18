@@ -13,7 +13,8 @@ import data._
   * @param tokens Input token stream.
   */
 class Parser(
-    val tokens: List[String]
+    val tokens: List[String],
+    val methodName: String = "program"
 ) {
   if (tokens == null || tokens.isEmpty) {
     throw new Exception("Invalid token stream")
@@ -22,18 +23,14 @@ class Parser(
   /** Method that should be called at parse
     * method i. e. symbol from which parsing starts.
     */
-  private var method: Any => Any = getMethodByName("program")
+  private var method: Any => Any = getMethodByName(methodName)
 
-  /** Custom constructor for parsing from particular symbol.
+  /** Get method reference by its string name for current instance of parser.
+    * Extracted method will be invoked in parse method of current parser instance.
     *
-    * @param tokens Input token stream.
-    * @param methodName Name of the method from which parsing starts.
+    * @param methodName String name of method.
+    * @return Reference to found method.
     */
-  def this(tokens: List[String], methodName: String = "program") {
-    this(tokens)
-    method = getMethodByName(methodName)
-  }
-
   private def getMethodByName(methodName: String): Any => Any = {
     val runtimeMirror = ru.runtimeMirror(getClass.getClassLoader)
     val methodSymbol = ru.typeOf[Parser].decl(ru.TermName(methodName)).asMethod
@@ -61,7 +58,7 @@ class Parser(
     if (result.isSuccess) {
       result
     } else {
-      new ParseResult(
+      return new ParseResult(
         s"Position ${pos}: error while parsing program - block expected",
         pos,
         result
@@ -81,7 +78,7 @@ class Parser(
 
       if (result.isSuccess) {
         if (tokens(result.pos) == "}") {
-          new ParseResult(
+          return new ParseResult(
             new Node(
               "block",
               new Node("{") :: result.tree.get :: new Node("}") :: Nil
@@ -89,13 +86,13 @@ class Parser(
             result.pos + 1
           )
         } else {
-          new ParseResult(
+          return new ParseResult(
             s"Position ${result.pos}: error while parsing block - '}' expected",
             result.pos
           )
         }
       } else {
-        new ParseResult(
+        return new ParseResult(
           s"Position ${pos + 1}: error while parsing block",
           pos + 1,
           result
@@ -103,7 +100,7 @@ class Parser(
       }
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position ${pos}: error while parsing block - '{' expected",
       pos
     )
@@ -122,7 +119,7 @@ class Parser(
       val tailResult = tail(opResult.pos)
 
       if (tailResult.isSuccess) {
-        new ParseResult(
+        return new ParseResult(
           new Node(
             "operator_list",
             opResult.tree.get :: tailResult.tree.get :: Nil
@@ -130,7 +127,7 @@ class Parser(
           tailResult.pos
         )
       } else {
-        new ParseResult(
+        return new ParseResult(
           s"Position ${opResult.pos}: error while " +
             s"parsing operator list - tail expected",
           opResult.pos,
@@ -139,7 +136,7 @@ class Parser(
       }
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position ${pos}: error while " +
         s"parsing operator list - operator expected",
       pos,
@@ -161,7 +158,7 @@ class Parser(
         val exprResult = expr(idResult.pos + 1)
 
         if (exprResult.isSuccess) {
-          new ParseResult(
+          return new ParseResult(
             new Node(
               "operator",
               idResult.tree.get :: new Node("=") :: exprResult.tree.get :: Nil
@@ -169,7 +166,7 @@ class Parser(
             exprResult.pos
           )
         } else {
-          new ParseResult(
+          return new ParseResult(
             s"Position ${idResult.pos + 1}: error while " +
               s"parsing operator - expression expected",
             idResult.pos + 1,
@@ -177,27 +174,27 @@ class Parser(
           )
         }
       } else {
-        new ParseResult(
-          s"Position ${idResult.pos + 1}: error while " +
+        return new ParseResult(
+          s"Position ${idResult.pos}: error while " +
             s"parsing operator - '=' expected",
           idResult.pos
         )
       }
-    } else {
-      val blockResult = block(pos)
-
-      if (blockResult.isSuccess) {
-        new ParseResult(
-          new Node(
-            "operator",
-            blockResult.tree.get :: Nil
-          ),
-          blockResult.pos
-        )
-      }
     }
 
-    new ParseResult(
+    val blockResult = block(pos)
+
+    if (blockResult.isSuccess) {
+      return new ParseResult(
+        new Node(
+          "operator",
+          blockResult.tree.get :: Nil
+        ),
+        blockResult.pos
+      )
+    }
+
+    return new ParseResult(
       s"Position ${pos}: error while " +
         s"parsing operator - identifier or nested block expected",
       pos,
@@ -216,17 +213,17 @@ class Parser(
       val result = operatorList(pos + 1)
 
       if (result.isSuccess) {
-        new ParseResult(
+        return new ParseResult(
           new Node("tail", result.tree.get.childs.get),
           result.pos
         )
-      } else {
-        new ParseResult(
-          s"Position ${pos + 1}: error while parsing tail - operator expected",
-          pos + 1,
-          result
-        )
       }
+
+      return new ParseResult(
+        s"Position ${pos + 1}: error while parsing tail - operator expected",
+        pos + 1,
+        result
+      )
     }
 
     // Tail allowed to be empty
@@ -247,14 +244,18 @@ class Parser(
 
     // Recursive descend with rollback
     for (parser <- parsers) {
-      val result = parser.parse()
+      try {
+        val result = parser.parse()
 
-      if (result.isSuccess) {
-        result
+        if (result.isSuccess) {
+          return result + pos
+        }
+      } catch {
+        case e: Exception => println("ERROR AT: " + parser.methodName)
       }
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"simple expression - simple_expr expected",
       pos
@@ -266,13 +267,13 @@ class Parser(
     val result = simpleExpr(pos)
 
     if (result.isSuccess) {
-      new ParseResult(
+      return new ParseResult(
         new Node("expr", result.tree.get :: Nil),
         result.pos
       )
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"expression - simple_expr expected",
       pos,
@@ -290,7 +291,7 @@ class Parser(
         val serResult = simpleExpr(relOpResult.pos)
 
         if (serResult.isSuccess) {
-          new ParseResult(
+          return new ParseResult(
             new Node(
               "expr",
               selResult.tree.get :: relOpResult.tree.get :: serResult.tree.get :: Nil
@@ -298,7 +299,7 @@ class Parser(
             serResult.pos
           )
         } else {
-          new ParseResult(
+          return new ParseResult(
             s"Position ${relOpResult.pos}: error while " +
               s"parsing expression - simple expression expected",
             relOpResult.pos,
@@ -306,7 +307,7 @@ class Parser(
           )
         }
       } else {
-        new ParseResult(
+        return new ParseResult(
           s"Position ${selResult.pos}: error while " +
             s"parsing expression - relation operation expected",
           selResult.pos,
@@ -315,7 +316,7 @@ class Parser(
       }
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"expression - simple expression expected",
       pos,
@@ -339,14 +340,19 @@ class Parser(
 
     // Recursive descend with rollback
     for (parser <- parsers) {
-      val result = parser.parse()
+      try {
+        val result = parser.parse()
 
-      if (result.isSuccess) {
-        result
+        if (result.isSuccess) {
+          return result + pos
+        }
+      } catch {
+        case e: Exception =>
+          println("ERROR AT " + parser.methodName + ": " + e.getMessage())
       }
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"simple expression - term or sign expected",
       pos
@@ -363,13 +369,13 @@ class Parser(
     val result = term(pos)
 
     if (result.isSuccess) {
-      new ParseResult(
+      return new ParseResult(
         new Node("simple_expr", result.tree.get :: Nil),
         result.pos
       )
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"simple expression - term expected",
       pos
@@ -389,7 +395,7 @@ class Parser(
       val termResult = term(signResult.pos)
 
       if (termResult.isSuccess) {
-        new ParseResult(
+        return new ParseResult(
           new Node(
             "simple_expr",
             signResult.tree.get :: termResult.tree.get :: Nil
@@ -397,7 +403,7 @@ class Parser(
           termResult.pos
         )
       } else {
-        new ParseResult(
+        return new ParseResult(
           s"Position ${signResult.pos}: error while parsing " +
             s"simple expression - term expected",
           signResult.pos,
@@ -406,7 +412,7 @@ class Parser(
       }
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"simple expression - sign expected",
       pos
@@ -426,7 +432,7 @@ class Parser(
       val seResult = simpleExpr_0(termResult.pos)
 
       if (seResult.isSuccess) {
-        new ParseResult(
+        return new ParseResult(
           new Node(
             "simple_expr",
             termResult.tree.get :: seResult.tree.get :: Nil
@@ -434,7 +440,7 @@ class Parser(
           seResult.pos
         )
       } else {
-        new ParseResult(
+        return new ParseResult(
           s"Position ${termResult.pos}: error while parsing simple " +
             s"expression - simple_expr#0 expected",
           termResult.pos,
@@ -443,7 +449,7 @@ class Parser(
       }
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"simple expression - term expected",
       pos,
@@ -467,7 +473,7 @@ class Parser(
         val seResult = simpleExpr_0(termResult.pos)
 
         if (seResult.isSuccess) {
-          new ParseResult(
+          return new ParseResult(
             new Node(
               "simple_expr",
               signResult.tree.get ::
@@ -477,7 +483,7 @@ class Parser(
             seResult.pos
           )
         } else {
-          new ParseResult(
+          return new ParseResult(
             s"Position ${termResult.pos}: error while parsing " +
               s"simple expression - simple_expr#0 expected",
             termResult.pos,
@@ -485,7 +491,7 @@ class Parser(
           )
         }
       } else {
-        new ParseResult(
+        return new ParseResult(
           s"Position ${signResult.pos}: error while parsing " +
             s"simple expression - term expected",
           signResult.pos,
@@ -494,7 +500,7 @@ class Parser(
       }
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"simple expression - sign expected",
       pos,
@@ -517,14 +523,18 @@ class Parser(
 
     // Recursive descend with rollback
     for (parser <- parsers) {
-      val result = parser.parse()
+      try {
+        val result = parser.parse()
 
-      if (result.isSuccess) {
-        result
+        if (result.isSuccess) {
+          return result + pos
+        }
+      } catch {
+        case e: Exception => println("ERROR AT: " + parser.methodName)
       }
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"simple_expr#0 - sum_op expected",
       pos
@@ -545,7 +555,7 @@ class Parser(
       val termResult = term(sumOpResult.pos)
 
       if (termResult.isSuccess) {
-        new ParseResult(
+        return new ParseResult(
           new Node(
             "simple_expr#0",
             sumOpResult.tree.get :: termResult.tree.get :: Nil
@@ -553,7 +563,7 @@ class Parser(
           termResult.pos
         )
       } else {
-        new ParseResult(
+        return new ParseResult(
           s"Position ${sumOpResult.pos}: error while parsing " +
             s"simple_expr#0 - sum_op expected",
           sumOpResult.pos,
@@ -562,7 +572,7 @@ class Parser(
       }
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"simple_expr#0 - sum_op expected",
       pos,
@@ -587,7 +597,7 @@ class Parser(
         val seResult = simpleExpr_0(termResult.pos)
 
         if (seResult.isSuccess) {
-          new ParseResult(
+          return new ParseResult(
             new Node(
               "simple_expr#0",
               sumOpResult.tree.get ::
@@ -597,7 +607,7 @@ class Parser(
             seResult.pos
           )
         } else {
-          new ParseResult(
+          return new ParseResult(
             s"Position ${termResult.pos}: error while parsing " +
               s"simple_expr#0 - simple_expr#3 expected",
             termResult.pos,
@@ -605,7 +615,7 @@ class Parser(
           )
         }
       } else {
-        new ParseResult(
+        return new ParseResult(
           s"Position ${sumOpResult.pos}: error while parsing " +
             s"simple_expr#0 - term expected",
           sumOpResult.pos,
@@ -614,7 +624,7 @@ class Parser(
       }
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"simple_expr#0 - sum operation expected",
       pos,
@@ -636,14 +646,18 @@ class Parser(
 
     // Recursive descend with rollback
     for (parser <- parsers) {
-      val result = parser.parse()
+      try {
+        val result = parser.parse()
 
-      if (result.isSuccess) {
-        result
+        if (result.isSuccess) {
+          return result + pos
+        }
+      } catch {
+        case e: Exception => println("ERROR AT: " + parser.methodName)
       }
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"term - factor expected",
       pos
@@ -660,13 +674,13 @@ class Parser(
     var result = factor(pos)
 
     if (result.isSuccess) {
-      new ParseResult(
+      return new ParseResult(
         new Node("term", result.tree.get :: Nil),
         result.pos
       )
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"term - factor expected",
       pos,
@@ -687,12 +701,12 @@ class Parser(
       val termResult = term_0(factorResult.pos)
 
       if (termResult.isSuccess) {
-        new ParseResult(
+        return new ParseResult(
           new Node("term", factorResult.tree.get :: termResult.tree.get :: Nil),
           termResult.pos
         )
       } else {
-        new ParseResult(
+        return new ParseResult(
           s"Position $pos: error while parsing " +
             s"term - term#0 expected",
           factorResult.pos,
@@ -701,7 +715,7 @@ class Parser(
       }
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"term - factor expected",
       pos,
@@ -723,14 +737,18 @@ class Parser(
 
     // Recursive descend with rollback
     for (parser <- parsers) {
-      val result = parser.parse()
+      try {
+        val result = parser.parse()
 
-      if (result.isSuccess) {
-        result
+        if (result.isSuccess) {
+          return result + pos
+        }
+      } catch {
+        case e: Exception => println("ERROR AT: " + parser.methodName)
       }
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"term#0 - mul_op expected",
       pos
@@ -750,7 +768,7 @@ class Parser(
       val factorResult = factor(mulOpResult.pos)
 
       if (factorResult.isSuccess) {
-        new ParseResult(
+        return new ParseResult(
           new Node(
             "term#0",
             mulOpResult.tree.get ::
@@ -760,7 +778,7 @@ class Parser(
           factorResult.pos
         )
       } else {
-        new ParseResult(
+        return new ParseResult(
           s"Position ${mulOpResult.pos}: error while parsing " +
             s"term#0 - factor expected",
           mulOpResult.pos,
@@ -769,7 +787,7 @@ class Parser(
       }
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"term#0 - multiplication operation expected",
       pos,
@@ -793,7 +811,7 @@ class Parser(
         val termResult = term_0(factorResult.pos)
 
         if (factorResult.isSuccess) {
-          new ParseResult(
+          return new ParseResult(
             new Node(
               "term#0",
               mulOpResult.tree.get ::
@@ -803,7 +821,7 @@ class Parser(
             termResult.pos
           )
         } else {
-          new ParseResult(
+          return new ParseResult(
             s"Position ${factorResult.pos}: error while parsing " +
               s"term#0 - term#0 expected",
             factorResult.pos,
@@ -811,7 +829,7 @@ class Parser(
           )
         }
       } else {
-        new ParseResult(
+        return new ParseResult(
           s"Position ${mulOpResult.pos}: error while parsing " +
             s"term#0 - factor expected",
           mulOpResult.pos,
@@ -820,7 +838,7 @@ class Parser(
       }
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"term#0 - multiplication operation expected",
       pos,
@@ -838,7 +856,7 @@ class Parser(
     val idResult = id(pos)
 
     if (idResult.isSuccess) {
-      new ParseResult(
+      return new ParseResult(
         new Node("factor", idResult.tree.get :: Nil),
         idResult.pos
       )
@@ -847,7 +865,7 @@ class Parser(
     val constResult = const(pos)
 
     if (constResult.isSuccess) {
-      new ParseResult(
+      return new ParseResult(
         new Node("factor", constResult.tree.get :: Nil),
         constResult.pos
       )
@@ -858,7 +876,7 @@ class Parser(
 
       if (seResult.isSuccess) {
         if (tokens(seResult.pos) == ")") {
-          new ParseResult(
+          return new ParseResult(
             new Node(
               "factor",
               new Node("(") :: constResult.tree.get :: new Node(")") :: Nil
@@ -866,14 +884,14 @@ class Parser(
             seResult.pos + 1
           )
         } else {
-          new ParseResult(
+          return new ParseResult(
             s"Position ${seResult.pos}: error while parsing " +
               s"factor - ')' expected",
             seResult.pos
           )
         }
       } else {
-        new ParseResult(
+        return new ParseResult(
           s"Position ${pos + 1}: error while parsing " +
             s"factor - simple_expr expected",
           pos + 1,
@@ -883,24 +901,24 @@ class Parser(
     }
 
     if (tokens(pos) == "not") {
-      val factorResult = factor(pos + 3)
+      val factorResult = factor(pos + 1)
 
       if (factorResult.isSuccess) {
-        new ParseResult(
+        return new ParseResult(
           new Node("factor", new Node("not") :: factorResult.tree.get :: Nil),
           factorResult.pos
         )
       } else {
-        new ParseResult(
-          s"Position ${pos + 3}: error while parsing " +
+        return new ParseResult(
+          s"Position ${pos + 1}: error while parsing " +
             s"factor - factor expected",
-          pos + 3,
+          pos + 1,
           factorResult
         )
       }
     }
 
-    new ParseResult(
+    return new ParseResult(
       s"Position $pos: error while parsing " +
         s"factor - id or const or '(' or 'not' expected",
       pos
@@ -914,12 +932,15 @@ class Parser(
     * @return Parse result which contains parse tree or parsing errors.
     */
   private def sign(pos: Int): ParseResult = {
-    val signRegex: Regex = "+|-".r
+    val signRegex: Regex = "\\+|-".r
 
     if (signRegex.matches(tokens(pos))) {
-      new ParseResult(new Node("sign", new Node(tokens(pos)) :: Nil), pos + 1)
+      return new ParseResult(
+        new Node("sign", new Node(tokens(pos)) :: Nil),
+        pos + 1
+      )
     } else {
-      new ParseResult(s"Position $pos: sign expected", pos)
+      return new ParseResult(s"Position $pos: sign expected", pos)
     }
   }
 
@@ -934,9 +955,12 @@ class Parser(
     val relOpRegex: Regex = "=|<>|<|<=|>|>=".r
 
     if (relOpRegex.matches(tokens(pos))) {
-      new ParseResult(new Node("rel_op", new Node(tokens(pos)) :: Nil), pos + 1)
+      return new ParseResult(
+        new Node("rel_op", new Node(tokens(pos)) :: Nil),
+        pos + 1
+      )
     } else {
-      new ParseResult(s"Position $pos: relation operation expected", pos)
+      return new ParseResult(s"Position $pos: relation operation expected", pos)
     }
   }
 
@@ -950,9 +974,12 @@ class Parser(
     val sumOpRegex: Regex = "\\+|-|or".r
 
     if (sumOpRegex.matches(tokens(pos))) {
-      new ParseResult(new Node("sum_op", new Node(tokens(pos)) :: Nil), pos + 1)
+      return new ParseResult(
+        new Node("sum_op", new Node(tokens(pos)) :: Nil),
+        pos + 1
+      )
     } else {
-      new ParseResult(s"Position $pos: sum operation expected", pos)
+      return new ParseResult(s"Position $pos: sum operation expected", pos)
     }
   }
 
@@ -967,9 +994,15 @@ class Parser(
     val mulOpRegex: Regex = "\\*|/|div|mod|and".r
 
     if (mulOpRegex.matches(tokens(pos))) {
-      new ParseResult(new Node("mul_op", new Node(tokens(pos)) :: Nil), pos + 1)
+      return new ParseResult(
+        new Node("mul_op", new Node(tokens(pos)) :: Nil),
+        pos + 1
+      )
     } else {
-      new ParseResult(s"Position $pos: multiplication operation expected", pos)
+      return new ParseResult(
+        s"Position $pos: multiplication operation expected",
+        pos
+      )
     }
   }
 
@@ -983,9 +1016,12 @@ class Parser(
     val idRegex: Regex = "[_a-zA-Z][_a-zA-Z0-9]{0,30}".r
 
     if (idRegex.matches(tokens(pos))) {
-      new ParseResult(new Node("id", new Node(tokens(pos)) :: Nil), pos + 1)
+      return new ParseResult(
+        new Node("id", new Node(tokens(pos)) :: Nil),
+        pos + 1
+      )
     } else {
-      new ParseResult(s"Position $pos: invalid identifier", pos)
+      return new ParseResult(s"Position $pos: invalid identifier", pos)
     }
   }
 
@@ -996,6 +1032,15 @@ class Parser(
     * @return Parse result which contains parse tree or parsing errors.
     */
   private def const(pos: Int): ParseResult = {
-    new ParseResult
+    val constRegex: Regex = "-?[0-9]+|\".*\"|\'.*\'".r
+
+    if (constRegex.matches(tokens(pos))) {
+      return new ParseResult(
+        new Node("const", new Node(tokens(pos)) :: Nil),
+        pos + 1
+      )
+    } else {
+      return new ParseResult(s"Position $pos: invalid const literal", pos)
+    }
   }
 }

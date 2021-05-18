@@ -2,6 +2,7 @@ import analysis._
 import grammar._
 import scala.util.matching.Regex
 import data.ParseResult
+import data.TreeSerializer
 
 object Main extends App {
   val lexer = new Lexer(
@@ -14,5 +15,10 @@ object Main extends App {
   val parser = new Parser(tokens)
   val result: ParseResult = parser.parse()
 
-  println(result.tree.get)
+  if (result.isSuccess) {
+    val serializer = new TreeSerializer("tree.dot")
+  } else {
+    result.printErrors()
+  }
+
 }
