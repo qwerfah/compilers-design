@@ -3,11 +3,10 @@ import grammar._
 import scala.util.matching.Regex
 import data.ParseResult
 import data.TreeSerializer
+import scala.reflect.io.File
 
 object Main extends App {
-  val lexer = new Lexer(
-    "C:\\Users\\Qwerheh\\Documents\\src\\compilers-design\\LR3\\code.code"
-  )
+  val lexer = new Lexer(File(".").toAbsolute + "/code.code")
   val tokens: List[String] = lexer.getTokens()
 
   tokens.foreach(println(_))

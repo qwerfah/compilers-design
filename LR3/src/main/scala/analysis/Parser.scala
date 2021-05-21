@@ -119,6 +119,10 @@ class Parser(
       val tailResult = tail(opResult.pos)
 
       if (tailResult.isSuccess) {
+        println(
+          s"successfully parsed operatorList: next pos = ${tailResult.pos}"
+        )
+
         return new ParseResult(
           new Node(
             "operator_list",
@@ -158,6 +162,8 @@ class Parser(
         val exprResult = expr(idResult.pos + 1)
 
         if (exprResult.isSuccess) {
+          println(s"successfully parsed operator: next pos = ${exprResult.pos}")
+
           return new ParseResult(
             new Node(
               "operator",
@@ -185,6 +191,8 @@ class Parser(
     val blockResult = block(pos)
 
     if (blockResult.isSuccess) {
+      println(s"successfully parsed operator: next pos = ${blockResult.pos}")
+
       return new ParseResult(
         new Node(
           "operator",
@@ -210,24 +218,39 @@ class Parser(
     */
   def tail(pos: Int): ParseResult = {
     if (tokens(pos) == ";") {
-      val result = operatorList(pos + 1)
+      val opResult = operator(pos + 1)
 
-      if (result.isSuccess) {
+      if (opResult.isSuccess) {
+        val tailResult = tail(opResult.pos)
+
+        if (tailResult.isSuccess) {
+          println(s"successfully parsed tail: next pos = ${tailResult.pos}")
+
+          return new ParseResult(
+            new Node(
+              "tail",
+              new Node(";") :: opResult.tree.get :: tailResult.tree.get :: Nil
+            ),
+            tailResult.pos
+          )
+        } else {
+          return new ParseResult(
+            s"Position ${opResult.pos}: error while parsing tail - tail expected",
+            opResult.pos,
+            tailResult
+          )
+        }
+      } else {
         return new ParseResult(
-          new Node("tail", result.tree.get.childs.get),
-          result.pos
+          s"Position ${pos + 1}: error while parsing tail - operator expected",
+          pos + 1,
+          opResult
         )
       }
-
-      return new ParseResult(
-        s"Position ${pos + 1}: error while parsing tail - operator expected",
-        pos + 1,
-        result
-      )
     }
 
     // Tail allowed to be empty
-    new ParseResult(new Node("eps"), pos)
+    return new ParseResult(new Node("eps"), pos)
   }
 
   /** Parse expression from token stream according to the grammar rule:
@@ -238,8 +261,8 @@ class Parser(
     */
   def expr(pos: Int): ParseResult = {
     val parsers =
-      new Parser(tokens.drop(pos), "expr_var1") ::
-        new Parser(tokens.drop(pos), "expr_var2") ::
+      new Parser(tokens.drop(pos), "expr_var2") ::
+        new Parser(tokens.drop(pos), "expr_var1") ::
         Nil
 
     // Recursive descend with rollback
@@ -267,6 +290,8 @@ class Parser(
     val result = simpleExpr(pos)
 
     if (result.isSuccess) {
+      println(s"successfully parsed expr(v1): next pos = ${result.pos}")
+
       return new ParseResult(
         new Node("expr", result.tree.get :: Nil),
         result.pos
@@ -291,6 +316,8 @@ class Parser(
         val serResult = simpleExpr(relOpResult.pos)
 
         if (serResult.isSuccess) {
+          println(s"successfully parsed expr(v2): next pos = ${serResult.pos}")
+
           return new ParseResult(
             new Node(
               "expr",
@@ -313,6 +340,7 @@ class Parser(
           selResult.pos,
           relOpResult
         )
+
       }
     }
 
@@ -332,10 +360,10 @@ class Parser(
     */
   def simpleExpr(pos: Int): ParseResult = {
     val parsers =
-      new Parser(tokens.drop(pos), "simpleExpr_var1") ::
-        new Parser(tokens.drop(pos), "simpleExpr_var2") ::
+      new Parser(tokens.drop(pos), "simpleExpr_var4") ::
         new Parser(tokens.drop(pos), "simpleExpr_var3") ::
-        new Parser(tokens.drop(pos), "simpleExpr_var4") ::
+        new Parser(tokens.drop(pos), "simpleExpr_var2") ::
+        new Parser(tokens.drop(pos), "simpleExpr_var1") ::
         Nil
 
     // Recursive descend with rollback
@@ -344,6 +372,10 @@ class Parser(
         val result = parser.parse()
 
         if (result.isSuccess) {
+          println(
+            s"successfully parsed simple_expr: next pos = ${result.pos + pos}"
+          )
+
           return result + pos
         }
       } catch {
@@ -369,6 +401,8 @@ class Parser(
     val result = term(pos)
 
     if (result.isSuccess) {
+      println(s"successfully parsed simple_expr(1): next pos = ${result.pos}")
+
       return new ParseResult(
         new Node("simple_expr", result.tree.get :: Nil),
         result.pos
@@ -395,6 +429,10 @@ class Parser(
       val termResult = term(signResult.pos)
 
       if (termResult.isSuccess) {
+        println(
+          s"successfully parsed simple_expr(v2): next pos = ${termResult.pos}"
+        )
+
         return new ParseResult(
           new Node(
             "simple_expr",
@@ -432,6 +470,10 @@ class Parser(
       val seResult = simpleExpr_0(termResult.pos)
 
       if (seResult.isSuccess) {
+        println(
+          s"successfully parsed simple_expr(v3): next pos = ${seResult.pos}"
+        )
+
         return new ParseResult(
           new Node(
             "simple_expr",
@@ -473,6 +515,10 @@ class Parser(
         val seResult = simpleExpr_0(termResult.pos)
 
         if (seResult.isSuccess) {
+          println(
+            s"successfully parsed simple_expr(v4): next pos = ${seResult.pos}"
+          )
+
           return new ParseResult(
             new Node(
               "simple_expr",
@@ -517,8 +563,8 @@ class Parser(
     */
   def simpleExpr_0(pos: Int): ParseResult = {
     val parsers =
-      new Parser(tokens.drop(pos), "simpleExpr_0_var1") ::
-        new Parser(tokens.drop(pos), "simpleExpr_0_var2") ::
+      new Parser(tokens.drop(pos), "simpleExpr_0_var2") ::
+        new Parser(tokens.drop(pos), "simpleExpr_0_var1") ::
         Nil
 
     // Recursive descend with rollback
@@ -527,6 +573,10 @@ class Parser(
         val result = parser.parse()
 
         if (result.isSuccess) {
+          println(
+            s"successfully parsed simple_expr0: next pos = ${result.pos + pos}"
+          )
+
           return result + pos
         }
       } catch {
@@ -555,6 +605,10 @@ class Parser(
       val termResult = term(sumOpResult.pos)
 
       if (termResult.isSuccess) {
+        println(
+          s"successfully parsed simple_expr0(v1): next pos = ${termResult.pos}"
+        )
+
         return new ParseResult(
           new Node(
             "simple_expr#0",
@@ -597,6 +651,10 @@ class Parser(
         val seResult = simpleExpr_0(termResult.pos)
 
         if (seResult.isSuccess) {
+          println(
+            s"successfully parsed simple_expr0(v2): next pos = ${seResult.pos}"
+          )
+
           return new ParseResult(
             new Node(
               "simple_expr#0",
@@ -640,8 +698,8 @@ class Parser(
     */
   def term(pos: Int): ParseResult = {
     val parsers =
-      new Parser(tokens.drop(pos), "term_var1") ::
-        new Parser(tokens.drop(pos), "term_var2") ::
+      new Parser(tokens.drop(pos), "term_var2") ::
+        new Parser(tokens.drop(pos), "term_var1") ::
         Nil
 
     // Recursive descend with rollback
@@ -650,6 +708,8 @@ class Parser(
         val result = parser.parse()
 
         if (result.isSuccess) {
+          println(s"successfully parsed term: next pos = ${result.pos + pos}")
+
           return result + pos
         }
       } catch {
@@ -674,6 +734,8 @@ class Parser(
     var result = factor(pos)
 
     if (result.isSuccess) {
+      println(s"successfully parsed term(v1): next pos = ${result.pos}")
+
       return new ParseResult(
         new Node("term", result.tree.get :: Nil),
         result.pos
@@ -701,6 +763,8 @@ class Parser(
       val termResult = term_0(factorResult.pos)
 
       if (termResult.isSuccess) {
+        println(s"successfully parsed term(v2): next pos = ${termResult.pos}")
+
         return new ParseResult(
           new Node("term", factorResult.tree.get :: termResult.tree.get :: Nil),
           termResult.pos
@@ -731,8 +795,8 @@ class Parser(
     */
   private def term_0(pos: Int): ParseResult = {
     val parsers =
-      new Parser(tokens.drop(pos), "term_0_var1") ::
-        new Parser(tokens.drop(pos), "term_0_var2") ::
+      new Parser(tokens.drop(pos), "term_0_var2") ::
+        new Parser(tokens.drop(pos), "term_0_var1") ::
         Nil
 
     // Recursive descend with rollback
@@ -741,6 +805,8 @@ class Parser(
         val result = parser.parse()
 
         if (result.isSuccess) {
+          println(s"successfully parsed term0: next pos = ${result.pos + pos}")
+
           return result + pos
         }
       } catch {
@@ -768,6 +834,10 @@ class Parser(
       val factorResult = factor(mulOpResult.pos)
 
       if (factorResult.isSuccess) {
+        println(
+          s"successfully parsed term0(v1): next pos = ${factorResult.pos}"
+        )
+
         return new ParseResult(
           new Node(
             "term#0",
@@ -811,6 +881,10 @@ class Parser(
         val termResult = term_0(factorResult.pos)
 
         if (factorResult.isSuccess) {
+          println(
+            s"successfully parsed term0(v2): next pos = ${factorResult.pos}"
+          )
+
           return new ParseResult(
             new Node(
               "term#0",
@@ -853,33 +927,17 @@ class Parser(
     * @return Parse result which contains parse tree or parsing errors.
     */
   private def factor(pos: Int): ParseResult = {
-    val idResult = id(pos)
-
-    if (idResult.isSuccess) {
-      return new ParseResult(
-        new Node("factor", idResult.tree.get :: Nil),
-        idResult.pos
-      )
-    }
-
-    val constResult = const(pos)
-
-    if (constResult.isSuccess) {
-      return new ParseResult(
-        new Node("factor", constResult.tree.get :: Nil),
-        constResult.pos
-      )
-    }
-
     if (tokens(pos) == "(") {
       val seResult = simpleExpr(pos + 1)
 
       if (seResult.isSuccess) {
         if (tokens(seResult.pos) == ")") {
+          println(s"successfully parsed factor: next pos = ${seResult.pos + 1}")
+
           return new ParseResult(
             new Node(
               "factor",
-              new Node("(") :: constResult.tree.get :: new Node(")") :: Nil
+              new Node("(") :: seResult.tree.get :: new Node(")") :: Nil
             ),
             seResult.pos + 1
           )
@@ -904,6 +962,8 @@ class Parser(
       val factorResult = factor(pos + 1)
 
       if (factorResult.isSuccess) {
+        println(s"successfully parsed factor: next pos = ${factorResult.pos}")
+
         return new ParseResult(
           new Node("factor", new Node("not") :: factorResult.tree.get :: Nil),
           factorResult.pos
@@ -916,6 +976,28 @@ class Parser(
           factorResult
         )
       }
+    }
+
+    val idResult = id(pos)
+
+    if (idResult.isSuccess) {
+      println(s"successfully parsed factor: next pos = ${idResult.pos}")
+
+      return new ParseResult(
+        new Node("factor", idResult.tree.get :: Nil),
+        idResult.pos
+      )
+    }
+
+    val constResult = const(pos)
+
+    if (constResult.isSuccess) {
+      println(s"successfully parsed factor: next pos = ${constResult.pos}")
+
+      return new ParseResult(
+        new Node("factor", constResult.tree.get :: Nil),
+        constResult.pos
+      )
     }
 
     return new ParseResult(
@@ -935,6 +1017,8 @@ class Parser(
     val signRegex: Regex = "\\+|-".r
 
     if (signRegex.matches(tokens(pos))) {
+      println(s"successfully parsed sign: next pos = ${pos + 1}")
+
       return new ParseResult(
         new Node("sign", new Node(tokens(pos)) :: Nil),
         pos + 1
@@ -952,9 +1036,11 @@ class Parser(
     * @return Parse result which contains parse tree or parsing errors.
     */
   private def relOp(pos: Int): ParseResult = {
-    val relOpRegex: Regex = "=|<>|<|<=|>|>=".r
+    val relOpRegex: Regex = "==|<>|<|<=|>|>=".r
 
     if (relOpRegex.matches(tokens(pos))) {
+      println(s"successfully parsed relOp: next pos = ${pos + 1}")
+
       return new ParseResult(
         new Node("rel_op", new Node(tokens(pos)) :: Nil),
         pos + 1
@@ -974,6 +1060,8 @@ class Parser(
     val sumOpRegex: Regex = "\\+|-|or".r
 
     if (sumOpRegex.matches(tokens(pos))) {
+      println(s"successfully parsed sumOp: next pos = ${pos + 1}")
+
       return new ParseResult(
         new Node("sum_op", new Node(tokens(pos)) :: Nil),
         pos + 1
@@ -994,6 +1082,8 @@ class Parser(
     val mulOpRegex: Regex = "\\*|/|div|mod|and".r
 
     if (mulOpRegex.matches(tokens(pos))) {
+      println(s"successfully parsed mulOp: next pos = ${pos + 1}")
+
       return new ParseResult(
         new Node("mul_op", new Node(tokens(pos)) :: Nil),
         pos + 1
@@ -1016,6 +1106,8 @@ class Parser(
     val idRegex: Regex = "[_a-zA-Z][_a-zA-Z0-9]{0,30}".r
 
     if (idRegex.matches(tokens(pos))) {
+      println(s"successfully parsed id: next pos = ${pos + 1}")
+
       return new ParseResult(
         new Node("id", new Node(tokens(pos)) :: Nil),
         pos + 1
@@ -1035,6 +1127,8 @@ class Parser(
     val constRegex: Regex = "-?[0-9]+|\".*\"|\'.*\'".r
 
     if (constRegex.matches(tokens(pos))) {
+      println(s"successfully parsed const: next pos = ${pos + 1}")
+
       return new ParseResult(
         new Node("const", new Node(tokens(pos)) :: Nil),
         pos + 1

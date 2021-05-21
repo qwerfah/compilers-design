@@ -14,7 +14,7 @@ tail :
   ;
 
 operator : 
-  id = expr | 
+  id "=" expr | 
   block ;
 
 expr : 
@@ -46,8 +46,7 @@ factor :
   "not" factor ;
 
 sign : 
-  "+" |
-  "-" ;
+  "--" ;
 
 rel_op : 
   "==" |
