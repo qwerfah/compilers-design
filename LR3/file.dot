@@ -1,7 +1,0 @@
-digraph ParseTree {
-"S" -> "D"
-"D" -> "A"
-"S" -> "E"
-"E" -> "B"
-"E" -> "C"
-}

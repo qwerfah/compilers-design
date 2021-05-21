@@ -16,8 +16,9 @@ object Main extends App {
 
   if (result.isSuccess) {
     val serializer = new TreeSerializer("tree.dot")
+    serializer.serialize(result.tree.get)
   } else {
     result.printErrors()
   }
-
+  println("\nDONE\n")
 }

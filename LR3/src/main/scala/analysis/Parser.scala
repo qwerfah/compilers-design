@@ -274,7 +274,8 @@ class Parser(
           return result + pos
         }
       } catch {
-        case e: Exception => println("ERROR AT: " + parser.methodName)
+        case e: Exception =>
+          println("ERROR AT " + parser.methodName + ": " + e.getMessage())
       }
     }
 
@@ -580,7 +581,8 @@ class Parser(
           return result + pos
         }
       } catch {
-        case e: Exception => println("ERROR AT: " + parser.methodName)
+        case e: Exception =>
+          println("ERROR AT " + parser.methodName + ": " + e.getMessage())
       }
     }
 
@@ -713,7 +715,8 @@ class Parser(
           return result + pos
         }
       } catch {
-        case e: Exception => println("ERROR AT: " + parser.methodName)
+        case e: Exception =>
+          println("ERROR AT " + parser.methodName + ": " + e.getMessage())
       }
     }
 
@@ -801,16 +804,9 @@ class Parser(
 
     // Recursive descend with rollback
     for (parser <- parsers) {
-      try {
-        val result = parser.parse()
-
-        if (result.isSuccess) {
-          println(s"successfully parsed term0: next pos = ${result.pos + pos}")
-
-          return result + pos
-        }
-      } catch {
-        case e: Exception => println("ERROR AT: " + parser.methodName)
+      try {} catch {
+        case e: Exception =>
+          println("ERROR AT " + parser.methodName + ": " + e.getMessage())
       }
     }
 
