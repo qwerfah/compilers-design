@@ -1016,7 +1016,7 @@ class Parser(
     * @return Parse result which contains parse tree or parsing errors.
     */
   private def sign(pos: Int): ParseResult = {
-    val signRegex: Regex = "\\++|--".r
+    val signRegex: Regex = "\\+|-".r
 
     if (signRegex.matches(tokens(pos))) {
       println(s"successfully parsed sign: next pos = ${pos + 1}")
