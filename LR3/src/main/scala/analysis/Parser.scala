@@ -804,7 +804,13 @@ class Parser(
 
     // Recursive descend with rollback
     for (parser <- parsers) {
-      try {} catch {
+      try {
+        val result = parser.parse()
+
+        println(s"successfully parsed term0: next pos = ${result.pos + pos}")
+
+        return result + pos
+      } catch {
         case e: Exception =>
           println("ERROR AT " + parser.methodName + ": " + e.getMessage())
       }
@@ -1010,7 +1016,7 @@ class Parser(
     * @return Parse result which contains parse tree or parsing errors.
     */
   private def sign(pos: Int): ParseResult = {
-    val signRegex: Regex = "\\+|-".r
+    val signRegex: Regex = "\\++|--".r
 
     if (signRegex.matches(tokens(pos))) {
       println(s"successfully parsed sign: next pos = ${pos + 1}")

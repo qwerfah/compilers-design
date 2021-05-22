@@ -2,5 +2,10 @@
     a = b ;
     f = t + r - ( a and r ) ;
     w = q or t ;
-    g = w and f
+    {
+        g = w and f ;
+        a = b ;
+        f = t + r - ( a and r ) ;
+        w = q or t 
+    }
 }
