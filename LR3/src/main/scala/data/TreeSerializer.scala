@@ -3,6 +3,8 @@ package data
 import java.io.PrintWriter
 import java.io.File
 
+import data.nodes._
+
 /** Tree serializer which converts
   * parse tree to DOT notation and saves to file.
   *
@@ -34,7 +36,7 @@ class TreeSerializer(val filename: String) {
     if (!node.childs.isDefined) return
     for (child <- node.childs.get) {
       _writer.write(
-        s""""${node.hashCode}\n${node.symbol.name}" -> "${child.hashCode}\n${child.symbol.name}"\n"""
+        s""""${node.hashCode}\n${node.name}" -> "${child.hashCode}\n${child.name}"\n"""
       )
       _serialize(child)
     }

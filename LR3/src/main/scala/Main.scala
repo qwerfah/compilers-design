@@ -15,14 +15,14 @@ object Main extends App {
   }
 
   val parser = new Parser(tokens)
-  println("\nPARSE:");
+  println("\nPARSE:")
   val result: ParseResult = parser.parse()
 
   if (result.isSuccess) {
     val serializer = new TreeSerializer("tree.dot")
     serializer.serialize(result.tree.get)
   } else {
-    println("\nERRORS:");
+    println("\nERRORS:")
     result.printErrors()
   }
   println("\nDONE\n")

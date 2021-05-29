@@ -6,6 +6,8 @@ import scala.reflect.runtime.{universe => ru}
 
 import grammar._
 import data._
+import data.nodes._
+import _root_.data.nodes.data.nodes._
 
 /** Perform parseing of input token stream and build
   * parse tree according to the specified grammar rules.
@@ -79,9 +81,9 @@ class Parser(
       if (result.isSuccess) {
         if (tokens(result.pos) == "}") {
           return new ParseResult(
-            new Node(
+            new Block(
               "block",
-              new Node("{") :: result.tree.get :: new Node("}") :: Nil
+              new Terminal("{") :: result.tree.get :: new Terminal("}") :: Nil
             ),
             result.pos + 1
           )
@@ -124,7 +126,7 @@ class Parser(
         )
 
         return new ParseResult(
-          new Node(
+          new OperatorList(
             "operator_list",
             opResult.tree.get :: tailResult.tree.get :: Nil
           ),
@@ -165,9 +167,11 @@ class Parser(
           println(s"successfully parsed operator: next pos = ${exprResult.pos}")
 
           return new ParseResult(
-            new Node(
+            new Operator(
               "operator",
-              idResult.tree.get :: new Node("=") :: exprResult.tree.get :: Nil
+              idResult.tree.get :: new Terminal(
+                "="
+              ) :: exprResult.tree.get :: Nil
             ),
             exprResult.pos
           )
@@ -194,7 +198,7 @@ class Parser(
       println(s"successfully parsed operator: next pos = ${blockResult.pos}")
 
       return new ParseResult(
-        new Node(
+        new Operator(
           "operator",
           blockResult.tree.get :: Nil
         ),
@@ -227,9 +231,11 @@ class Parser(
           println(s"successfully parsed tail: next pos = ${tailResult.pos}")
 
           return new ParseResult(
-            new Node(
+            new Tail(
               "tail",
-              new Node(";") :: opResult.tree.get :: tailResult.tree.get :: Nil
+              new Terminal(
+                ";"
+              ) :: opResult.tree.get :: tailResult.tree.get :: Nil
             ),
             tailResult.pos
           )
@@ -250,7 +256,7 @@ class Parser(
     }
 
     // Tail allowed to be empty
-    return new ParseResult(new Node("eps"), pos)
+    return new ParseResult(new Terminal("eps"), pos)
   }
 
   /** Parse expression from token stream according to the grammar rule:
@@ -294,7 +300,7 @@ class Parser(
       println(s"successfully parsed expr(v1): next pos = ${result.pos}")
 
       return new ParseResult(
-        new Node("expr", result.tree.get :: Nil),
+        new Expr("expr", result.tree.get :: Nil),
         result.pos
       )
     }
@@ -320,7 +326,7 @@ class Parser(
           println(s"successfully parsed expr(v2): next pos = ${serResult.pos}")
 
           return new ParseResult(
-            new Node(
+            new Expr(
               "expr",
               selResult.tree.get :: relOpResult.tree.get :: serResult.tree.get :: Nil
             ),
@@ -405,7 +411,7 @@ class Parser(
       println(s"successfully parsed simple_expr(1): next pos = ${result.pos}")
 
       return new ParseResult(
-        new Node("simple_expr", result.tree.get :: Nil),
+        new SimpleExpr("simple_expr", result.tree.get :: Nil),
         result.pos
       )
     }
@@ -435,7 +441,7 @@ class Parser(
         )
 
         return new ParseResult(
-          new Node(
+          new SimpleExpr(
             "simple_expr",
             signResult.tree.get :: termResult.tree.get :: Nil
           ),
@@ -476,7 +482,7 @@ class Parser(
         )
 
         return new ParseResult(
-          new Node(
+          new SimpleExpr(
             "simple_expr",
             termResult.tree.get :: seResult.tree.get :: Nil
           ),
@@ -521,7 +527,7 @@ class Parser(
           )
 
           return new ParseResult(
-            new Node(
+            new SimpleExpr(
               "simple_expr",
               signResult.tree.get ::
                 termResult.tree.get ::
@@ -612,7 +618,7 @@ class Parser(
         )
 
         return new ParseResult(
-          new Node(
+          new SimpleExpr0(
             "simple_expr#0",
             sumOpResult.tree.get :: termResult.tree.get :: Nil
           ),
@@ -658,7 +664,7 @@ class Parser(
           )
 
           return new ParseResult(
-            new Node(
+            new SimpleExpr0(
               "simple_expr#0",
               sumOpResult.tree.get ::
                 termResult.tree.get ::
@@ -740,7 +746,7 @@ class Parser(
       println(s"successfully parsed term(v1): next pos = ${result.pos}")
 
       return new ParseResult(
-        new Node("term", result.tree.get :: Nil),
+        new Term("term", result.tree.get :: Nil),
         result.pos
       )
     }
@@ -769,7 +775,7 @@ class Parser(
         println(s"successfully parsed term(v2): next pos = ${termResult.pos}")
 
         return new ParseResult(
-          new Node("term", factorResult.tree.get :: termResult.tree.get :: Nil),
+          new Term("term", factorResult.tree.get :: termResult.tree.get :: Nil),
           termResult.pos
         )
       } else {
@@ -841,7 +847,7 @@ class Parser(
         )
 
         return new ParseResult(
-          new Node(
+          new Term0(
             "term#0",
             mulOpResult.tree.get ::
               factorResult.tree.get ::
@@ -888,7 +894,7 @@ class Parser(
           )
 
           return new ParseResult(
-            new Node(
+            new Term0(
               "term#0",
               mulOpResult.tree.get ::
                 factorResult.tree.get ::
@@ -937,9 +943,9 @@ class Parser(
           println(s"successfully parsed factor: next pos = ${seResult.pos + 1}")
 
           return new ParseResult(
-            new Node(
+            new Factor(
               "factor",
-              new Node("(") :: seResult.tree.get :: new Node(")") :: Nil
+              new Terminal("(") :: seResult.tree.get :: new Terminal(")") :: Nil
             ),
             seResult.pos + 1
           )
@@ -967,7 +973,10 @@ class Parser(
         println(s"successfully parsed factor: next pos = ${factorResult.pos}")
 
         return new ParseResult(
-          new Node("factor", new Node("not") :: factorResult.tree.get :: Nil),
+          new Factor(
+            "factor",
+            new Terminal("not") :: factorResult.tree.get :: Nil
+          ),
           factorResult.pos
         )
       } else {
@@ -986,7 +995,7 @@ class Parser(
       println(s"successfully parsed factor: next pos = ${idResult.pos}")
 
       return new ParseResult(
-        new Node("factor", idResult.tree.get :: Nil),
+        new Factor("factor", idResult.tree.get :: Nil),
         idResult.pos
       )
     }
@@ -997,7 +1006,7 @@ class Parser(
       println(s"successfully parsed factor: next pos = ${constResult.pos}")
 
       return new ParseResult(
-        new Node("factor", constResult.tree.get :: Nil),
+        new Factor("factor", constResult.tree.get :: Nil),
         constResult.pos
       )
     }
@@ -1022,7 +1031,7 @@ class Parser(
       println(s"successfully parsed sign: next pos = ${pos + 1}")
 
       return new ParseResult(
-        new Node("sign", new Node(tokens(pos)) :: Nil),
+        new Sign("sign", new Terminal(tokens(pos)) :: Nil),
         pos + 1
       )
     } else {
@@ -1044,7 +1053,7 @@ class Parser(
       println(s"successfully parsed relOp: next pos = ${pos + 1}")
 
       return new ParseResult(
-        new Node("rel_op", new Node(tokens(pos)) :: Nil),
+        new RelOp("rel_op", new Terminal(tokens(pos)) :: Nil),
         pos + 1
       )
     } else {
@@ -1065,7 +1074,7 @@ class Parser(
       println(s"successfully parsed sumOp: next pos = ${pos + 1}")
 
       return new ParseResult(
-        new Node("sum_op", new Node(tokens(pos)) :: Nil),
+        new SumOp("sum_op", new Terminal(tokens(pos)) :: Nil),
         pos + 1
       )
     } else {
@@ -1087,7 +1096,7 @@ class Parser(
       println(s"successfully parsed mulOp: next pos = ${pos + 1}")
 
       return new ParseResult(
-        new Node("mul_op", new Node(tokens(pos)) :: Nil),
+        new MulOp("mul_op", new Terminal(tokens(pos)) :: Nil),
         pos + 1
       )
     } else {
@@ -1111,7 +1120,7 @@ class Parser(
       println(s"successfully parsed id: next pos = ${pos + 1}")
 
       return new ParseResult(
-        new Node("id", new Node(tokens(pos)) :: Nil),
+        new Ident("id", new Terminal(tokens(pos)) :: Nil),
         pos + 1
       )
     } else {
@@ -1132,7 +1141,7 @@ class Parser(
       println(s"successfully parsed const: next pos = ${pos + 1}")
 
       return new ParseResult(
-        new Node("const", new Node(tokens(pos)) :: Nil),
+        new Const("const", new Terminal(tokens(pos)) :: Nil),
         pos + 1
       )
     } else {

@@ -1,6 +1,6 @@
 {
-    f = t + r - ( a and r ) ;
+    f = t + r - ( a and "string" ) ;
     {
-        w = - q or ( + t )
+        w = - q or ( + 5 )
     }
 }

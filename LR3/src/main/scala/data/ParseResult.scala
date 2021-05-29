@@ -1,5 +1,7 @@
 package data
 
+import data.nodes._
+
 import grammar.GrammarSymbol
 
 /** Result of pasing operation (contains parse tree or pasing errors).
