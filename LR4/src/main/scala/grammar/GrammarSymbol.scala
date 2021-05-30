@@ -18,4 +18,6 @@ class GrammarSymbol(
   if (stype == null) {
     throw new Exception("Invalid symbol type")
   }
+
+  override def toString(): String = s"< ${name} : ${stype} >\n"
 }

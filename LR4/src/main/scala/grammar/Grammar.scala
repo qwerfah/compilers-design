@@ -28,4 +28,11 @@ class Grammar(
   if (axiom == null) {
     throw new Exception("Invalid axiom")
   }
+
+  override def toString(): String = {
+    "NONTERMINALS:\n" + nonTerms +
+      "\nTERMINALS:'n" + terms +
+      "\nRULES:\n" + rules +
+      "\nAXIOM: " + axiom
+  }
 }

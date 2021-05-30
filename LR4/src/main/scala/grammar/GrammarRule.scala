@@ -7,11 +7,13 @@ package grammar
   * @param rhs Right-hand-side of the rule.
   */
 class GrammarRule(val lhs: List[GrammarSymbol], val rhs: List[GrammarSymbol]) {
-  if (lhs == null || lhs.isEmpty) {
+  if (lhs == null || lhs.isEmpty || lhs.length != 1) {
     throw new Exception("Invalid left-hand side of the rule")
   }
 
   if (rhs == null) {
     throw new Exception("Invalid right-hand side of the rule")
   }
+
+  override def toString(): String = s"${lhs.head} -> ${rhs}\n"
 }
