@@ -39,9 +39,9 @@ class ControlTable(grammar: Grammar) {
       term2: GrammarSymbol
   ): PrecedenceType = {
 
-    if (grammar.rules.exists(rule => true)) return PrecedenceType.Precedes
-    if (grammar.rules.exists(rule => true)) return PrecedenceType.Follows
-    if (grammar.rules.exists(rule => true)) return PrecedenceType.Neighbors
+    if (isPrecedes(term1, term2)) return PrecedenceType.Precedes
+    if (isFollows(term1, term2)) return PrecedenceType.Follows
+    if (isNeighbors(term1, term2)) return PrecedenceType.Neighbors
 
     PrecedenceType.None
   }
@@ -50,7 +50,58 @@ class ControlTable(grammar: Grammar) {
     * @param term1 First terminal symbol.
     * @param term2 Second terminal symbol.
     */
-  private def isPrecedesRule(term1: GrammarSymbol, term2: GrammarSymbol) {
+  private def isPrecedes(
+      term1: GrammarSymbol,
+      term2: GrammarSymbol
+  ): Boolean = {
+    // Select all rules of the form <U ->x term1 C y> where C is nonterminal
+    val rules = grammar.rules.filter(rule =>
+      rule.rhs.contains(term1) && rule
+        .rhs(rule.rhs.indexOf(term1) + 1)
+        .stype == SymbolType.NonTerm
+    )
+
+    for (rule <- rules) {
+      if (isPrecedeReachable(term2, rule.rhs(rule.rhs.indexOf(term1) + 1))) {
+        return true
+      }
+    }
+
+    false
+  }
+
+  /** Determine whether first symbol follows second symbol.
+    * @param term1 First terminal symbol.
+    * @param term2 Second terminal symbol.
+    */
+  private def isFollows(
+      term1: GrammarSymbol,
+      term2: GrammarSymbol
+  ): Boolean = {
+    // Select all rules of the form <U ->x term1 C y> where C is nonterminal
+    val rules = grammar.rules.filter(rule =>
+      rule.rhs.contains(term2) && rule
+        .rhs(rule.rhs.indexOf(term2) - 1)
+        .stype == SymbolType.NonTerm
+    )
+
+    for (rule <- rules) {
+      if (isFollowReachable(term1, rule.rhs(rule.rhs.indexOf(term2) - 1))) {
+        return true
+      }
+    }
+
+    false
+  }
+
+  /** Determine whether first symbol neighbors with second symbol.
+    * @param term1 First terminal symbol.
+    * @param term2 Second terminal symbol.
+    */
+  private def isNeighbors(
+      term1: GrammarSymbol,
+      term2: GrammarSymbol
+  ): Boolean = {
     grammar.rules.exists(rule => {
       val ind1 = rule.rhs.indexOf(term1)
       val ind2 = rule.rhs.indexOf(term2)
@@ -60,15 +111,25 @@ class ControlTable(grammar: Grammar) {
     })
   }
 
-  /** Determine whether first symbol follows second symbol.
-    * @param term1 First terminal symbol.
-    * @param term2 Second terminal symbol.
+  /** Determines if specified terminal symbol is reachable
+    * from specified nonterminal symbol for precedence.
+    * @param term Terminal symbol that should be deduced.
+    * @param nonterm Nonterminal symbol from which deduction starts.
+    * @return
     */
-  private def isFollowsRule(term1: GrammarSymbol, term2: GrammarSymbol) {}
+  private def isPrecedeReachable(
+      term: GrammarSymbol,
+      nonterm: GrammarSymbol
+  ): Boolean = {}
 
-  /** Determine whether first symbol neighbors with second symbol.
-    * @param term1 First terminal symbol.
-    * @param term2 Second terminal symbol.
+  /** Determines if specified terminal symbol is reachable
+    * from specified nonterminal symbol for succession.
+    * @param term Terminal symbol that should be deduced.
+    * @param nonterm Nonterminal symbol from which deduction starts.
+    * @return
     */
-  private def isNeighborsRule(term1: GrammarSymbol, term2: GrammarSymbol) {}
+  private def isFollowReachable(
+      term: GrammarSymbol,
+      nonterm: GrammarSymbol
+  ): Boolean = {}
 }
