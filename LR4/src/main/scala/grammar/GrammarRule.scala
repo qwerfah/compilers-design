@@ -6,7 +6,8 @@ package grammar
   * @param lhs Left-hand side of the rule.
   * @param rhs Right-hand-side of the rule.
   */
-class GrammarRule(val lhs: List[GrammarSymbol], val rhs: List[GrammarSymbol]) {
+class GrammarRule(val lhs: List[GrammarSymbol], val rhs: List[GrammarSymbol])
+    extends Ordered[GrammarRule] {
   if (lhs == null || lhs.isEmpty || lhs.length != 1) {
     throw new Exception("Invalid left-hand side of the rule")
   }
@@ -16,4 +17,20 @@ class GrammarRule(val lhs: List[GrammarSymbol], val rhs: List[GrammarSymbol]) {
   }
 
   override def toString(): String = s"${lhs.head} -> ${rhs}\n"
+
+  override def compare(that: GrammarRule): Int = {
+    val thisSymbols = lhs ::: rhs
+    val thatSymbols = that.lhs ::: that.rhs
+
+    val result = thisSymbols
+      .zip(thatSymbols)
+      .dropWhile(pair => pair._1.compare(pair._2) == 0)
+
+    if (result.isEmpty) {
+      thisSymbols.length - thatSymbols.length
+    } else {
+      result.head._1.compare(result.head._2)
+    }
+  }
+
 }

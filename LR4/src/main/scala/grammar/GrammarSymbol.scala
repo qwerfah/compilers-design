@@ -9,7 +9,7 @@ package grammar
 class GrammarSymbol(
     val name: String,
     val stype: SymbolType.SymbolType = SymbolType.Term
-) {
+) extends Ordered[GrammarSymbol] {
 
   if (name == null || name.isBlank()) {
     throw new Exception("Invalid name")
@@ -20,4 +20,6 @@ class GrammarSymbol(
   }
 
   override def toString(): String = s"< ${name} : ${stype} >\n"
+
+  override def compare(that: GrammarSymbol): Int = name.compare(that.name)
 }

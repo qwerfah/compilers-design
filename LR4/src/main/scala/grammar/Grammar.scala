@@ -1,5 +1,7 @@
 package grammar
 
+import scala.collection.immutable.SortedSet
+
 /** Specifies context-free grammar which represents a tuple consisnts of four elements.
   *
   * @param terms Set of terminal symbols.
@@ -8,9 +10,9 @@ package grammar
   * @param axiom Start symbol of grammar.
   */
 class Grammar(
-    val terms: Set[GrammarSymbol],
-    val nonTerms: Set[GrammarSymbol],
-    val rules: Set[GrammarRule],
+    val terms: SortedSet[GrammarSymbol],
+    val nonTerms: SortedSet[GrammarSymbol],
+    val rules: SortedSet[GrammarRule],
     val axiom: GrammarSymbol
 ) {
   if (terms == null || terms.isEmpty) {

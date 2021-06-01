@@ -6,6 +6,7 @@ import java.io._
 import scala.xml
 
 import grammar._
+import scala.collection.immutable.SortedSet
 
 /** Xml parser for xml files with xml context-free grammar representation.
   *
@@ -22,15 +23,13 @@ class XmlReader(filename: String) {
   def parse(): Grammar = {
     val terminals = (_grammar \ "terminalsymbols" \ "term")
       .map(term => new GrammarSymbol((term \ "@name").text, SymbolType.Term))
-      .toSet
 
     val nonterminals = (_grammar \ "nonterminalsymbols" \ "nonterm")
       .map(nonterm =>
         new GrammarSymbol((nonterm \ "@name").text, SymbolType.NonTerm)
       )
-      .toSet
 
-    val alphabet: Set[GrammarSymbol] = terminals ++ nonterminals
+    val alphabet: Seq[GrammarSymbol] = terminals ++ nonterminals
 
     val rules = (_grammar \ "productions" \ "production")
       .map(rule => {
@@ -40,20 +39,30 @@ class XmlReader(filename: String) {
             .get
         )
 
-        val rhs = (rule \ "rhs" \ "symbol")
-          .map(symbol =>
-            alphabet.find(s => s.name == (symbol \ "@name").text).get
+        val rhs = (rule \ "rhs")
+          .map(rhs =>
+            (rhs \ "symbol")
+              .map(symbol =>
+                alphabet.find(s => s.name == (symbol \ "@name").text).get
+              )
+              .toList
           )
           .toList
 
-        new GrammarRule(lhs, rhs)
+        rhs.map(r => new GrammarRule(lhs, r))
+
       })
-      .toSet
+      .flatten
 
     val axiom = (terminals ++ nonterminals)
       .find(s => s.name == (_grammar \ "startsymbol" \ "@name").text)
       .get
 
-    new Grammar(terminals, nonterminals, rules, axiom)
+    new Grammar(
+      SortedSet(terminals: _*),
+      SortedSet(nonterminals: _*),
+      SortedSet(rules: _*),
+      axiom
+    )
   }
 }

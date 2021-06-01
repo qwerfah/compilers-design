@@ -41,7 +41,32 @@
             </rhs>
             <rhs>
                 <symbol type="nonterm" name="simple_expr" />
-                <symbol type="nonterm" name="rel_op" />
+                <symbol type="term" name="==" />
+                <symbol type="nonterm" name="simple_expr" />
+            </rhs>
+            <rhs>
+                <symbol type="nonterm" name="simple_expr" />
+                <symbol type="term" name="&lt;&gt;" />
+                <symbol type="nonterm" name="simple_expr" />
+            </rhs>
+            <rhs>
+                <symbol type="nonterm" name="simple_expr" />
+                <symbol type="term" name="&lt;" />
+                <symbol type="nonterm" name="simple_expr" />
+            </rhs>
+            <rhs>
+                <symbol type="nonterm" name="simple_expr" />
+                <symbol type="term" name="&lt;=" />
+                <symbol type="nonterm" name="simple_expr" />
+            </rhs>
+            <rhs>
+                <symbol type="nonterm" name="simple_expr" />
+                <symbol type="term" name="&gt;" />
+                <symbol type="nonterm" name="simple_expr" />
+            </rhs>
+            <rhs>
+                <symbol type="nonterm" name="simple_expr" />
+                <symbol type="term" name="&gt;=" />
                 <symbol type="nonterm" name="simple_expr" />
             </rhs>
         </production>
@@ -51,12 +76,26 @@
                 <symbol type="nonterm" name="term" />
             </rhs>
             <rhs>
-                <symbol type="nonterm" name="sign" />
+                <symbol type="term" name="+" />
+                <symbol type="nonterm" name="term" />
+            </rhs>
+            <rhs>
+                <symbol type="term" name="-" />
                 <symbol type="nonterm" name="term" />
             </rhs>
             <rhs>
                 <symbol type="nonterm" name="simple_expr" />
-                <symbol type="nonterm" name="sum_op" />
+                <symbol type="term" name="+" />
+                <symbol type="nonterm" name="term" />
+            </rhs>
+            <rhs>
+                <symbol type="nonterm" name="simple_expr" />
+                <symbol type="term" name="-" />
+                <symbol type="nonterm" name="term" />
+            </rhs>
+            <rhs>
+                <symbol type="nonterm" name="simple_expr" />
+                <symbol type="term" name="or" />
                 <symbol type="nonterm" name="term" />
             </rhs>
         </production>
@@ -67,7 +106,27 @@
             </rhs>
             <rhs>
                 <symbol type="nonterm" name="term" />
-                <symbol type="nonterm" name="mul_op" />
+                <symbol type="term" name="*" />
+                <symbol type="nonterm" name="factor" />
+            </rhs>
+            <rhs>
+                <symbol type="nonterm" name="term" />
+                <symbol type="term" name="/" />
+                <symbol type="nonterm" name="factor" />
+            </rhs>
+            <rhs>
+                <symbol type="nonterm" name="term" />
+                <symbol type="term" name="div" />
+                <symbol type="nonterm" name="factor" />
+            </rhs>
+            <rhs>
+                <symbol type="nonterm" name="term" />
+                <symbol type="term" name="mod" />
+                <symbol type="nonterm" name="factor" />
+            </rhs>
+            <rhs>
+                <symbol type="nonterm" name="term" />
+                <symbol type="term" name="and" />
                 <symbol type="nonterm" name="factor" />
             </rhs>
         </production>
@@ -87,42 +146,6 @@
             <rhs>
                 <symbol type="term" name="not" />
                 <symbol type="nonterm" name="factor" />
-            </rhs>
-        </production>
-        <production>
-            <lhs name="sign" />
-            <rhs>
-                <symbol type="term" name="+" />
-                <symbol type="term" name="-" />
-            </rhs>
-        </production>
-        <production>
-            <lhs name="rel_op" />
-            <rhs>
-                <symbol type="term" name="==" />
-                <symbol type="term" name="&lt;&gt;" />
-                <symbol type="term" name="&lt;" />
-                <symbol type="term" name="&lt;=" />
-                <symbol type="term" name="&gt;" />
-                <symbol type="term" name=">=" />
-            </rhs>
-        </production>
-        <production>
-            <lhs name="sum_op" />
-            <rhs>
-                <symbol type="term" name="+" />
-                <symbol type="term" name="-" />
-                <symbol type="term" name="or" />
-            </rhs>
-        </production>
-        <production>
-            <lhs name="mul_op" />
-            <rhs>
-                <symbol type="term" name="*" />
-                <symbol type="term" name="/" />
-                <symbol type="term" name="div" />
-                <symbol type="term" name="mod" />
-                <symbol type="term" name="and" />
             </rhs>
         </production>
     </productions>
