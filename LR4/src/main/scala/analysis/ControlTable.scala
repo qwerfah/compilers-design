@@ -10,6 +10,8 @@ import PrecedenceType._
   */
 class ControlTable(grammar: Grammar) {
   type RawTable = Map[(GrammarSymbol, GrammarSymbol), PrecedenceType]
+  type ExtremeSymbolTable =
+    Map[GrammarSymbol, (Set[GrammarSymbol], Set[GrammarSymbol])]
 
   val table: RawTable = buildTable()
 
@@ -27,6 +29,15 @@ class ControlTable(grammar: Grammar) {
         (pair.head, pair.last) -> determineRelation(pair.head, pair.last)
       })
       .toMap
+  }
+
+  def buildExtremeSymbolTable(
+  ): ExtremeSymbolTable = {
+    val table = grammar.nonTerms.map(nt => {
+      val rules = grammar.rules.filter(r => r.lhs.contains(nt))
+      (nt -> (rules.map(r => r.rhs.head), rules.map(r => r.rhs.last)))
+    })
+
   }
 
   /** Determine precedence relation between two terminal symbols.
@@ -120,7 +131,7 @@ class ControlTable(grammar: Grammar) {
   private def isPrecedeReachable(
       term: GrammarSymbol,
       nonterm: GrammarSymbol
-  ): Boolean = {}
+  ): Boolean = { true }
 
   /** Determines if specified terminal symbol is reachable
     * from specified nonterminal symbol for succession.
@@ -131,5 +142,5 @@ class ControlTable(grammar: Grammar) {
   private def isFollowReachable(
       term: GrammarSymbol,
       nonterm: GrammarSymbol
-  ): Boolean = {}
+  ): Boolean = { true }
 }
