@@ -8,5 +8,8 @@ package analysis
   */
 object PrecedenceType extends Enumeration {
   type PrecedenceType = Value
-  val Precedes, Follows, Neighbors, None = Value
+  val Precedes = Value("<.")
+  val Follows = Value(".>")
+  val Neighbors = Value("=.")
+  val No = Value("-")
 }

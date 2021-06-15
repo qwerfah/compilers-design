@@ -19,7 +19,7 @@ class GrammarSymbol(
     throw new Exception("Invalid symbol type")
   }
 
-  override def toString(): String = s"< ${name} : ${stype} >\n"
+  override def toString(): String = name // s"< ${name} : ${stype} >\n"
 
   override def compare(that: GrammarSymbol): Int = name.compare(that.name)
 }

@@ -1,6 +1,7 @@
 package analysis
 
 import grammar._
+import scala.collection.immutable.SortedSet
 
 import PrecedenceType._
 
@@ -13,46 +14,98 @@ class ControlTable(val grammar: Grammar) {
   type ExtremeSymbolTable =
     Map[GrammarSymbol, (Set[GrammarSymbol], Set[GrammarSymbol])]
 
-  val table: RawTable = buildTable()
+  val table: Map[(GrammarSymbol, GrammarSymbol), PrecedenceType] =
+    buildControlTable()
 
   /** Build control table for all terminal symbols based on grammar data.
     * @return Raw representation of control table (map).
     */
-  private def buildControlTable(): Unit = {
+  private def buildControlTable(): RawTable = {
     val extremeTable = buildExtremeTerminalTable()
-    var controlTable = Map[(GrammarSymbol, GrammarSymbol), PrecedenceType.PrecedenceType]()
-    
-    def getNextTerm(term: GrammarSymbol)(rule: GrammarRule): Option[GrammarSymbol] = {
+    var controlTable =
+      Map[(GrammarSymbol, GrammarSymbol), PrecedenceType.PrecedenceType]()
+
+    /** Get terminal symbol following specified terminal.
+      * @param term Terminal ыньищд to search for next.
+      * @param rule Grammar rule that presumably contains required symbols.
+      * @return Required terminal symbol or none if not found.
+      */
+    def getNextTerm(
+        term: GrammarSymbol
+    )(rule: GrammarRule): Option[GrammarSymbol] = {
       if (!rule.rhs.contains(term)) return None
-      
+
       val ind = rule.rhs.indexOf(term)
 
-      return if (rule.rhs.isDefinedAt(ind + 1) && 
-                 grammar.terms.contains(rule.rhs(ind + 1))) Option(rule.rhs(ind + 1))
-        else if (rule.rhs.isDefinedAt(ind + 2) && 
-                 grammar.terms.contains(rule.rhs(ind + 2))) Option(rule.rhs(ind + 2))
-        else None
+      return if (
+        rule.rhs.isDefinedAt(ind + 1) &&
+        rule.rhs(ind + 1).stype == SymbolType.Term
+      ) Option(rule.rhs(ind + 1))
+      else if (
+        rule.rhs.isDefinedAt(ind + 2) &&
+        rule.rhs(ind + 2).stype == SymbolType.Term
+      ) Option(rule.rhs(ind + 2))
+      else None
     }
-    
-    def getNextNonterm(term: GrammarSymbol)(rule: GrammarRule): Option[GrammarSymbol] = {
+
+    /** Get nonterminal symbol following or precedes specified terminal.
+      *
+      * @param term Terminal symbol to search for next.
+      * @param rule Grammar rule that presumably contains required symbols.
+      * @return Required nonterminal symbol or none if not found.
+      */
+    def getNonterm(
+        term: GrammarSymbol,
+        offset: Int
+    )(rule: GrammarRule): Option[GrammarSymbol] = {
       if (!rule.rhs.contains(term)) return None
-      
+
       val ind = rule.rhs.indexOf(term)
-      
-      return if (rule.rhs.isDefinedAt(ind + 1) && 
-                 grammar.nonTerms.contains(rule.rhs(ind + 1))) Option(rule.rhs(ind + 1))
-        else None
+
+      return if (
+        rule.rhs.isDefinedAt(ind + offset) &&
+        rule.rhs(ind + offset).stype == SymbolType.NonTerm
+      ) Option(rule.rhs(ind + offset))
+      else None
     }
 
     for (term <- grammar.terms) {
       val neighborSymbols = grammar.rules.map(getNextTerm(term) _).flatten
-      
+
+      // Step 1: fill in table cells for symbols that have common basis with current
       for (symbol <- neighborSymbols) {
         controlTable += ((term, symbol) -> PrecedenceType.Neighbors)
       }
-      
-      val nonterms = grammar.rules.map(getNextNonterm(term) _).flatten
+
+      // Step 2: fill in table cells for symbols that precedes current in some basis
+      val leftmost = grammar.rules.map(getNonterm(term, 1) _).flatten
+      controlTable ++= leftmost
+        .map(nt => extremeTable(nt)._1)
+        .flatten
+        .filter(s => s.stype == SymbolType.Term)
+        .map(s => (term, s) -> PrecedenceType.Precedes)
+
+      // Step 3: fill in table cells for symbols that follows current in some basis
+      val rightmost = grammar.rules.map(getNonterm(term, -1) _).flatten
+      controlTable ++= rightmost
+        .map(nt => extremeTable(nt)._2)
+        .flatten
+        .filter(s => s.stype == SymbolType.Term)
+        .map(s => (s, term) -> PrecedenceType.Follows)
     }
+
+    val start = new GrammarSymbol("start")
+    val stop = new GrammarSymbol("stop")
+
+    controlTable ++= extremeTable(grammar.axiom)._1
+      .filter(s => s.stype == SymbolType.Term)
+      .map(s => ((start, s) -> PrecedenceType.Precedes))
+
+    controlTable ++= extremeTable(grammar.axiom)._2
+      .filter(s => s.stype == SymbolType.Term)
+      .map(s => ((s, stop) -> PrecedenceType.Follows))
+
+    return controlTable
   }
 
   /** Build extreme (leftmost and rightmost) nonterminal symbols table.
@@ -73,24 +126,27 @@ class ControlTable(val grammar: Grammar) {
     while (isChanged) {
       var updatedTable =
         Map[GrammarSymbol, (Set[GrammarSymbol], Set[GrammarSymbol])]()
+      isChanged = false
 
-      for (str <- table) {
-        val leftmost = str._2._1
+      for ((symbol, sets) <- table) {
+        val leftmost1 = sets._1
           .filter(s => table.contains(s))
           .map(s => table(s)._1)
-          .flatten ++ str._2._1
-        
-        val rightmost = str._2._2
+          .flatten
+
+        val leftmost = leftmost1 ++ sets._1
+
+        val rightmost = sets._2
           .filter(s => table.contains(s))
           .map(s => table(s)._2)
-          .flatten ++ str._2._2
-        
-        updatedTable = updatedTable + (str._1 -> (leftmost, rightmost))
-        
-        isChanged = if (
-          !(leftmost &~ str._2._1).isEmpty || !(rightmost &~ str._2._2).isEmpty
-        ) true
-        else isChanged
+          .flatten ++ sets._2
+
+        updatedTable += (symbol -> (leftmost, rightmost))
+
+        isChanged =
+          if (!(leftmost &~ sets._1).isEmpty || !(rightmost &~ sets._2).isEmpty)
+            true
+          else isChanged
       }
 
       table = updatedTable
@@ -112,32 +168,52 @@ class ControlTable(val grammar: Grammar) {
 
       val leftmost = rules
         .filter(r =>
-          grammar.terms.contains(r.rhs.head) || 
-          grammar.terms.contains(r.rhs.tail.head)
+          r.rhs.head.stype == SymbolType.Term ||
+            (r.rhs.isDefinedAt(1) &&
+              r.rhs.tail.head.stype == SymbolType.Term)
         )
         .map(r =>
-          if (grammar.terms.contains(r.rhs.head)) r.rhs.head
+          if (r.rhs.head.stype == SymbolType.Term) r.rhs.head
           else r.rhs.tail.head
         )
-      
-      val rightmost = rules.filter(r => grammar.terms.contains(r.rhs.last)).map(r => r.rhs.last)
+
+      val rightmost = rules
+        .filter(r => r.rhs.last.stype == SymbolType.Term)
+        .map(r => r.rhs.last)
       termTable += (nt -> (leftmost, rightmost))
     }
-    
-    for (str <- table) {
-      val leftmost = str._2._1
-        .filter(s => table.contains(s))
+
+    for ((symbol, sets) <- table) {
+      val leftmost = sets._1
+        .filter(s => termTable.contains(s))
         .map(s => termTable(s)._1)
-        .flatten ++ termTable(str._1)._1
+        .flatten ++ termTable(symbol)._1
 
-      val rightmost = str._2._2
-        .filter(s => table.contains(s))
+      val rightmost = sets._2
+        .filter(s => termTable.contains(s))
         .map(s => termTable(s)._2)
-        .flatten ++ termTable(str._1)._2
+        .flatten ++ termTable(symbol)._2
 
-      termTable = termTable + (str._1 -> (leftmost, rightmost))
+      termTable = termTable.updated(symbol, (leftmost, rightmost))
     }
-    
+
     return table
+  }
+
+  override def toString(): String = {
+    val (rows, cols) = {
+      val (r, c) = table.keys.unzip
+      (SortedSet(r.toSeq: _*).toList, SortedSet(c.toSeq: _*).toList)
+    }
+
+    ("      " +: cols).map("%5s |".format(_)).mkString + "\n" +
+      rows
+        .map { r =>
+          "-" + "------|" * (cols.length + 1) + "\n" +
+            "%5s  |".format(r.name) + cols.map { c =>
+              "%4s  |".format(table.getOrElse((r, c), "--"))
+            }.mkString
+        }
+        .mkString("\n")
   }
 }

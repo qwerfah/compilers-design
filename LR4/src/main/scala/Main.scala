@@ -8,9 +8,7 @@ object Main extends App {
 
   println(grammar)
 
-  val list = List(1, 2, 3) :: List(4, 5, 6) :: Nil
-
-  println(list.reduce((a, b) => a ::: b))
-
   val table = new ControlTable(grammar)
+
+  println(table)
 }
