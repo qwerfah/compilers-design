@@ -32,5 +32,4 @@ class GrammarRule(val lhs: List[GrammarSymbol], val rhs: List[GrammarSymbol])
       result.head._1.compare(result.head._2)
     }
   }
-
 }

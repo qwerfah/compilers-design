@@ -8,7 +8,7 @@ import PrecedenceType._
   * syntax analysis algorithm of operator precedence.
   * @param grammar Operator precedence grammar.
   */
-class ControlTable(grammar: Grammar) {
+class ControlTable(val grammar: Grammar) {
   type RawTable = Map[(GrammarSymbol, GrammarSymbol), PrecedenceType]
   type ExtremeSymbolTable =
     Map[GrammarSymbol, (Set[GrammarSymbol], Set[GrammarSymbol])]
@@ -18,129 +18,126 @@ class ControlTable(grammar: Grammar) {
   /** Build control table for all terminal symbols based on grammar data.
     * @return Raw representation of control table (map).
     */
-  private def buildTable(): RawTable = {
-    if (grammar.terms.isEmpty) {
-      throw new Exception("Invalid grammar (no terminal symbols)")
+  private def buildControlTable(): Unit = {
+    val extremeTable = buildExtremeTerminalTable()
+    var controlTable = Map[(GrammarSymbol, GrammarSymbol), PrecedenceType.PrecedenceType]()
+    
+    def getNextTerm(term: GrammarSymbol)(rule: GrammarRule): Option[GrammarSymbol] = {
+      if (!rule.rhs.contains(term)) return None
+      
+      val ind = rule.rhs.indexOf(term)
+
+      return if (rule.rhs.isDefinedAt(ind + 1) && 
+                 grammar.terms.contains(rule.rhs(ind + 1))) Option(rule.rhs(ind + 1))
+        else if (rule.rhs.isDefinedAt(ind + 2) && 
+                 grammar.terms.contains(rule.rhs(ind + 2))) Option(rule.rhs(ind + 2))
+        else None
+    }
+    
+    def getNextNonterm(term: GrammarSymbol)(rule: GrammarRule): Option[GrammarSymbol] = {
+      if (!rule.rhs.contains(term)) return None
+      
+      val ind = rule.rhs.indexOf(term)
+      
+      return if (rule.rhs.isDefinedAt(ind + 1) && 
+                 grammar.nonTerms.contains(rule.rhs(ind + 1))) Option(rule.rhs(ind + 1))
+        else None
     }
 
-    grammar.terms.toList
-      .combinations(2)
-      .map(pair => {
-        (pair.head, pair.last) -> determineRelation(pair.head, pair.last)
-      })
-      .toMap
+    for (term <- grammar.terms) {
+      val neighborSymbols = grammar.rules.map(getNextTerm(term) _).flatten
+      
+      for (symbol <- neighborSymbols) {
+        controlTable += ((term, symbol) -> PrecedenceType.Neighbors)
+      }
+      
+      val nonterms = grammar.rules.map(getNextNonterm(term) _).flatten
+    }
   }
 
-  def buildExtremeSymbolTable(
-  ): ExtremeSymbolTable = {
-    val table = grammar.nonTerms.map(nt => {
+  /** Build extreme (leftmost and rightmost) nonterminal symbols table.
+    * @return Extreme nonterminal symbols table.
+    */
+  def buildExtremeNonterminalTable(): ExtremeSymbolTable = {
+    var table = Map[GrammarSymbol, (Set[GrammarSymbol], Set[GrammarSymbol])]()
+
+    for (nt <- grammar.nonTerms) {
       val rules = grammar.rules.filter(r => r.lhs.contains(nt))
-      (nt -> (rules.map(r => r.rhs.head), rules.map(r => r.rhs.last)))
-    })
-
-  }
-
-  /** Determine precedence relation between two terminal symbols.
-    * @param term1 First terminal symbol.
-    * @param term2 Second terminal symbol.
-    * @return Type of precedence relation between specified symbols.
-    */
-  def determineRelation(
-      term1: GrammarSymbol,
-      term2: GrammarSymbol
-  ): PrecedenceType = {
-
-    if (isPrecedes(term1, term2)) return PrecedenceType.Precedes
-    if (isFollows(term1, term2)) return PrecedenceType.Follows
-    if (isNeighbors(term1, term2)) return PrecedenceType.Neighbors
-
-    PrecedenceType.None
-  }
-
-  /** Determine whether first symbol precedes second symbol.
-    * @param term1 First terminal symbol.
-    * @param term2 Second terminal symbol.
-    */
-  private def isPrecedes(
-      term1: GrammarSymbol,
-      term2: GrammarSymbol
-  ): Boolean = {
-    // Select all rules of the form <U ->x term1 C y> where C is nonterminal
-    val rules = grammar.rules.filter(rule =>
-      rule.rhs.contains(term1) && rule
-        .rhs(rule.rhs.indexOf(term1) + 1)
-        .stype == SymbolType.NonTerm
-    )
-
-    for (rule <- rules) {
-      if (isPrecedeReachable(term2, rule.rhs(rule.rhs.indexOf(term1) + 1))) {
-        return true
-      }
+      val pair =
+        (rules.map(r => r.rhs.head).toSet, rules.map(r => r.rhs.last).toSet)
+      table = table + (nt -> pair)
     }
 
-    false
-  }
+    var isChanged = true
 
-  /** Determine whether first symbol follows second symbol.
-    * @param term1 First terminal symbol.
-    * @param term2 Second terminal symbol.
-    */
-  private def isFollows(
-      term1: GrammarSymbol,
-      term2: GrammarSymbol
-  ): Boolean = {
-    // Select all rules of the form <U ->x term1 C y> where C is nonterminal
-    val rules = grammar.rules.filter(rule =>
-      rule.rhs.contains(term2) && rule
-        .rhs(rule.rhs.indexOf(term2) - 1)
-        .stype == SymbolType.NonTerm
-    )
+    while (isChanged) {
+      var updatedTable =
+        Map[GrammarSymbol, (Set[GrammarSymbol], Set[GrammarSymbol])]()
 
-    for (rule <- rules) {
-      if (isFollowReachable(term1, rule.rhs(rule.rhs.indexOf(term2) - 1))) {
-        return true
+      for (str <- table) {
+        val leftmost = str._2._1
+          .filter(s => table.contains(s))
+          .map(s => table(s)._1)
+          .flatten ++ str._2._1
+        
+        val rightmost = str._2._2
+          .filter(s => table.contains(s))
+          .map(s => table(s)._2)
+          .flatten ++ str._2._2
+        
+        updatedTable = updatedTable + (str._1 -> (leftmost, rightmost))
+        
+        isChanged = if (
+          !(leftmost &~ str._2._1).isEmpty || !(rightmost &~ str._2._2).isEmpty
+        ) true
+        else isChanged
       }
+
+      table = updatedTable
     }
 
-    false
+    return table
   }
 
-  /** Determine whether first symbol neighbors with second symbol.
-    * @param term1 First terminal symbol.
-    * @param term2 Second terminal symbol.
+  /** Build extreme (leftmost and rightmost) terminal symbols table.
+    * @return Extreme terminal symbols table.
     */
-  private def isNeighbors(
-      term1: GrammarSymbol,
-      term2: GrammarSymbol
-  ): Boolean = {
-    grammar.rules.exists(rule => {
-      val ind1 = rule.rhs.indexOf(term1)
-      val ind2 = rule.rhs.indexOf(term2)
-      (ind2 - ind1 == 1) || (ind2 - ind1 == 2 && rule
-        .rhs(ind1 + 1)
-        .stype == SymbolType.NonTerm)
-    })
+  def buildExtremeTerminalTable(): ExtremeSymbolTable = {
+    val table = buildExtremeNonterminalTable()
+    var termTable =
+      Map[GrammarSymbol, (Set[GrammarSymbol], Set[GrammarSymbol])]()
+
+    for (nt <- grammar.nonTerms) {
+      val rules = grammar.rules.filter(r => r.lhs.contains(nt))
+
+      val leftmost = rules
+        .filter(r =>
+          grammar.terms.contains(r.rhs.head) || 
+          grammar.terms.contains(r.rhs.tail.head)
+        )
+        .map(r =>
+          if (grammar.terms.contains(r.rhs.head)) r.rhs.head
+          else r.rhs.tail.head
+        )
+      
+      val rightmost = rules.filter(r => grammar.terms.contains(r.rhs.last)).map(r => r.rhs.last)
+      termTable += (nt -> (leftmost, rightmost))
+    }
+    
+    for (str <- table) {
+      val leftmost = str._2._1
+        .filter(s => table.contains(s))
+        .map(s => termTable(s)._1)
+        .flatten ++ termTable(str._1)._1
+
+      val rightmost = str._2._2
+        .filter(s => table.contains(s))
+        .map(s => termTable(s)._2)
+        .flatten ++ termTable(str._1)._2
+
+      termTable = termTable + (str._1 -> (leftmost, rightmost))
+    }
+    
+    return table
   }
-
-  /** Determines if specified terminal symbol is reachable
-    * from specified nonterminal symbol for precedence.
-    * @param term Terminal symbol that should be deduced.
-    * @param nonterm Nonterminal symbol from which deduction starts.
-    * @return
-    */
-  private def isPrecedeReachable(
-      term: GrammarSymbol,
-      nonterm: GrammarSymbol
-  ): Boolean = { true }
-
-  /** Determines if specified terminal symbol is reachable
-    * from specified nonterminal symbol for succession.
-    * @param term Terminal symbol that should be deduced.
-    * @param nonterm Nonterminal symbol from which deduction starts.
-    * @return
-    */
-  private def isFollowReachable(
-      term: GrammarSymbol,
-      nonterm: GrammarSymbol
-  ): Boolean = { true }
 }
