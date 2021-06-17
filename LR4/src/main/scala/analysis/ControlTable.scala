@@ -9,10 +9,9 @@ import PrecedenceType._
   * syntax analysis algorithm of operator precedence.
   * @param grammar Operator precedence grammar.
   */
-class ControlTable(val grammar: Grammar) {
-  type RawTable = Map[(GrammarSymbol, GrammarSymbol), PrecedenceType]
-  type ExtremeSymbolTable =
-    Map[GrammarSymbol, (Set[GrammarSymbol], Set[GrammarSymbol])]
+class ControlTable(var grammar: Grammar) {
+  val boarder = new GrammarSymbol("$")
+  val axiom = new GrammarSymbol("axiom")
 
   val table: Map[(GrammarSymbol, GrammarSymbol), PrecedenceType] =
     buildControlTable()
@@ -20,10 +19,8 @@ class ControlTable(val grammar: Grammar) {
   /** Build control table for all terminal symbols based on grammar data.
     * @return Raw representation of control table (map).
     */
-  private def buildControlTable(): RawTable = {
-    val extremeTable = buildExtremeTerminalTable()
-    var controlTable =
-      Map[(GrammarSymbol, GrammarSymbol), PrecedenceType.PrecedenceType]()
+  private def buildControlTable()
+      : Map[(GrammarSymbol, GrammarSymbol), PrecedenceType] = {
 
     /** Get terminal symbol following specified terminal.
       * @param term Terminal ыньищд to search for next.
@@ -69,6 +66,22 @@ class ControlTable(val grammar: Grammar) {
       else None
     }
 
+    /*
+    grammar = new Grammar(
+      this.grammar.terms + boarder,
+      this.grammar.nonTerms + axiom,
+      this.grammar.rules + new GrammarRule(
+        axiom :: Nil,
+        boarder :: this.grammar.axiom :: boarder :: Nil
+      ),
+      axiom
+    )
+     */
+
+    val extremeTable = buildExtremeTerminalTable()
+    var controlTable =
+      Map[(GrammarSymbol, GrammarSymbol), PrecedenceType.PrecedenceType]()
+
     for (term <- grammar.terms) {
       val neighborSymbols = grammar.rules.map(getNextTerm(term) _).flatten
 
@@ -92,18 +105,27 @@ class ControlTable(val grammar: Grammar) {
         .flatten
         .filter(s => s.stype == SymbolType.Term)
         .map(s => (s, term) -> PrecedenceType.Follows)
-    }
 
-    val start = new GrammarSymbol("start")
-    val stop = new GrammarSymbol("stop")
+      /** Step 4: fill in table cells for start and stop symbol
+        *      if (extremeTable.contains(term)) {
+        *        controlTable ++= extremeTable(term)._1
+        *          .filter(s => s.stype == SymbolType.Term)
+        *          .map(s => ((start, s) -> PrecedenceType.Precedes))
+        *
+        *        controlTable ++= extremeTable(term)._2
+        *          .filter(s => s.stype == SymbolType.Term)
+        *          .map(s => ((s, stop) -> PrecedenceType.Follows))
+        *      }
+        */
+    }
 
     controlTable ++= extremeTable(grammar.axiom)._1
       .filter(s => s.stype == SymbolType.Term)
-      .map(s => ((start, s) -> PrecedenceType.Precedes))
+      .map(s => ((boarder, s) -> PrecedenceType.Precedes))
 
     controlTable ++= extremeTable(grammar.axiom)._2
       .filter(s => s.stype == SymbolType.Term)
-      .map(s => ((s, stop) -> PrecedenceType.Follows))
+      .map(s => ((s, boarder) -> PrecedenceType.Follows))
 
     return controlTable
   }
@@ -111,45 +133,39 @@ class ControlTable(val grammar: Grammar) {
   /** Build extreme (leftmost and rightmost) nonterminal symbols table.
     * @return Extreme nonterminal symbols table.
     */
-  def buildExtremeNonterminalTable(): ExtremeSymbolTable = {
+  def buildExtremeNonterminalTable()
+      : Map[GrammarSymbol, (Set[GrammarSymbol], Set[GrammarSymbol])] = {
     var table = Map[GrammarSymbol, (Set[GrammarSymbol], Set[GrammarSymbol])]()
 
     for (nt <- grammar.nonTerms) {
       val rules = grammar.rules.filter(r => r.lhs.contains(nt))
       val pair =
         (rules.map(r => r.rhs.head).toSet, rules.map(r => r.rhs.last).toSet)
-      table = table + (nt -> pair)
+      table += (nt -> pair)
     }
 
     var isChanged = true
 
     while (isChanged) {
-      var updatedTable =
-        Map[GrammarSymbol, (Set[GrammarSymbol], Set[GrammarSymbol])]()
       isChanged = false
 
       for ((symbol, sets) <- table) {
-        val leftmost1 = sets._1
+        val leftmost = sets._1
           .filter(s => table.contains(s))
           .map(s => table(s)._1)
-          .flatten
-
-        val leftmost = leftmost1 ++ sets._1
+          .flatten ++ sets._1
 
         val rightmost = sets._2
           .filter(s => table.contains(s))
           .map(s => table(s)._2)
           .flatten ++ sets._2
 
-        updatedTable += (symbol -> (leftmost, rightmost))
+        table += (symbol -> (leftmost, rightmost))
 
-        isChanged =
-          if (!(leftmost &~ sets._1).isEmpty || !(rightmost &~ sets._2).isEmpty)
-            true
-          else isChanged
+        if (leftmost != sets._1 || rightmost != sets._2) {
+          isChanged = true
+        }
       }
-
-      table = updatedTable
     }
 
     return table
@@ -158,8 +174,10 @@ class ControlTable(val grammar: Grammar) {
   /** Build extreme (leftmost and rightmost) terminal symbols table.
     * @return Extreme terminal symbols table.
     */
-  def buildExtremeTerminalTable(): ExtremeSymbolTable = {
+  def buildExtremeTerminalTable()
+      : Map[GrammarSymbol, (Set[GrammarSymbol], Set[GrammarSymbol])] = {
     val table = buildExtremeNonterminalTable()
+
     var termTable =
       Map[GrammarSymbol, (Set[GrammarSymbol], Set[GrammarSymbol])]()
 
@@ -178,8 +196,16 @@ class ControlTable(val grammar: Grammar) {
         )
 
       val rightmost = rules
-        .filter(r => r.rhs.last.stype == SymbolType.Term)
-        .map(r => r.rhs.last)
+        .filter(r =>
+          r.rhs.last.stype == SymbolType.Term ||
+            (r.rhs.isDefinedAt(r.rhs.length - 2) &&
+              r.rhs(r.rhs.length - 2).stype == SymbolType.Term)
+        )
+        .map(r =>
+          if (r.rhs.last.stype == SymbolType.Term) r.rhs.last
+          else r.rhs(r.rhs.length - 2)
+        )
+
       termTable += (nt -> (leftmost, rightmost))
     }
 
@@ -194,10 +220,10 @@ class ControlTable(val grammar: Grammar) {
         .map(s => termTable(s)._2)
         .flatten ++ termTable(symbol)._2
 
-      termTable = termTable.updated(symbol, (leftmost, rightmost))
+      termTable += (symbol -> (leftmost, rightmost))
     }
 
-    return table
+    return termTable
   }
 
   override def toString(): String = {
