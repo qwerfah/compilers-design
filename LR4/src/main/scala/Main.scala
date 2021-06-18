@@ -20,7 +20,7 @@ object Main extends App {
   println(table)
 
   val parser = new Parser(grammar, table)
-  val input = "\"str\" + 56 - ( 78 or ( 12 + 22 ) ) * 11"
+  val input = "\"str\" + 56 - ( 78 or 12 * 22 ) * 11"
   val lexer = new SimpleLexer(grammar)
   var tokens: List[GrammarSymbol] = null
 
