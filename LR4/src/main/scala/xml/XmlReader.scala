@@ -22,7 +22,13 @@ class XmlReader(filename: String) {
     */
   def parse(): Grammar = {
     val terminals = (_grammar \ "terminalsymbols" \ "term")
-      .map(term => new GrammarSymbol((term \ "@name").text, SymbolType.Term))
+      .map(term =>
+        new GrammarSymbol(
+          (term \ "@name").text,
+          SymbolType.Term,
+          Option((term \ "@regex").text.r)
+        )
+      )
 
     val nonterminals = (_grammar \ "nonterminalsymbols" \ "nonterm")
       .map(nonterm =>

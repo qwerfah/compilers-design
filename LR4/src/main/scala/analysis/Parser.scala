@@ -37,7 +37,7 @@ class Parser(val grammar: Grammar, val table: ControlTable) {
         rhs = stack.pop() +: rhs
       }
 
-      println("conv: ", rhs)
+      // println("conv: ", rhs)
 
       val rule = grammar.rules.find(matchRule(rhs) _)
 
@@ -45,7 +45,9 @@ class Parser(val grammar: Grammar, val table: ControlTable) {
         throw new NoSuchElementException(s"No matching rule for base ${rhs}")
       }
 
-      postfix = postfix ::: rhs.filter(s => s.stype == SymbolType.Term)
+      postfix = postfix ::: rhs.filter(s =>
+        s.stype == SymbolType.Term && !"()".contains(s.name)
+      )
 
       stack.push(rule.get.lhs.head)
     }
@@ -54,7 +56,7 @@ class Parser(val grammar: Grammar, val table: ControlTable) {
       val s = stack.find(s => s.stype == SymbolType.Term).get
       if (s == table.boarder && chain(pos) == table.boarder) return postfix
 
-      println("pair: ", (s, chain(pos)), table.table((s, chain(pos))))
+      // println("pair: ", (s, chain(pos)), table.table((s, chain(pos))))
 
       table.table((s, chain(pos))) match {
         case PrecedenceType.Neighbors | PrecedenceType.Precedes => shift()
