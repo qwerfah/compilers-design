@@ -15,7 +15,7 @@ import scala.collection.immutable.SortedSet
 class XmlReader(filename: String) {
 
   private val _grammar: xml.Elem =
-    xml.XML.loadFile(File(".").toAbsolute + "\\resources\\" + filename)
+    xml.XML.loadFile(File(".").toAbsolute + "/resources/" + filename)
 
   /** Parse xml file content to context-free grammar.
     *  @return Context-free grammar object.

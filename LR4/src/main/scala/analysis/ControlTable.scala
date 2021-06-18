@@ -27,9 +27,7 @@ class ControlTable(var grammar: Grammar) {
       * @param rule Grammar rule that presumably contains required symbols.
       * @return Required terminal symbol or none if not found.
       */
-    def getNextTerm(
-        term: GrammarSymbol
-    )(rule: GrammarRule): Option[GrammarSymbol] = {
+    def getNextTerm(term: GrammarSymbol)(rule: GrammarRule): Option[GrammarSymbol] = {
       if (!rule.rhs.contains(term)) return None
 
       val ind = rule.rhs.indexOf(term)

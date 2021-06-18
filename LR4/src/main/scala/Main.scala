@@ -16,10 +16,16 @@ object Main extends App {
   val parser = new Parser(grammar, table)
 
   println
-  parser.parse(
-    new GrammarSymbol("id", SymbolType.Term) ::
+  val res = parser.parse(
+    new GrammarSymbol("id") ::
       new GrammarSymbol("+") ::
-      new GrammarSymbol("const", SymbolType.Term) ::
+      // new GrammarSymbol("(") ::
+      new GrammarSymbol("const") ::
+      new GrammarSymbol("==") ::
+      new GrammarSymbol("id") ::
+      // new GrammarSymbol(")") ::
       Nil
   )
+
+  res.foreach(s => print(s"${s.name} "))
 }
