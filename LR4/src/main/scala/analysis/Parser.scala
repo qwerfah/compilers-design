@@ -24,8 +24,6 @@ class Parser(val grammar: Grammar, val table: ControlTable) {
     }
 
     def conv(): Unit = {
-      println(stack)
-
       var rhs = stack.pop() :: Nil
 
       while (
@@ -38,8 +36,6 @@ class Parser(val grammar: Grammar, val table: ControlTable) {
       ) {
         rhs = stack.pop() +: rhs
       }
-
-      println("conv: ", rhs)
 
       val rule = grammar.rules.find(matchRule(rhs) _)
 
@@ -57,8 +53,6 @@ class Parser(val grammar: Grammar, val table: ControlTable) {
     while (true) {
       val s = stack.find(s => s.stype == SymbolType.Term).get
       if (s == table.boarder && chain(pos) == table.boarder) return postfix
-
-      println("pair: ", (s, chain(pos)), table.table((s, chain(pos))))
 
       table.table((s, chain(pos))) match {
         case PrecedenceType.Neighbors | PrecedenceType.Precedes => shift()
